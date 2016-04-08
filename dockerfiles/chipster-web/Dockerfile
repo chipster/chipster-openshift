@@ -1,7 +1,8 @@
-FROM java:8
+FROM chipster-web-server
 
-RUN mkdir /opt/chipster-web
-RUN chown -R chipster:chipster /opt/chipster-*
+USER 0
+
+RUN mkdir /opt/chipster-web && chmod ugo+rwx /opt/chipster-web
 
 USER 1001
 
