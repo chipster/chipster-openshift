@@ -2,7 +2,7 @@ FROM base
 
 WORKDIR /tmp/src
 
-RUN mkdir -p /opt/chipster/lib && chmod ugo+rwx /opt/chipster
+RUN mkdir -p /opt/chipster/lib && chmod ugo+rwx /opt/chipster /tmp/src
 
 USER 1001
 
