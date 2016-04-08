@@ -2,7 +2,7 @@ FROM chipster-jms
 
 WORKDIR /tmp/src
 
-RUN mkdir -p /opt/chipster-web-server/lib chmod -R ugo+rwx /opt/chipster-web-server
+RUN mkdir -p /opt/chipster-web-server/lib ; chmod -R ugo+rwx /opt/chipster-web-server
 
 RUN git clone --branch ${API_BRANCH:-openshift} https://github.com/chipster/chipster-web-server.git --depth=1
 
