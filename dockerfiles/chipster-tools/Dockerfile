@@ -5,7 +5,7 @@ USER 0
 RUN mkdir /opt/chipster-tools && chmod ugo+rwx /opt/chipster-tools
 
 # no need to build these projects, clone directly to /opt
-RUN cd /opt; git clone --branch ${TOOLS_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-tools.git --depth=1
+RUN cd /opt; git clone --branch ${TOOLS_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-tools.git --depth=1 && rm -rf chipster-tools/.git
 
 WORKDIR /opt/chipster-web-server
 

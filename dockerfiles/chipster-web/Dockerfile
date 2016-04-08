@@ -5,7 +5,7 @@ USER 0
 RUN mkdir /opt/chipster-web && chmod ugo+rwx /opt/chipster-web
 
 # no need to build these projects, clone directly to /opt
-RUN cd /opt; git clone --branch ${CLIENT_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-web.git --depth=1
+RUN cd /opt; git clone --branch ${CLIENT_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-web.git --depth=1 && rm -rf chipster-web/.git
 
 USER 1001
 
