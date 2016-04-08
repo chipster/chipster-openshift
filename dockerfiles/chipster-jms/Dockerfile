@@ -2,9 +2,7 @@ FROM base
 
 WORKDIR /tmp/src
 
-RUN mkdir -p /opt/chipster/lib && chmod ugo+rwx /opt/chipster /tmp/src
-
-USER 1001
+RUN mkdir -p /opt/chipster/lib && chmod ugo+rwx /opt/chipster
 
 # clone main projects to the tmp dir for building
 RUN git clone --branch ${CHIPSTER_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster.git --depth=1
