@@ -15,7 +15,7 @@ RUN echo $"{\n\
   "sessionDbEvents": "ws://session-db-events-${OPENSHIFT_BUILD_NAMESPACE}.dac-oso.csc.fi/",\n\
   "toolbox": "http://toolbox-${OPENSHIFT_BUILD_NAMESPACE}.dac-oso.csc.fi/"\n\
 }\n"\
->> /opt/chipster-web/js/json/config.json
+> /opt/chipster-web/js/json/config.json
 
 USER 1001
 
