@@ -190,7 +190,7 @@ spec:
       storage: 200G
 ' | oc create -f -
 
-
+#oc delete job download
 TOOLS_URL="http://bio.nic.funet.fi/pub/sci/molbio/chipster/dist/virtual_machines/3.7.2/tools/tools.tar.gz"
 echo '
 apiVersion: extensions/v1beta1
@@ -215,8 +215,8 @@ spec:
             claimName: tool-binaries
       containers:
       - name: download
-        image: base
-        command: ["bash", "-c", "df -h && cd /opt/chipster/tools && wget '$TOOLS_URL' -O - | tar -zx"]
+        image: 172.30.1.144:5000/chipster/base
+        command: ["bash", "-c", "df -h && cd /opt/chipster/tools && curl '$TOOLS_URL' | tar -zx"]
         volumeMounts:
            - name: volume-sjrxr
              mountPath: /opt/chipster/tools
