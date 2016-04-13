@@ -4,7 +4,7 @@ USER 0
 
 WORKDIR /tmp/src
 
-RUN mkdir -p /opt/chipster-web-server/lib && chmod -R ugo+rwx /opt/chipster-web-server
+RUN mkdir -p /opt/chipster-web-server/lib #&& chmod -R ugo+rwx /opt/chipster-web-server
 
 RUN git clone --branch ${SERVER_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-web-server.git --depth=1
 
