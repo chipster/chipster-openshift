@@ -8,7 +8,7 @@ RUN mkdir /opt/chipster-web && chmod ugo+rwx /opt/chipster-web
 RUN cd /opt; git clone --branch ${CLIENT_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-web.git --depth=1 && chmod -R ugo+rwx /opt/chipster-web && rm -rf chipster-web/.git
 
 # generate a client configuration
-RUN echo $'{\n\
+RUN echo '{\n\
   "proxies": ["http://session-db-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/"],\n\
   "auth": "http://auth-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/",\n\
   "fileBroker": "http://file-broker-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/",\n\

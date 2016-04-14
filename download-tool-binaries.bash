@@ -45,7 +45,7 @@ spec:
         # - redirect stderr to stdout for easier editing
         # - flush output buffer after each line (stdbuf -oL)
         # - curl prints a carriage return after each status line. Replace it with a new line character
-        command: ["bash", "-c", "df -h && cd /opt/chipster/tools && mkfifo /tmp/pipe && tar -zxf /tmp/pipe & curl '$TOOLS_URL' -o /tmp/pipe 2>&1 | stdbuf -oL tr '\''\r'\'' '\''\n'\''"]
+        command: ["bash", "-c", "df -h && cd /opt/chipster/tools && mkfifo /tmp/pipe && tar -zxf /tmp/pipe & curl '$TOOLS_URL' -o /tmp/pipe --keepalive-time 2 2>&1 | stdbuf -oL tr '\''\r'\'' '\''\n'\''"]
         #command: ["bash", "-c", "df -h && cd /opt/chipster/tools && curl '$TOOLS_URL' -o tools.tar.gz 2>&1 | stdbuf -oL tr '\''\r'\'' '\''\n'\''"]
         volumeMounts:
            - name: volume-sjrxr

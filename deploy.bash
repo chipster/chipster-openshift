@@ -178,4 +178,16 @@ oc new-app --name web --image-stream chipster-web \
 && oc expose dc/web --port=8080 && oc expose service web 
 
 
+oc set volume dc/auth --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/auth --add -t emptyDir --mount-path /opt/chipster-web-server/database
+oc set volume dc/service-locator --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/session-db --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/session-db --add -t emptyDir --mount-path /opt/chipster-web-server/database
+oc set volume dc/file-broker --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/file-broker --add -t emptyDir --mount-path /opt/chipster-web-server/storage
+oc set volume dc/scheduler --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/toolbox --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
+oc set volume dc/web --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 
