@@ -5,7 +5,7 @@ RUN apt-get update \
 # install the add-apt-repository command \
 && apt-get install -y python-software-properties \
 # install some generic tools
-&& apt-get install -y git-core ant nano dstat pv wget unzip \
+&& apt-get install -y ant nano dstat pv wget unzip \
 # add a java repository \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
 # update all packages \
