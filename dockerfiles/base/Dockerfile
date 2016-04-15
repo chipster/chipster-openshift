@@ -1,5 +1,15 @@
 FROM ubuntu:12.04
 
+# Fake a fuse install https://gist.github.com/henrik-muehe/6155333
+RUN apt-get install libfuse2 \
+&& cd /tmp ; apt-get download fuse \
+&& cd /tmp ; dpkg-deb -x fuse_* . \
+&& cd /tmp ; dpkg-deb -e fuse_* \
+&& cd /tmp ; rm fuse_*.deb \
+&& cd /tmp ; echo -en '#!/bin/bash\nexit 0\n' > DEBIAN/postinst \
+&& cd /tmp ; dpkg-deb -b . /fuse.deb \
+&& cd /tmp ; dpkg -i /fuse.deb
+
 # all in one RUN command to avoid extra image layers
 RUN apt-get update \
 # install the add-apt-repository command \
@@ -8,7 +18,7 @@ RUN apt-get update \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
 && apt-get update \
 # install some generic tools
-&& apt-get install -y nano dstat pv wget unzip openjdk-8-jdk \
+&& apt-get install -y nano dstat pv wget unzip openjdk-8-jdk openjdk-8-jre \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
