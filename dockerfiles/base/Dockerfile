@@ -6,6 +6,7 @@ RUN apt-get update \
 && apt-get install -y python-software-properties \
 # add a java repository \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
+&& apt-get update \
 # install some generic tools
 && apt-get install -y nano dstat pv wget unzip openjdk-8-jre openjdk-8-jre \
 # update all packages \
@@ -13,7 +14,7 @@ RUN apt-get update \
 # remove old java versions \
 && apt-get purge -y openjdk-6-* \
 && apt-get purge -y openjdk-7-* \
-# don't store the apt-get cache into the image \
+# don't store the apt-get cache to the image \
 && apt-get clean
 
 # install ant from binaries, because the apt-get package depends on openjdk-6
