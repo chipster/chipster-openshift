@@ -5,16 +5,24 @@ RUN apt-get update \
 # install the add-apt-repository command \
 && apt-get install -y python-software-properties \
 # install some generic tools
-&& apt-get install -y ant nano dstat pv wget unzip \
+&& apt-get install -y nano dstat pv wget unzip \
 # add a java repository \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
-# && apt-get purge -y openjdk-6-* \
+&& apt-get purge -y openjdk-6-* \
 && apt-get purge -y openjdk-7-* \
 # don't store the apt-get cache into the image \
 && apt-get clean
+
+RUN mkdir -p /opt && cd /opt \
+&& wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.tar.gz -O ant.tar.gz \
+&& tar -zxf ant.tar.gz
+
+ENV ANT_HOME=/opt/ant
+ENV PATH=$PATH:$ANT_HOME/bin 
+
 
 RUN apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
 RUN mkdir -p /opt && cd /opt \
