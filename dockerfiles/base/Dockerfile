@@ -16,6 +16,14 @@ RUN apt-get update \
 # don't store the apt-get cache into the image \
 && apt-get clean
 
+RUN apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
+RUN mkdir -p /opt && cd /opt \
+&& wget https://git-core.googlecode.com/files/git-1.8.1.2.tar.gz -O git.tar.gz \
+&& tar -zxf git.tar.gz \
+&& cd git \
+&& make prefix=/usr/local all
+&& make prefix=/usr/local install 
+
 # install gradle manually, because package installation fails in ubuntu:12.04 container
 RUN mkdir -p /opt && cd /opt \
 && wget https://services.gradle.org/distributions/gradle-2.13-rc-1-bin.zip -O gradle.zip \
