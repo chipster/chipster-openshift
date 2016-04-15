@@ -16,14 +16,14 @@ RUN apt-get update \
 # don't store the apt-get cache into the image \
 && apt-get clean
 
+# install ant from binaries, because the apt-get package depends on openjdk-6
 RUN mkdir -p /opt && cd /opt \
 && wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.tar.gz -O ant.tar.gz \
 && tar -zxf ant.tar.gz
-
 ENV ANT_HOME=/opt/ant
 ENV PATH=$PATH:$ANT_HOME/bin 
 
-
+# install git from sources, because package installation fails in ubuntu:12.04 container
 RUN apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
 RUN mkdir -p /opt && cd /opt \
 && wget https://git-core.googlecode.com/files/git-1.8.1.2.tar.gz -O git.tar.gz \
@@ -33,7 +33,7 @@ RUN mkdir -p /opt && cd /opt \
 && make prefix=/usr/local all \
 && make prefix=/usr/local install 
 
-# install gradle manually, because package installation fails in ubuntu:12.04 container
+# install gradle from binaries, because package installation fails in ubuntu:12.04 container
 RUN mkdir -p /opt && cd /opt \
 && wget https://services.gradle.org/distributions/gradle-2.13-rc-1-bin.zip -O gradle.zip \
 && unzip gradle.zip \
