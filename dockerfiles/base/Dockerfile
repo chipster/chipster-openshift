@@ -11,7 +11,7 @@ RUN apt-get update \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
-&& apt-get purge -y openjdk-6-* \
+# && apt-get purge -y openjdk-6-* \
 && apt-get purge -y openjdk-7-* \
 # don't store the apt-get cache into the image \
 && apt-get clean
