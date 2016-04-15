@@ -2,8 +2,10 @@ FROM ubuntu:12.04
 
 # all in one RUN command to avoid extra image layers
 RUN apt-get update \
+# install the add-apt-repository command \
+&& apt-get install -y python-software-properties \
 # install some generic tools
-&& apt-get install -y ant nano netcat dstat mbuffer pv \
+&& apt-get install -y ant nano dstat pv \
 # add a java repository \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
 # update all packages \
