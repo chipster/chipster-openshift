@@ -22,7 +22,7 @@ RUN mkdir -p /opt && cd /opt \
 && tar -zxf git.tar.gz \
 && ln -s git-* git \
 && cd git \
-&& make prefix=/usr/local all
+&& make prefix=/usr/local all \
 && make prefix=/usr/local install 
 
 # install gradle manually, because package installation fails in ubuntu:12.04 container
