@@ -1,5 +1,6 @@
 FROM ubuntu:12.04
 
+# install Oracle java, because openjdk installation fails in a container
 
 RUN apt-get update \
 && apt-get -y install python-software-properties \

@@ -16,3 +16,4 @@ EXPOSE 8080
 
 WORKDIR /opt/chipster-web-server  
 CMD java -cp lib/*: ${JAVA_CLASS:-fi.csc.chipster.rest.ServerLauncher}
+
