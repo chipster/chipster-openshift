@@ -21,8 +21,7 @@ RUN apt-get update \
 #&& cd /tmp ; dpkg -i /fuse.deb
 
 # all in one RUN command to avoid extra image layers
-RUN # install some generic tools \
-&& apt-get install -y nano dstat pv wget unzip \
+RUN apt-get install -y nano dstat pv wget unzip \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
