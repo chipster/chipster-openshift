@@ -1,7 +1,19 @@
-FROM java:8
+FROM ubuntu:12.04
 
-RUN apt-get update
-RUN apt-get install -y ant nano netcat dstat mbuffer pv && apt-get clean
+# all in one RUN command to avoid extra image layers
+RUN apt-get update \
+# install some generic tools
+&& apt-get install -y ant nano netcat dstat mbuffer pv \
+# add a java repository \
+&& add-apt-repository 'ppa:openjdk-r/ppa' \
+# update all packages \
+&& apt-get upgrade \
+# remove old java versions \
+&& apt-get purge -y openjdk-6-* \
+&& apt-get purge -y openjdk-7-* \
+# don't store the apt-get cache into the image \
+&& apt-get clean
+
 
 # install gradle manually, because the apt-get package depends on Java 7
 RUN mkdir -p /opt && cd /opt && wget https://services.gradle.org/distributions/gradle-2.13-rc-1-bin.zip -O gradle.zip && unzip gradle.zip && ln -s gradle-* gradle && rm gradle.zip
