@@ -4,10 +4,10 @@ FROM ubuntu:12.04
 RUN apt-get update \
 # install the add-apt-repository command \
 && apt-get install -y python-software-properties \
-# install some generic tools
-&& apt-get install -y nano dstat pv wget unzip \
 # add a java repository \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
+# install some generic tools
+&& apt-get install -y nano dstat pv wget unzip openjdk-8-jre openjdk-8-jre \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
