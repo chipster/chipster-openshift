@@ -72,3 +72,4 @@ spec:
 ' | oc create -f -
 
 oc set volume dc/comp --add -t pvc --mount-path /opt/chipster/tools --claim-name tool-binaries
+
