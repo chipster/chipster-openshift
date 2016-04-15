@@ -5,7 +5,7 @@ RUN apt-get update \
 # install the add-apt-repository command \
 && apt-get install -y python-software-properties \
 # install some generic tools
-&& apt-get install -y ant nano dstat pv wget unzip \
+&& apt-get install -y ant gradle nano dstat pv wget unzip \
 # add a java repository \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
 # update all packages \
@@ -16,12 +16,15 @@ RUN apt-get update \
 # don't store the apt-get cache into the image \
 && apt-get clean
 
-
 # install gradle manually, because the apt-get package depends on Java 7
-RUN mkdir -p /opt && cd /opt && wget https://services.gradle.org/distributions/gradle-2.13-rc-1-bin.zip -O gradle.zip && unzip gradle.zip && ln -s gradle-* gradle && rm gradle.zip
-ENV GRADLE_PATH=/opt/gradle/bin
-ENV PATH=$PATH:$GRADLE_PATH
-ENV TERM=xterm
+#RUN mkdir -p /opt && cd /opt \
+#&& wget https://services.gradle.org/distributions/gradle-2.13-rc-1-bin.zip -O gradle.zip \
+#&& unzip gradle.zip \
+#&& ln -s gradle-* gradle && rm gradle.zip
+
+#ENV GRADLE_PATH=/opt/gradle/bin
+#ENV PATH=$PATH:$GRADLE_PATH
+#ENV TERM=xterm
 
 #RUN update-java-alternatives --list
 #RUN update-java-alternatives -s java-1.8.0-openjdk-amd64
