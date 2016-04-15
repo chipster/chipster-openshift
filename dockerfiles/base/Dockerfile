@@ -8,7 +8,7 @@ RUN apt-get update \
 && add-apt-repository 'ppa:openjdk-r/ppa' \
 && apt-get update \
 # install some generic tools
-&& apt-get install -y nano dstat pv wget unzip openjdk-8-jre openjdk-8-jre \
+&& apt-get install -y nano dstat pv wget unzip openjdk-8-jdk \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
