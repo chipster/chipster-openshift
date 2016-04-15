@@ -20,6 +20,7 @@ RUN apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl
 RUN mkdir -p /opt && cd /opt \
 && wget https://git-core.googlecode.com/files/git-1.8.1.2.tar.gz -O git.tar.gz \
 && tar -zxf git.tar.gz \
+&& ln -s git-* git \
 && cd git \
 && make prefix=/usr/local all
 && make prefix=/usr/local install 
