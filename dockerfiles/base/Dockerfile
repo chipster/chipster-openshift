@@ -1,4 +1,4 @@
-FROM centos7
+FROM centos:7
 
 # all in one RUN command to avoid extra image layers
 # update all packages \
