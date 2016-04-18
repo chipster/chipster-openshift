@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 
 # install Oracle java, because openjdk installation fails in a container
 
-RUN apt-get update \
+#RUN apt-get update \
 #&& apt-get -y install python-software-properties \
 # accept Oracle's license \
 #&& echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections \
@@ -11,7 +11,8 @@ RUN apt-get update \
 #&& apt-get install -y oracle-java8-installer
 
 # all in one RUN command to avoid extra image layers
-RUN apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip \
+RUN apt-get update \
+&& apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip \
 # update all packages \
 && apt-get upgrade \
 # remove old java versions \
