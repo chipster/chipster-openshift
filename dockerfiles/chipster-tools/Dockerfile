@@ -24,4 +24,3 @@ WORKDIR /opt/chipster-web-server
 USER 1001
 
 CMD java -cp lib/*: ${JAVA_CLASS}
-
