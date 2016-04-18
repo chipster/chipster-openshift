@@ -3,7 +3,7 @@ FROM centos:7
 # all in one RUN command to avoid extra image layers
 # update all packages \
 RUN yum upgrade -y \
-&& yum install -y java-1.8.0-openjdk git ant gradle nano dstat pv wget unzip \
+&& yum install -y java-1.8.0-openjdk git ant gradle nano dstat pv wget unzip which \
 && yum clean all
 
 # there is no gradle package in centos7
