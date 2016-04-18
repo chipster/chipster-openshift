@@ -8,7 +8,12 @@ RUN \
 add-apt-repository 'deb http://nova.clouds.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse' \
 && apt-get update \
 # all the packages from the VM \
-&& apt-get install -y ghostscript fastx-toolkit python-pip python-numpy python-matplotlib python-zsi cython  \
+&& apt-get install -y ghostscript  \
+&& apt-get install -y fastx-toolkit \
+&& apt-get install -y python-pip \
+&& apt-get install -y python-matplotlib \
+&& apt-get install -y python-zsi \
+&& apt-get install -y cython  \
 && apt-get install -y libgd2-noxpm-dev python3-yaml libgfortran3 libcurl3 libglib2.0-0 libglu1-mesa libgsl0ldbl  \
 && apt-get install -y libpng12-0 libreadline6 libxml2 mesa-common-dev tcl tk xorg-dev unixodbc gawk libnetcdf6  \
 && apt-get install -y build-essential gfortran libcurl4-openssl-dev libglib2.0-dev libglu1-mesa-dev libgsl0-dev  \
