@@ -33,15 +33,18 @@ RUN apt-get install -y nano dstat pv wget unzip \
 # install ant from binaries, because the apt-get package depends on openjdk-6
 RUN mkdir -p /opt && cd /opt \
 && wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.tar.gz -O ant.tar.gz \
-&& tar -zxf ant.tar.gz
+&& tar -zxf ant.tar.gz \
+&& rm ant.tar.gz \
+&& ln -s apache-ant- ant
 ENV ANT_HOME=/opt/ant
-ENV PATH=$PATH:$ANT_HOME/bin 
+ENV PATH=$PATH:$ANT_HOME/bin
 
 # install git from sources, because package installation fails in ubuntu:12.04 container
 RUN apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential
 RUN mkdir -p /opt && cd /opt \
 && wget https://git-core.googlecode.com/files/git-1.8.1.2.tar.gz -O git.tar.gz \
 && tar -zxf git.tar.gz \
+&& rm git.tar.gz \
 && ln -s git-* git \
 && cd git \
 && make prefix=/usr/local all \
