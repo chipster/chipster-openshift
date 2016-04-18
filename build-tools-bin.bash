@@ -1,7 +1,6 @@
 #!/bin/bash
 
 DEPS="R-3.0.2"
-
 oc new-app --name tools-bin base~https://github.com/chipster/chipster-openshift.git \
 --context-dir build-tools-bin/$DEPS --allow-missing-imagestream-tags --strategy=docker \
 && oc delete dc/tools-bin
