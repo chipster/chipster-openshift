@@ -8,7 +8,7 @@ RUN \
 add-apt-repository 'deb http://nova.clouds.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse' \
 && apt-get update \
 # all the packages from the VM \
-&& apt-get install -y ghostscript  \
+#&& apt-get install -y ghostscript  \
 && apt-get install -y fastx-toolkit \
 && apt-get install -y python-pip \
 && apt-get install -y python-matplotlib \
