@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 # install Oracle java, because openjdk installation fails in a container
 
