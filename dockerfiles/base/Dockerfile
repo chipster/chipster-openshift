@@ -35,7 +35,7 @@ RUN mkdir -p /opt && cd /opt \
 && wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.tar.gz -O ant.tar.gz \
 && tar -zxf ant.tar.gz \
 && rm ant.tar.gz \
-&& ln -s apache-ant- ant
+&& ln -s apache-ant-* ant
 ENV ANT_HOME=/opt/ant
 ENV PATH=$PATH:$ANT_HOME/bin
 
