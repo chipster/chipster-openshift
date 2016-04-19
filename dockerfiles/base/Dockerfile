@@ -7,7 +7,7 @@ FROM ubuntu:16.04
 #&& yum install -y java-1.8.0-openjdk git ant gradle nano dstat pv wget unzip which \
 #&& yum clean all
 
-RUN apt-get udpate -y \ 
+RUN apt-get update -y \ 
 && apt-get upgrade -y \
 && apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip which \
 && apt-get clean
