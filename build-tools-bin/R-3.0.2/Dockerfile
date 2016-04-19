@@ -1,3 +1,5 @@
 FROM base
- 
-RUN apt-get build-dep -y r-base-dev
+
+# install R build dependencies 
+RUN apt-get build-dep -y r-base-dev \
+&& apt-get clean
