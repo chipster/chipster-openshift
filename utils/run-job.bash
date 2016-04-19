@@ -1,28 +1,22 @@
 #!/bin/bash
 
-DEPS="R-3.0.2"
-oc new-app --name tools-bin base~https://github.com/chipster/chipster-openshift.git \
---context-dir build-tools-bin/$DEPS --allow-missing-imagestream-tags --strategy=docker \
-&& oc delete dc/tools-bin
+set -e
 
-echo '
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: artefacts
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 4G
-' | oc create -f -
+if [ $# -eq 0 ]
+  then
+    echo "Usgae: run-job.bash JOB_NAME BASH_SCRIPT [IMAGE]"
+    exit 0
+fi
 
+if [ -z "$3" ]
+then
+  IMAGE="$3"
+else
+  IMAGE="base"
+fi
 
-JOB_NAME="build-tools-bin"
-BUILD_FILE="build-tools-bin/R-3.0.2.bash"
-CMD="$(cat $BUILD_FILE | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
-echo "$CMD"
+JOB_NAME="$1"
+CMD="$(cat "$2" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
 oc delete job $JOB_NAME
 echo '
 {
@@ -58,7 +52,7 @@ echo '
                 "containers": [
                     {
                         "name": "'$JOB_NAME'",
-                        "image": "172.30.1.144:5000/chipster/base",
+                        "image": "172.30.1.144:5000/chipster/'$IMAGE'",
                         "command": [
                             "bash",
                             "-c",
@@ -84,5 +78,7 @@ echo '
         }
     }
 }' > cmd3
-cat cmd1 cmd2 cmd3 | oc create -f - 
+cat cmd1 cmd2 cmd3 | oc create -f -
+rm cmd1 cmd2 cmd3
 
+bash $(dirname "${BASH_SOURCE[0]}")/follow-logs.bash $JOB_NAME
