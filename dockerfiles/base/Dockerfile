@@ -9,7 +9,7 @@ FROM ubuntu:16.04
 
 RUN apt-get update -y \ 
 && apt-get upgrade -y \
-&& apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip which \
+&& apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip \
 && apt-get clean
 
 # there is no gradle package in centos7
