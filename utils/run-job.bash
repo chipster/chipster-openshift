@@ -27,7 +27,7 @@ BASH_SCRIPT="$1"
 # - removing the path and file extension
 # - replacing underscores with dashes and 
 # - changing uppercase letters to lowercase
-JOB_NAME=build-$(basename $BASH_SCRIPT .bash | sed s/_/-/g | tr '[:upper:]' '[:lower:]')
+JOB_NAME=build-$(basename $BASH_SCRIPT .bash | tr '[:upper:]' '[:lower:]' | sed s/^a-z0-9/-/g | sed 's/\./-/g' )
 CMD="$(cat "$ENVS_FILE" "$BASH_SCRIPT" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
 
 if oc get job $JOB_NAME > /dev/null 2>&1 ; then

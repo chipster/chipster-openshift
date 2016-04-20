@@ -19,6 +19,10 @@ if oc get bc $NAME > /dev/null 2>&1 ; then
   oc delete bc/$NAME
 fi
 
+if oc get dc $NAME > /dev/null 2>&1 ; then
+  oc delete dc/$NAME
+fi
+
 oc new-app --name $NAME base~https://github.com/chipster/chipster-openshift.git \
 --context-dir $DOCKERFILE_DIR --allow-missing-imagestream-tags --strategy=docker \
 && oc delete dc/$NAME
