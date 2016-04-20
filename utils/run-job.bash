@@ -3,9 +3,9 @@
 set -e
 
 if [ $# -eq 0 ]
-  then
-    echo "Usgae: run-job.bash BASH_SCRIPT [IMAGE [ENVS_FILE]]"
-    exit 0
+then
+  echo "Usgae: run-job.bash BASH_SCRIPT [IMAGE [ENVS_FILE]]"
+  exit 0
 fi
 
 if [ -z "$2" ]
@@ -25,9 +25,9 @@ fi
 BASH_SCRIPT="$1"
 # generate valid job names from the script name by 
 # - removing the path and file extension
-# - replacing underscores with dashes and 
 # - changing uppercase letters to lowercase
-JOB_NAME=build-$(basename $BASH_SCRIPT .bash | tr '[:upper:]' '[:lower:]' | sed s/^a-z0-9/-/g | sed 's/\./-/g' )
+# - replacing any special characters with dashes 
+JOB_NAME=build3-$(basename $BASH_SCRIPT .bash | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z|0-9]/-/g' )
 CMD="$(cat "$ENVS_FILE" "$BASH_SCRIPT" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
 
 if oc get job $JOB_NAME > /dev/null 2>&1 ; then
@@ -106,6 +106,13 @@ echo '
 # delete the job in the end to prevent failed jobs to restart
 function finish {
   oc delete job $JOB_NAME
+  if [ $SUCCESS ]; then 
+    echo "JOB SUCCESSFUL"
+    exit 0
+  else
+    echo "JOB FAILED"
+    exit 1
+  fi  
 }
 trap finish EXIT
 
@@ -114,5 +121,4 @@ cat template-start job-command template-end | oc create -f -
 rm template-start job-command template-end
 
 bash $(dirname "${BASH_SOURCE[0]}")/follow-logs.bash $JOB_NAME
-
-echo "JOB SUCCESSFUL"
+SUCCESS=1

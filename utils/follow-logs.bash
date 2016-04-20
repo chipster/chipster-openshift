@@ -17,10 +17,15 @@ if [ $POD_COUNT != 1 ]; then
   exit 1
 fi
 
-# until oc logs $POD; do
+#until oc logs $POD; do
 # shorter output
 until oc logs $POD 2>&1 | cut -d ":" -f 3 ; test ${PIPESTATUS[0]} -eq 0; do
   sleep 2
 done
 
 oc logs $POD --follow
+
+sleep 1
+
+EXIT_CODE=$(oc get pod $POD -o json | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["status"]["containerStatuses"][0]["state"]["terminated"]["exitCode"];')
+exit $EXIT_CODE

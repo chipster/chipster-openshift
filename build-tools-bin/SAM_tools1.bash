@@ -9,6 +9,7 @@
   perl -pi -e 's/LIBCURSES=/#LIBCURSES=/g' Makefile
   make
   cd ..
-  mv samtools-1.2/ ${TOOLS_BIN_PATH}/
+  cp -r samtools-1.2 ${TOOLS_BIN_PATH}/
+  rm -rf samtools-1.2
   rm samtools-1.2.tar.bz2
   #ln -s ${TOOLS_PATH}/samtools-1.2 ${TOOLS_PATH}/samtools
