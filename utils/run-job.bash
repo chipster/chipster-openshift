@@ -23,10 +23,14 @@ else
 fi
 
 BASH_SCRIPT="$1"
+# generate valid job names from the script name by 
+# - removing the path and file extension
+# - replacing underscores with dashes and 
+# - changing uppercase letters to lowercase
 JOB_NAME=build-$(basename $BASH_SCRIPT .bash | sed s/_/-/g | tr '[:upper:]' '[:lower:]')
 CMD="$(cat "$ENVS_FILE" "$BASH_SCRIPT" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
 
-if oc get job $JOB_NAME 2>&1 > /dev/null ; then
+if oc get job $JOB_NAME > /dev/null 2>&1 ; then
   oc delete job $JOB_NAME
 fi
 
@@ -99,7 +103,7 @@ echo '
     }
 }' > template-end
 
-# delete the job to prevent failed jobs to restart
+# delete the job in the end to prevent failed jobs to restart
 function finish {
   oc delete job $JOB_NAME
 }
@@ -110,3 +114,5 @@ cat template-start job-command template-end | oc create -f -
 rm template-start job-command template-end
 
 bash $(dirname "${BASH_SOURCE[0]}")/follow-logs.bash $JOB_NAME
+
+echo "JOB SUCCESSFUL"

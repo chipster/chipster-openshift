@@ -11,8 +11,13 @@ set -e
 DOCKERFILE_DIR="$1"
 NAME="$2"
 
-oc delete is/$NAME
-oc delete bc/$NAME
+if oc get job is/$NAME > /dev/null 2>&1 ; then
+  oc delete is/$NAME
+fi
+
+if oc get job bc/$NAME > /dev/null 2>&1 ; then
+  oc delete bc/$NAME
+fi
 
 oc new-app --name $NAME base~https://github.com/chipster/chipster-openshift.git \
 --context-dir $DOCKERFILE_DIR --allow-missing-imagestream-tags --strategy=docker \
