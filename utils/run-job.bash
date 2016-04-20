@@ -23,7 +23,7 @@ else
 fi
 
 BASH_SCRIPT="$1"
-JOB_NAME=build-$BASH_SCRIPT
+JOB_NAME=build-$(basename $BASH_SCRIPT .bash | sed s/_/-/g | tr '[:upper:]' '[:lower:]')
 CMD="$(cat "$ENVS_FILE" "$BASH_SCRIPT" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
 
 if oc get job $JOB_NAME 2>&1 > /dev/null ; then
@@ -98,6 +98,13 @@ echo '
         }
     }
 }' > template-end
+
+# delete the job to prevent failed jobs to restart
+function finish {
+  oc delete job $JOB_NAME
+}
+trap finish EXIT
+
 cat template-start job-command template-end | oc create -f -
 #cat template-start job-command template-end
 rm template-start job-command template-end
