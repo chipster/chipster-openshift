@@ -22,4 +22,4 @@ bash utils/run-job.bash build-tools-bin/SAM_tools.bash base envs.bash
 
 bash utils/create-image.bash build-tools-bin/vcftools tools-bin-vcftools
 
-bash utils/run-job.bash build-tools-bin/vcftools.bash base envs.bash
+bash utils/run-job.bash build-tools-bin/vcftools.bash tools-bin-vcftools envs.bash
