@@ -1,4 +1,4 @@
 FROM base
   
-RUN apt-get install -y zlib-devel ncurses-dev \
+RUN apt-get install -y zlib1g-dev ncurses-dev \
 && apt-get clean

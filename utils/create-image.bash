@@ -6,16 +6,16 @@ if [ $# -eq 0 ]
     exit 0
 fi
 
-set -e
+set -ex
 
 DOCKERFILE_DIR="$1"
 NAME="$2"
 
-if oc get job is/$NAME > /dev/null 2>&1 ; then
+if oc get is $NAME > /dev/null 2>&1 ; then
   oc delete is/$NAME
 fi
 
-if oc get job bc/$NAME > /dev/null 2>&1 ; then
+if oc get bc $NAME > /dev/null 2>&1 ; then
   oc delete bc/$NAME
 fi
 
