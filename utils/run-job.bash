@@ -4,20 +4,32 @@ set -e
 
 if [ $# -eq 0 ]
   then
-    echo "Usgae: run-job.bash JOB_NAME BASH_SCRIPT [IMAGE]"
+    echo "Usgae: run-job.bash BASH_SCRIPT [IMAGE [ENVS_FILE]]"
     exit 0
+fi
+
+if [ -z "$2" ]
+then
+  IMAGE="base"
+else
+  IMAGE="$2"
 fi
 
 if [ -z "$3" ]
 then
-  IMAGE="$3"
+  ENVS_FILE=/dev/null
 else
-  IMAGE="base"
+  ENVS_FILE=$3
 fi
 
-JOB_NAME="$1"
-CMD="$(cat "$2" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
-oc delete job $JOB_NAME
+BASH_SCRIPT="$1"
+JOB_NAME=build-$BASH_SCRIPT
+CMD="$(cat "$ENVS_FILE" "$BASH_SCRIPT" | python -c 'import json,sys;str=sys.stdin.read();print(json.dumps(str))')"
+
+if oc get job $JOB_NAME 2>&1 > /dev/null ; then
+  oc delete job $JOB_NAME
+fi
+
 echo '
 {
     "kind": "Job",
@@ -47,6 +59,10 @@ echo '
                         "persistentVolumeClaim": {
                             "claimName": "artefacts"
                         }
+                    },
+                    {
+                        "name": "volume-empty-dir1",
+                        "emptyDir": { }
                     }
                 ],
                 "containers": [
@@ -56,9 +72,9 @@ echo '
                         "command": [
                             "bash",
                             "-c",
-                            ' > cmd1
+                            ' > template-start
                             
-echo "$CMD" > cmd2
+echo "$CMD" > job-command
 
 echo '
                         ],
@@ -67,18 +83,23 @@ echo '
                             {
                                 "name": "volume-sjrx3",
                                 "mountPath": "/mnt/artefacts"
+                            },
+                            {
+                                "name": "volume-empty-dir1",
+                                "mountPath": "/opt"
                             }
                         ],
                         "imagePullPolicy": "Always"
                     }
                 ],
                 "restartPolicy": "Never",
-                "terminationGracePeriodSeconds": 1
+                "terminationGracePeriodSeconds": 30
             }
         }
     }
-}' > cmd3
-cat cmd1 cmd2 cmd3 | oc create -f -
-rm cmd1 cmd2 cmd3
+}' > template-end
+cat template-start job-command template-end | oc create -f -
+#cat template-start job-command template-end
+rm template-start job-command template-end
 
 bash $(dirname "${BASH_SOURCE[0]}")/follow-logs.bash $JOB_NAME
