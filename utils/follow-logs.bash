@@ -27,5 +27,8 @@ oc logs $POD --follow
 
 sleep 1
 
-EXIT_CODE=$(oc get pod $POD -o json | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["status"]["containerStatuses"][0]["state"]["terminated"]["exitCode"];')
+until EXIT_CODE=$(oc get pod $POD -o json | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["status"]["containerStatuses"][0]["state"]["terminated"]["exitCode"];'); do
+  sleep 1
+done
+
 exit $EXIT_CODE
