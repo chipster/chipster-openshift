@@ -1,8 +1,9 @@
 FROM base
- 
-# install R build dependencies 
-# R itself
+  
+# dependencies of the R itself
 RUN apt-get build-dep -y r-base-dev \
-# R libs
+&& apt-get clean
+
+# dependencies of the R libs
 RUN apt-get install -y libxml2-dev \
 && apt-get clean
