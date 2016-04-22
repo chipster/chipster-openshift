@@ -17,7 +17,7 @@ libgfortran3 \
 libcurl3 \
 libglib2.0-0 \
 libglu1-mesa \
-libgsl0ldbl \
+libgsl-dev \ #libgsl0ldbl \
 libpng12-0 \
 libreadline6 \
 libxml2 \
@@ -27,7 +27,7 @@ tk \
 xorg-dev \
 unixodbc \
 gawk \
-libnetcdf6 \
+libnetcdf11 \ #libnetcdf6 \
 build-essential \
 gfortran \
 libcurl4-openssl-dev \
@@ -58,7 +58,7 @@ pigz \
 pbzip2 \
 dstat \
 xfsprogs \
-emacs23 \
+emacs24 \ #emacs23 \
 tree \
 #nfs-common \
 python-pip \
