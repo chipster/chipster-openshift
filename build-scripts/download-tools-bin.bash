@@ -10,3 +10,5 @@ curl $TOOLS_BIN_URL -o tools.tar.gz
 cat tools.tar.gz | pv -f | tar -zx
 
 rm tools.tar.gz
+
+ln -s $CHIPSTER_TOOLS_BIN_BUILD $CHIPSTER_TOOLS_BIN_PATH/../latest

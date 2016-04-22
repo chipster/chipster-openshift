@@ -15,3 +15,5 @@ tar -xf build/distributions/chipster-web-server.tar
 cp chipster-web-server/lib/*.jar $CHIPSTER_WEB_SERVER_PATH
 cd ..
 rm -rf chipster-web-server
+
+ln -s $CHIPSTER_WEB_SERVER_BUILD $CHIPSTER_WEB_SERVER_PATH/../latest

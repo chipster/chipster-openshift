@@ -17,3 +17,6 @@ echo '{\n\
   "toolbox": "http://toolbox-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/"\n\
 }\n'\
 > chipster-web/js/json/config.json
+
+
+ln -s $CHIPSTER_WEB_BUILD $CHIPSTER_WEB_PATH/../latest
