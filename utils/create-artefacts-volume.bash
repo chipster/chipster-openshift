@@ -10,5 +10,5 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: 250G
+      storage: 500G
 ' | oc create -f -

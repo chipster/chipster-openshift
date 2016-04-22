@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 mkdir -p $TOOLS_PATH
 cd $TOOLS_PATH
 
