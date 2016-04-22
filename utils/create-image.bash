@@ -2,8 +2,15 @@
 
 if [ $# -eq 0 ]
   then
-    echo "Usgae: create-image.bash DOCKERFILE_DIR NAME"
+    echo "Usgae: create-image.bash DOCKERFILE_DIR NAME [BASE_IMAGE]"
     exit 0
+fi
+
+if [ -z "$3" ]
+then
+  BASE_IMAGE="base"
+else
+  BASE_IMAGE=$3
 fi
 
 set -ex
@@ -23,7 +30,7 @@ if oc get dc $NAME > /dev/null 2>&1 ; then
   oc delete dc/$NAME
 fi
 
-oc new-app --name $NAME base~https://github.com/chipster/chipster-openshift.git \
+oc new-app --name $NAME $BASE_IMAGE~https://github.com/chipster/chipster-openshift.git \
 --context-dir $DOCKERFILE_DIR --allow-missing-imagestream-tags --strategy=docker \
 && oc delete dc/$NAME
 

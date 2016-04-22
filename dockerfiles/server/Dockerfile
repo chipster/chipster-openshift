@@ -7,7 +7,7 @@ RUN mkdir -p /opt/chipster-web-server && ln -s /mnt/artefacts/chipster-web-serve
 RUN ln -s /mnt/artefacts/chipster-web/${CHIPSTER_WEB_BUILD:-latest} /opt/chipster-web
 RUN ln -s /mnt/artefacts/chipster-tools/${CHIPSTER_TOOLS_BUILD:-latest} /opt/chipster-tools
 
-RUN chown -R /opt && chmod -R ugo+rwx /opt
+RUN chmod -R ugo+rwx /opt
 
 USER 1001
 
