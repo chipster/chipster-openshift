@@ -76,4 +76,4 @@ WORKDIR /opt/chipster-web-server
 
 USER 1001
 
-CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.comp.CompServer"]
+CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.comp.RestCompServer"]
