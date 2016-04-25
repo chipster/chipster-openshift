@@ -8,7 +8,7 @@ git clone --branch ${TOOLS_BRANCH:-openshift} --single-branch https://github.com
 rm -rf chipster-tools/.git
 
 mv chipster-tools/* .
-rmdir chipster-tools
+rm -rf chipster-tools
 
 cd $TOOLS_PATH/..
-ln -s $CHIPSTER_TOOLS_BUILD latest
+ln -s $TOOLS_BUILD latest
