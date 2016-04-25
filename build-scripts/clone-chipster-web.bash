@@ -7,6 +7,9 @@ git clone --branch ${CLIENT_BRANCH:-openshift} --single-branch https://github.co
 
 rm -rf chipster-web/.git
 
+mv chipster-web/* .
+rmdir chipster-web
+
 # generate a client configuration
 echo '{\n\
   "proxies": ["http://session-db-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/"],\n\
@@ -16,7 +19,7 @@ echo '{\n\
   "sessionDbEvents": "ws://session-db-events-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/",\n\
   "toolbox": "http://toolbox-'${OPENSHIFT_BUILD_NAMESPACE}'.dac-oso.csc.fi/"\n\
 }\n'\
-> chipster-web/js/json/config.json
+> js/json/config.json
 
-
-ln -s $CHIPSTER_WEB_BUILD $CHIPSTER_WEB_PATH/../latest
+cd $CHIPSTER_WEB_PATH/..
+ln -s $CHIPSTER_WEB_BUILD latest
