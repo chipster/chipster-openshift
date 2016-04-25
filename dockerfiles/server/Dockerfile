@@ -18,6 +18,8 @@ USER 1001
 
 EXPOSE 8080
 
-WORKDIR /opt/chipster-web-server  
-CMD ["java", "-cp",  "lib/*:", "${JAVA_CLASS:-fi.csc.chipster.rest.ServerLauncher}"]
+WORKDIR /opt/chipster-web-server
+
+ENTRYPOINT ["java", "-cp",  "lib/*:"]  
+CMD ["fi.csc.chipster.rest.ServerLauncher"]
 
