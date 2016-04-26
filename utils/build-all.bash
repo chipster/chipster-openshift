@@ -4,14 +4,15 @@ bash utils/create-image.bash dockerfiles/base base
 
 bash utils/create-arteafacts-volume.bash
 
-bash utils/run-job3.bash build-scripts/clone-chipster.bash
-bash utils/run-job3.bash build-scripts/build-chipster.bash
-bash utils/run-job3.bash build-scripts/build-chipster-web-server.bash
+bash utils/run-job3.bash build-scripts/clone-chipster.bash base openshift
+bash utils/run-job3.bash build-scripts/build-chipster.bash base latest_openshift
+# chipster-web-server branch and build of the old chipster project 
+bash utils/run-job3.bash build-scripts/build-chipster-web-server.bash base openshift latest_openshift
 
-bash utils/run-job3.bash build-scripts/clone-chipster-web.bash
-bash utils/run-job3.bash build-scripts/clone-chipster-tools.bash
+bash utils/run-job3.bash build-scripts/clone-chipster-web.bash base openshift
+bash utils/run-job3.bash build-scripts/clone-chipster-tools.bash base openshift
 
-bash utils/run-job3.bash build-scripts/download-tools-bin.bash
+bash utils/run-job3.bash build-scripts/download-tools-bin.bash base
 
 bash utils/create-image.bash dockerfiles/server server
 bash utils/create-image.bash dockerfiles/comp comp server

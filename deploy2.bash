@@ -15,14 +15,16 @@ then
   oc login
 fi
 
-oc project "$1"
+PROJECT=$1
+
+oc project "$PROJECT"
 
 if [ $? -eq 1 ]
 then
-  oc new-project "$1"
+  oc new-project "$PROJECT"
 fi
 
-if [[ $(oc project -q) != "$1" ]]
+if [[ $(oc project -q) != "$PROJECT" ]]
 then
   echo "failed to create the project"
   exit 1
@@ -39,7 +41,7 @@ set -x
 
 # deploy
 
-oc run auth --image 172.30.1.144:5000/chipster/server \
+oc run auth --image 172.30.1.144:5000/$PROJECT/server \
 --env JAVA_CLASS=fi.csc.chipster.auth.AuthenticationService \
 --env authentication_service_bind=http://0.0.0.0:8080/ \
 --expose --port 8080
@@ -50,7 +52,7 @@ oc set volume dc/auth --add -t emptyDir --mount-path /opt/chipster-web-server/da
 
 oc expose service auth
 
-oc run service-locator --image 172.30.1.144:5000/chipster/server \
+oc run service-locator --image 172.30.1.144:5000/$PROJECT/server \
 --env JAVA_CLASS=fi.csc.chipster.servicelocator.ServiceLocator \
 --env service_locator_bind=http://0.0.0.0:8080/ \
 --env authentication_service=http://auth:8080/ \
@@ -64,7 +66,7 @@ oc run service-locator --image 172.30.1.144:5000/chipster/server \
 oc set volume dc/service-locator --add -t pvc --mount-path /mnt/artefacts --claim-name artefacts
 oc set volume dc/service-locator --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 
-oc run session-db --image 172.30.1.144:5000/chipster/server \
+oc run session-db --image 172.30.1.144:5000/$PROJECT/server \
 --env JAVA_CLASS=fi.csc.chipster.sessiondb.SessionDb \
 --env session_db_bind=http://0.0.0.0:8080/ \
 --env session_db_events_bind=ws://0.0.0.0:8081/ \
@@ -106,7 +108,7 @@ oc set volume dc/session-db --add -t emptyDir --mount-path /opt/chipster-web-ser
 oc set volume dc/session-db --add -t emptyDir --mount-path /opt/chipster-web-server/database
 
 
-oc run file-broker --image 172.30.1.144:5000/chipster/server \
+oc run file-broker --image 172.30.1.144:5000/$PROJECT/server \
 --env JAVA_CLASS=fi.csc.chipster.filebroker.FileBroker \
 --env file_broker_bind=http://0.0.0.0:8080/ \
 --env service_locator=http://service-locator:8080/ \
@@ -119,7 +121,7 @@ oc set volume dc/file-broker --add -t emptyDir --mount-path /opt/chipster-web-se
 oc set volume dc/file-broker --add -t emptyDir --mount-path /opt/chipster-web-server/storage
 
 
-oc run scheduler --image 172.30.1.144:5000/chipster/server \
+oc run scheduler --image 172.30.1.144:5000/$PROJECT/server \
 --env JAVA_CLASS=fi.csc.chipster.scheduler.Scheduler \
 --env scheduler_bind=ws://0.0.0.0:8080/ \
 --env service_locator=http://service-locator:8080/ \
@@ -129,7 +131,7 @@ oc set volume dc/scheduler --add -t pvc --mount-path /mnt/artefacts --claim-name
 oc set volume dc/scheduler --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 
 
-oc run toolbox --image 172.30.1.144:5000/chipster/server \
+oc run toolbox --image 172.30.1.144:5000/$PROJECT/server \
 --env JAVA_CLASS=fi.csc.chipster.toolbox.ToolboxService \
 --env toolbox_bind_url=http://0.0.0.0:8080/ \
 --env service_locator=http://service-locator:8080/ \
@@ -141,19 +143,21 @@ oc set volume dc/toolbox --add -t pvc --mount-path /mnt/artefacts --claim-name a
 oc set volume dc/toolbox --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 
 
-oc new-app --name comp --image-stream chipster-tools \
+oc run comp --image 172.30.1.144:5000/$PROJECT/comp \
 --env JAVA_CLASS=fi.csc.chipster.comp.RestCompServer \
---env service_locator=http://service-locator:8080/ \
---allow-missing-imagestream-tags
+--env service_locator=http://service-locator:8080/
 
-oc new-app --name web --image-stream chipster-web \
---env web_bind=http://0.0.0.0:8080/ \
---allow-missing-imagestream-tags \
-&& oc expose dc/web --port=8080 && oc expose service web 
-
-
-
+oc set volume dc/comp --add -t pvc --mount-path /mnt/artefacts --claim-name artefacts
 oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
+
+oc run web --image 172.30.1.144:5000/$PROJECT/server \
+--env JAVA_CLASS=fi.csc.chipster.web.WebServer \
+--env web_bind=http://0.0.0.0:8080/ \
+--expose --port 8080
+
+oc expose service web 
+
+oc set volume dc/web --add -t pvc --mount-path /mnt/artefacts --claim-name artefacts
 oc set volume dc/web --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 

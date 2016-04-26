@@ -6,18 +6,28 @@ EXIT_CODE=1
 
 if [ $# -eq 0 ]
 then
-  echo "Usgae: run-job.bash BASH_SCRIPT [IMAGE]"
+  echo "Usgae: run-job.bash BASH_SCRIPT IMAGE"
   exit 0
 fi
 
-if [ -z "$2" ]
+if [ -z "$1" ]
 then
-  IMAGE="base"
-else
-  IMAGE="$2"
+  echo "BASH_SCRIPT parameter missing"
+  exit 1
 fi
 
 BASH_SCRIPT="$1"
+shift
+
+if [ -z "$1" ]
+then
+  echo "IMAGE parameter missing"
+  exit 1 
+fi
+
+IMAGE="$1"
+shift
+
 # generate valid job names from the script name by 
 # - removing the path and file extension
 # - changing uppercase letters to lowercase
@@ -98,7 +108,7 @@ function get_running_pods {
 }
 
 until test $(get_running_pods | wc -l ) -eq 1 ; do
-  echo "Waiting until there is 1 running pod"
+  echo "Waiting for pod"
   sleep 2
 done
 
@@ -127,6 +137,6 @@ function finish {
 trap finish EXIT
 
 echo "** Run"
-oc exec $POD -- bash -c "source /tmp/job/envs.bash && source /tmp/job/$BASH_SCRIPT"
+oc exec $POD -- bash -c "source /tmp/job/envs.bash && source /tmp/job/$BASH_SCRIPT $@"
 
 EXIT_CODE=$?

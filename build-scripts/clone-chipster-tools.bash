@@ -1,14 +1,18 @@
 #!/bin/bash
 
-mkdir -p $TOOLS_PATH
-cd $TOOLS_PATH
+BRANCH=${1:-openshift}
 
-git clone --branch ${TOOLS_BRANCH:-openshift} --single-branch https://github.com/chipster/chipster-tools.git --depth=1 
+cd $CHIPSTER_TOOLS_BUILDS
+BUILD=$(get_next_build)_$BRANCH
+
+mkdir -p $TMPDIR_PATH/build 
+cd $TMPDIR_PATH/build
+
+git clone --branch $BRANCH --single-branch https://github.com/chipster/chipster-tools.git --depth=1 
 
 rm -rf chipster-tools/.git
 
-mv chipster-tools/* .
-rm -rf chipster-tools
+mv chipster-tools $CHIPSTER_TOOLS_BUILDS/$BUILD
 
-cd $TOOLS_PATH/..
-ln -s $TOOLS_BUILD latest
+cd $CHIPSTER_TOOLS_BUILDS
+create_links $BUILD $BRANCH
