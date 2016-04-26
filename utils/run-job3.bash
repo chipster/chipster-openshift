@@ -137,6 +137,6 @@ function finish {
 trap finish EXIT
 
 echo "** Run"
-oc exec $POD -- bash -c "source /tmp/job/envs.bash && source /tmp/job/$BASH_SCRIPT $@"
+oc exec $POD -- bash -c "source /tmp/job/build-scripts/envs.bash && source /tmp/job/$BASH_SCRIPT $@"
 
 EXIT_CODE=$?
