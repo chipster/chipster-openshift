@@ -6,18 +6,9 @@ EXIT_CODE=1
 
 if [ $# -eq 0 ]
 then
-  echo "Usgae: run-job.bash BASH_SCRIPT IMAGE"
+  echo "Usgae: run-job.bash IMAGE INIT_SCRIPT JOB_SCRIPT [JOB_SCRIPT_ARGS...]"
   exit 0
 fi
-
-if [ -z "$1" ]
-then
-  echo "BASH_SCRIPT parameter missing"
-  exit 1
-fi
-
-BASH_SCRIPT="$1"
-shift
 
 if [ -z "$1" ]
 then
@@ -28,11 +19,30 @@ fi
 IMAGE="$1"
 shift
 
+if [ -z "$1" ]
+then
+  echo "INIT_SCRIPT parameter missing"
+  exit 1
+fi
+
+INIT_SCRIPT="$1"
+shift
+
+if [ -z "$1" ]
+then
+  echo "JOB_SCRIPT parameter missing"
+  exit 1
+fi
+
+JOB_SCRIPT="$1"
+shift
+
+
 # generate valid job names from the script name by 
 # - removing the path and file extension
 # - changing uppercase letters to lowercase
 # - replacing any special characters with dashes 
-JOB_NAME=job-$(basename $BASH_SCRIPT .bash | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z|0-9]/-/g' )
+JOB_NAME=job-$(basename $JOB_SCRIPT .bash | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z|0-9]/-/g' )
 
 if oc get job $JOB_NAME > /dev/null 2>&1 ; then
   oc delete job $JOB_NAME
@@ -137,6 +147,6 @@ function finish {
 trap finish EXIT
 
 echo "** Run"
-oc exec $POD -- bash -c "source /tmp/job/build-scripts/envs.bash && source /tmp/job/$BASH_SCRIPT $@"
+oc exec $POD bash /tmp/job/utils/bootstrap.bash $INIT_SCRIPT $JOB_SCRIPT "$@"
 
 EXIT_CODE=$?

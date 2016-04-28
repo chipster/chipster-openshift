@@ -15,7 +15,7 @@ git clone --branch $BRANCH --single-branch https://github.com/chipster/chipster-
 cd chipster-web-server
 cp $CHIPSTER_BUILDS/$CHIPSTER_BUILD/chipster-*.jar .
 gradle distTar
-tar -xf build/distributions/chipster-web-server.tar
+tar -zxf build/distributions/chipster-web-server.tar.gz
 mkdir -p $CHIPSTER_WEB_SERVER_BUILDS/$BUILD
 cp chipster-web-server/lib/*.jar $CHIPSTER_WEB_SERVER_BUILDS/$BUILD
 
