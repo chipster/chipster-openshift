@@ -36,4 +36,16 @@ function create_links {
   ln -s $BUILD latest_$BRANCH
 }
 
+function json_dict_edit {
+  JSON_FILE=$1
+  KEY=$2
+  VALUE=$3
+  cat $JSON_FILE | python -c '
+import json,sys
+obj=json.load(sys.stdin)
+obj["'$KEY'"]="'$VALUE'"
+print(json.dumps(obj))
+' > $JSON_FILE
+}
+
 set -ex

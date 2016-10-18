@@ -1,23 +1,14 @@
-#FROM centos:7
 FROM ubuntu:16.04
-
-# all in one RUN command to avoid extra image layers
-# update all packages \
-#RUN yum upgrade -y \
-#&& yum install -y java-1.8.0-openjdk git ant nano dstat pv wget unzip which \
-#&& yum clean all
 
 RUN apt-get update -y \ 
 && apt-get upgrade -y \
-&& apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip bzip2 curl build-essential \
+&& apt-get install -y openjdk-8-jdk git ant gradle nano dstat pv wget unzip bzip2 curl build-essential liblz4-tool parallel\
+&& curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+&& apt-get install -y nodejs \
 && apt-get clean
 
-# there is no gradle package in centos7
-#RUN mkdir -p /opt && cd /opt \
-#&& wget https://services.gradle.org/distributions/gradle-2.13-rc-1-bin.zip -O gradle.zip \
-#&& unzip gradle.zip \
-#&& ln -s gradle-* gradle && rm gradle.zip
-#ENV GRADLE_PATH=/opt/gradle/bin
-#ENV PATH=$PATH:$GRADLE_PATH
+# OpenShift gives a random uid for the user and some programs (e.g. dstat) try to find a username from the /etc/passwd.
+# Let user to fix it, but obviously this shouldn't be run outside OpenShift
+RUN chmod ug+rw /etc/passwd
 
 CMD sleep inf
