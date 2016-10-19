@@ -10,6 +10,7 @@ RUN cd /tmp/build/chipster-web-server \
 	&& mkdir -p /opt/chipster-web-server/lib \
 	&& mv *.jar /opt/chipster-web-server/lib \
 	&& mv chipster-web-server/lib/*.jar /opt/chipster-web-server/lib \
+	&& mv conf /opt/chipster-web-server/ \
  	&& chmod -R ugo+rwx /opt/chipster-web-server \
  	&& rm -rf /tmp/build/chipster-web-server
 
