@@ -16,7 +16,7 @@ oc logs -f bc/chipster
 oc new-build https://github.com/chipster/chipster-web-server.git -D - < dockerfiles/chipster-web-server/Dockerfile && \
 oc logs -f bc/chipster-web-server
 
-for component in auth file-broker scheduler service-locator session-db; do
+for component in auth file-broker scheduler service-locator session-db session-worker; do
 	oc new-build --name=$component -D - < dockerfiles/$component/Dockerfile
 done
 

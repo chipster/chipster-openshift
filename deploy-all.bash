@@ -110,6 +110,15 @@ oc set volume dc/scheduler --add -t emptyDir --mount-path /opt/chipster-web-serv
 oc expose dc scheduler --port=8006
 
 
+oc new-app session-worker \
+-e service_locator=http://service-locator:8003
+
+oc set volume dc/session-worker --add -t emptyDir --mount-path /opt/chipster-web-server/logs
+ 
+oc expose dc session-worker --port=8009 &&\
+oc expose service session-worker
+
+
 oc new-app toolbox
 
 oc expose service toolbox
