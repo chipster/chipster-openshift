@@ -65,7 +65,9 @@ oc new-app service-locator \
 -e file_broker_pub=http://file-broker-$PROJECT.$DOMAIN/ \
 -e scheduler=ws://scheduler:8006/ \
 -e toolbox_url=http://toolbox:8008/ \
--e toolbox_url_pub=http://toolbox-$PROJECT.$DOMAIN/
+-e toolbox_url_pub=http://toolbox-$PROJECT.$DOMAIN/ \
+-e session_worker=http://session-worker:8009/ \
+-e session_worker_pub=http://session-worker-$PROJECT.$DOMAIN/
 
 oc set volume dc/service-locator --add -t emptyDir --mount-path /opt/chipster-web-server/logs
 
@@ -95,7 +97,7 @@ oc new-app file-broker \
 
 oc set volume dc/file-broker --add -t emptyDir --mount-path /opt/chipster-web-server/logs &&\
 oc set volume dc/file-broker --add --name storage -t pvc --mount-path /opt/chipster-web-server/storage \
---claim-name=file-broker-storage --claim-size=4G --overwrite
+--claim-name=file-broker-storage --claim-size=100G --overwrite
 
 oc expose dc file-broker --port=8007 &&\
 oc expose service file-broker
