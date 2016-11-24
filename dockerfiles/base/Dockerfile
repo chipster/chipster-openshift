@@ -11,4 +11,7 @@ RUN apt-get update -y \
 # Let user to fix it, but obviously this shouldn't be run outside OpenShift
 RUN chmod ug+rw /etc/passwd
 
+# needed for the client builds and takes some time to install
+RUN npm install -g angular-cli
+
 CMD sleep inf
