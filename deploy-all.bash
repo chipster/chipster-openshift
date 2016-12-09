@@ -92,8 +92,11 @@ function create_secret {
   if [[ $(oc get secret $secret_name) ]]; then
   	oc delete secret $secret_name  
   fi
-  // copy the old config file for comp, because mounting the secret will hide other files in the conf dir
-  oc create secret generic $secret_name --from-file=chipster.yaml=conf/${service}.yaml --from-file=comp-chipster-config.xml=../chipster-web-server/conf/comp-chipster-config.xml  
+  # copy the old config file for comp, because mounting the secret will hide other files in the conf dir
+  oc create secret generic $secret_name \
+  	--from-file=chipster.yaml=conf/${service}.yaml \
+  	--from-file=comp-chipster-config.xml=../chipster-web-server/conf/comp-chipster-config.xml \
+  	--from-file=jaas.config=../chipster-web-server/conf/jaas.config
 }
 
 create_secret auth
@@ -123,6 +126,7 @@ function deploy_service {
 # oc delete route auth && oc delete service auth && oc delete pvc auth-database
 deploy_service auth
 oc set volume dc/auth --add --name database -t pvc --mount-path /opt/chipster-web-server/database --claim-name=auth-database --claim-size=1G --overwrite
+oc set volume dc/auth --add --name security -t pvc --mount-path /opt/chipster-web-server/security --claim-name=auth-security --claim-size=1G --overwrite
 oc expose dc auth --port=8002
 oc expose service auth
 
@@ -199,4 +203,6 @@ echo 'echo "chipster:x:$(id -u):$(id -g)::/tmp:/bin/bash" >> /etc/passwd'
 echo '------------------------------------------------------------------------------'
 echo '# 2) Finally go to the OpenShift's Configuration tab of each build which has a GitHub source, copy the Github webhook URL' 
 echo '# and paste it to the GitHub's settings page of the repository. Disable the GitHub's SSL check in the webhook's settings.'
+echo '------------------------------------------------------------------------------'
+echo '# 3) Configure user accounts in /opt/chipster-web-server/security/users on auth'
 echo '------------------------------------------------------------------------------'
