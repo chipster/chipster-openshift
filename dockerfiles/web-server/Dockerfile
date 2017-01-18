@@ -19,7 +19,7 @@ USER 1000
 
 RUN cd /tmp/build/chipster-web \
 	&& HOME=/tmp/build/home \
-	&& sed -i "/export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/app/app.constants.ts \	
+	&& sed -i "/export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/app/core/app.constants.ts \	
 	&& npm install \
 	&& ng build || true \	
 	&& cp -r dist/* /opt/chipster-web/ \

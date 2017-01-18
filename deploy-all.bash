@@ -60,19 +60,19 @@ create_password file-broker
 create_password session-worker
 create_password proxy
 
-echo "authentication-service: http://auth:8002/
-authentication-service-pub: http://auth-$PROJECT.$DOMAIN/
-session-db: http://session-db:8004/
-session-db-events: ws://session-db-events:8005/
-session-db-pub: http://session-db-$PROJECT.$DOMAIN/
-session-db-events-pub: ws://session-db-events-$PROJECT.$DOMAIN/
-file-broker: http://file-broker:8007/
-file-broker-pub: http://file-broker-$PROJECT.$DOMAIN/
-scheduler: ws://scheduler:8006/
-toolbox-url: http://toolbox:8008/
-toolbox-url-pub: http://toolbox-$PROJECT.$DOMAIN/
-session-worker: http://session-worker:8009/
-session-worker-pub: http://session-worker-$PROJECT.$DOMAIN/" >> conf/service-locator.yaml
+echo "authentication-service: http://auth:8002
+authentication-service-pub: http://auth-$PROJECT.$DOMAIN
+session-db: http://session-db:8004
+session-db-events: ws://session-db-events:8005
+session-db-pub: http://session-db-$PROJECT.$DOMAIN
+session-db-events-pub: ws://session-db-events-$PROJECT.$DOMAIN
+file-broker: http://file-broker:8007
+file-broker-pub: http://file-broker-$PROJECT.$DOMAIN
+scheduler: ws://scheduler:8006
+toolbox-url: http://toolbox:8008
+toolbox-url-pub: http://toolbox-$PROJECT.$DOMAIN
+session-worker: http://session-worker:8009
+session-worker-pub: http://session-worker-$PROJECT.$DOMAIN" >> conf/service-locator.yaml
 
 echo "service-locator: http://service-locator:8003" >> conf/session-db.yaml
 echo "service-locator: http://service-locator:8003" >> conf/file-broker.yaml
@@ -83,6 +83,7 @@ echo "service-locator: http://service-locator:8003" >> conf/comp.yaml
 echo "toolbox-url: http://toolbox:8008" >> conf/comp.yaml
 
 # deployment assumes that there is a configuration secret for each service
+touch conf/auth.yaml
 touch conf/toolbox.yaml
 touch conf/web-server.yaml
 
