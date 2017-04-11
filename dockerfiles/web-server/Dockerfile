@@ -6,9 +6,9 @@ RUN mkdir -p /tmp/build/home /tmp/build/chipster-web /opt/chipster-web \
 	&& chmod ugo+rwx -R /tmp/build /opt/chipster-web \
 	&& HOME=/tmp/build/home \
 	&& cd /tmp/build/chipster-web \
-	&& npm install -g angular-cli \
+	&& npm install -g @angular/cli \
 	&& npm install -g bower \
-	&& npm install angular-cli
+	&& npm install @angular/cli
 
 COPY . /tmp/build/chipster-web
 
@@ -19,7 +19,7 @@ USER 1000
 
 RUN cd /tmp/build/chipster-web \
 	&& HOME=/tmp/build/home \
-	&& sed -i "/export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/app/core/app.constants.ts \	
+	&& sed -i "/export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/assets/app.constants.ts \	
 	&& npm install \
 	&& ng build || true \	
 	&& cp -r dist/* /opt/chipster-web/ \
