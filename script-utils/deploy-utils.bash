@@ -99,5 +99,5 @@ function add_volume {
   	  oc delete pvc $service-$volume_name
     fi
 
-	retry oc set volume dc/$service --add --name $volume_name -t pvc --mount-path /opt/chipster-web-server/$volume_name --claim-name=$service-$volume_name --claim-size=$size --overwrite
+	retry oc set volume dc/$service --add --name $service-$volume_name -t pvc --mount-path /opt/chipster-web-server/$volume_name --claim-name=$service-$volume_name --claim-size=$size --overwrite
 }

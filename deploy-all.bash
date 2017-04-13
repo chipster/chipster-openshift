@@ -9,9 +9,15 @@ echo
 echo "Deploy all for $PROJECT.$DOMAIN"
 echo
 
-if [[ $(oc get dc) ]] || [[ $(oc get service) ]] || [[ $(oc get routes) ]] || [[ $(oc get pvc) ]]; then
+if [[ $(oc get dc) ]] || [[ $(oc get service) ]] || [[ $(oc get routes) ]] ; then
   echo "The project is not empty. Run the following command to remove all deployments:"
-  echo "oc delete dc --all; oc delete service --all; oc delete routes --all; oc delete pods --all; oc delete pvc --all"
+  echo ""
+  echo "    oc delete dc --all; oc delete service --all; oc delete routes --all; oc delete pods --all"
+  echo ""
+  echo "and if your want to remove volumes too:"
+  echo ""
+  echo "    oc delete pvc --all"
+  echo ""
   exit 1
 fi 
 
@@ -24,7 +30,7 @@ add_volume auth security 1G
 
 deploy_java_service service-locator fi.csc.chipster.servicelocator.ServiceLocator
 
-# oc delete route session-db-events
+# oc delete route session-db-events && oc delete service session-db-events
 deploy_java_service session-db fi.csc.chipster.sessiondb.SessionDb
 add_volume session-db database 1G
 oc expose dc session-db --port=8005 --name session-db-events
@@ -46,8 +52,8 @@ deploy_service web-server
 oc expose service web-server --hostname=$PROJECT.$DOMAIN
  
 deploy_service comp
-# retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tool
-retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
+retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tool
+# retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
 retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
 
 # for tools-bin download
