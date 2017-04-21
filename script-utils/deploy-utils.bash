@@ -74,7 +74,7 @@ function deploy_js_service {
   
   delete_service $service
   
-  oc new-app chipster-web-server-js -e JS_FILE=$service.js --name $service
+  oc new-app chipster-web-server-js --name $service
   
   configure_service $service
 }
