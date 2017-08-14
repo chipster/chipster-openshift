@@ -12,4 +12,6 @@ RUN apt-get update -y \
 # Let user to fix it, but obviously this shouldn't be run outside OpenShift
 RUN chmod ug+rw /etc/passwd
 
+WORKDIR /home/user
+
 CMD sleep inf

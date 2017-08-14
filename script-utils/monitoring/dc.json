@@ -1,0 +1,158 @@
+{
+    "kind": "DeploymentConfig",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "comp",
+        "namespace": "chipster-dev",
+        "selfLink": "/oapi/v1/namespaces/chipster-dev/deploymentconfigs/comp",
+        "uid": "8e33ef2b-1ea1-11e7-80a4-fa163e1e1e81",
+        "resourceVersion": "24399759",
+        "generation": 62,
+        "creationTimestamp": "2017-04-11T10:28:08Z",
+        "labels": {
+            "app": "comp"
+        },
+        "annotations": {
+            "openshift.io/generated-by": "OpenShiftNewApp"
+        }
+    },
+    "spec": {
+        "strategy": {
+            "type": "Rolling",
+            "rollingParams": {
+                "updatePeriodSeconds": 1,
+                "intervalSeconds": 1,
+                "timeoutSeconds": 600,
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+            },
+            "resources": {}
+        },
+        "triggers": [
+            {
+                "type": "ConfigChange"
+            },
+            {
+                "type": "ImageChange",
+                "imageChangeParams": {
+                    "automatic": true,
+                    "containerNames": [
+                        "comp"
+                    ],
+                    "from": {
+                        "kind": "ImageStreamTag",
+                        "namespace": "chipster-dev",
+                        "name": "comp:latest"
+                    },
+                    "lastTriggeredImage": "172.30.130.41:5000/chipster-dev/comp@sha256:84baad1dca73177607e042040cae6e6e92ec7048d6a0d743300f5ab61e665426"
+                }
+            }
+        ],
+        "replicas": 2,
+        "test": false,
+        "selector": {
+            "app": "comp",
+            "deploymentconfig": "comp"
+        },
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "comp",
+                    "deploymentconfig": "comp"
+                },
+                "annotations": {
+                    "openshift.io/container.comp.image.entrypoint": "[\"java\",\"-cp\",\"lib/*:\",\"fi.csc.chipster.comp.RestCompServer\"]",
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "volumes": [
+                    {
+                        "name": "volume-j7qqm",
+                        "emptyDir": {}
+                    },
+                    {
+                        "name": "volume-6m9xe",
+                        "secret": {
+                            "secretName": "comp-conf"
+                        }
+                    },
+                    {
+                        "name": "volume-r3wk8",
+                        "persistentVolumeClaim": {
+                            "claimName": "tools"
+                        }
+                    },
+                    {
+                        "name": "volume-myhxs",
+                        "emptyDir": {}
+                    }
+                ],
+                "containers": [
+                    {
+                        "name": "comp",
+                        "image": "172.30.130.41:5000/chipster-dev/comp@sha256:84baad1dca73177607e042040cae6e6e92ec7048d6a0d743300f5ab61e665426",
+                        "resources": {
+                            "limits": {
+                                "cpu": "1900m",
+                                "memory": "7Gi"
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "name": "volume-j7qqm",
+                                "mountPath": "/opt/chipster-web-server/logs"
+                            },
+                            {
+                                "name": "volume-6m9xe",
+                                "mountPath": "/opt/chipster-web-server/conf"
+                            },
+                            {
+                                "name": "volume-r3wk8",
+                                "mountPath": "/mnt/tools"
+                            },
+                            {
+                                "name": "volume-myhxs",
+                                "mountPath": "/opt/chipster-web-server/jobs-data"
+                            }
+                        ],
+                        "terminationMessagePath": "/dev/termination-log",
+                        "imagePullPolicy": "Always"
+                    },
+                    {
+                        "name": "status",
+                        "image": "172.30.130.41:5000/chipster-dev/base",
+                        "resources": {
+                            "limits": {
+                                "cpu": "100m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "imagePullPolicy": "Always"
+                    }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {}
+            }
+        }
+    },
+    "status": {
+        "latestVersion": 51,
+        "observedGeneration": 62,
+        "replicas": 2,
+        "updatedReplicas": 2,
+        "availableReplicas": 2,
+        "details": {
+            "message": "config change",
+            "causes": [
+                {
+                    "type": "ConfigChange"
+                }
+            ]
+        }
+    }
+}

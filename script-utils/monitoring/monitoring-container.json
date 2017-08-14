@@ -1,0 +1,20 @@
+{
+    "spec": {
+        "containers": [
+            {
+            },
+            {
+                "name": "status",
+                "image": "172.30.130.41:5000/chipster-dev/monitoring",
+                "resources": {
+                    "limits": {
+                        "cpu": "100m",
+                        "memory": "1Gi"
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "imagePullPolicy": "Always"
+            }
+        ]
+    }
+}
