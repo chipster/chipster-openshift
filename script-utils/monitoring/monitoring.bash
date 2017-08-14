@@ -6,7 +6,7 @@ token=$(echo "$auth_resp" | grep tokenKey | cut -d '"' -f 4 )
 echo token $token
 while true; do
 
-  status=$(curl localhost:8012/admin/status?pretty -u token:${token} | grep ":")
+  status=$(curl  -s -S localhost:8012/admin/status?pretty -u token:${token} | grep ":")
 
   echo status "$status"
 
