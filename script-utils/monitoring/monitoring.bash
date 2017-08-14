@@ -1,6 +1,6 @@
 influxdb="http://influxdb:8086"
 role="comp"
-auth_resp=$(curl -s -S -X POST http://auth:8002/tokens?pretty -u admin)
+auth_resp=$(curl -s -S -X POST http://auth:8002/tokens?pretty -u admin:$password)
 echo auth response "$auth_resp"
 token=$(echo "$auth_resp" | grep tokenKey | cut -d '"' -f 4 )
 echo token $token

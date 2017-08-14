@@ -37,5 +37,7 @@ oc patch dc comp -p "$(cat script-utils/monitoring/resources.json)"
 oc patch dc comp -p "$(cat script-utils/monitoring/monitoring-container.json)"
 
 # oc delete  bc monitoring ; oc delete is monitoring
-oc new-build . --context-dir='.' --name=monitoring -D - < dockerfiles/monitoring/Dockerfile
+oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile
+
+oc env dc comp --containers status password=FILL_IN
  
