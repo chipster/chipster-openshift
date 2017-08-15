@@ -1,11 +1,13 @@
 influxdb="http://influxdb:8086"
+port_env=$(echo $role | tr '[:lower:]' '[:upper:]')_SERVICE_PORT
+port=${!port_env}
 auth_resp=$(curl -s -S -X POST http://auth:8002/tokens?pretty -u admin:$password)
 echo auth response "$auth_resp"
 token=$(echo "$auth_resp" | grep tokenKey | cut -d '"' -f 4 )
 echo token $token
 while true; do
 
-  status=$(curl  -s -S localhost:8012/admin/status?pretty -u token:${token} | grep ":")
+  status=$(curl  -s -S localhost:$port/admin/status?pretty -u token:${token} | grep ":")
 
   echo status "$status"
 

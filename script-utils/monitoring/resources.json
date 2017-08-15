@@ -1,14 +1,6 @@
-{
-    "spec": {
-        "containers": [
-            {
-                "resources": {
+"resources": {
                     "limits": {
-                        "cpu": "1900m",
-                        "memory": "7Gi"
+                        "cpu": "1000m",
+                        "memory": "4Gi"
                     }
                 }
-            }
-        ]
-    }
-}

@@ -33,12 +33,25 @@ oc expose service grafana
 #  ./oc login dac-oso.csc.fi:8443 --certificate-authority=/run/secrets/kubernetes.io/serviceaccount/ca.crt --token $(cat /run/secrets/kubernetes.io/serviceaccount/token )
 
 
-oc patch dc comp -p "$(cat script-utils/monitoring/resources.json)"
+oc patch dc comp -p "$(cat script-utils/monitoring/resources-comp.json)"
 oc patch dc comp -p "$(cat script-utils/monitoring/monitoring-container.json)"
 
 # oc delete  bc monitoring ; oc delete is monitoring
 oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile
 
-oc env dc comp --containers status role=comp
-oc env dc comp --containers status password=FILL_IN
+
+for d in $(oc get dc -o name); do 
+	echo $d; 
+	oc get $d -o json | sed s/'"resources": {}'/'"resources": { "limits": { "cpu": "1000m", "memory": "4Gi" } }'/ | oc replace $d -f -
+done
+
+for role in auth comp file-broker scheduler service-locator session-db session-worker toolbox type-service web-server; do 	
+	
+	oc get dc $role -o json | jq '.spec.template.spec.containers[1]='"$(cat script-utils/monitoring/monitoring-container.json)" | oc replace dc $role -f -
+	
+	oc env dc $role --containers status role=$role
+	oc env dc $role --containers status password=$password
+	
+done
+
  

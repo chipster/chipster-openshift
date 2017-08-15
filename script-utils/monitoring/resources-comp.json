@@ -1,0 +1,14 @@
+{
+    "spec": {
+        "containers": [
+            {
+                "resources": {
+                    "limits": {
+                        "cpu": "1900m",
+                        "memory": "7Gi"
+                    }
+                }
+            }
+        ]
+    }
+}
