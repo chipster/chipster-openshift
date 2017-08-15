@@ -42,7 +42,7 @@ oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile
 
 for d in $(oc get dc -o name); do 
 	echo $d; 
-	oc get $d -o json | sed s/'"resources": {}'/'"resources": { "limits": { "cpu": "1000m", "memory": "4Gi" } }'/ | oc replace $d -f -
+	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "500m", "memory": "2Gi"}}' | oc replace $d -f -
 done
 
 for role in auth comp file-broker scheduler service-locator session-db session-worker toolbox type-service web-server; do 	

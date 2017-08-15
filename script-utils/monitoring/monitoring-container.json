@@ -3,7 +3,7 @@
     "image": "172.30.130.41:5000/chipster-dev/monitoring",
     "resources": {
         "limits": {
-            "cpu": "100m",
+            "cpu": "250m",
             "memory": "1Gi"
         }
     },

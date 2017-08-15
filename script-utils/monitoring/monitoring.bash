@@ -1,7 +1,7 @@
 while true; do
 
 	influxdb="http://influxdb:8086"
-	port_env=$(echo $role | tr '[:lower:]' '[:upper:]' | tr - _')_SERVICE_PORT
+	port_env=$(echo $role | tr '[:lower:]' '[:upper:]' | tr - _)_SERVICE_PORT
 	port=${!port_env}
 	auth_resp=$(curl -s -S -X POST http://auth:8002/tokens?pretty -u admin:$password)
 	echo auth response "$auth_resp"
