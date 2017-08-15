@@ -46,7 +46,7 @@ for d in $(oc get dc -o name); do
 done
 
 for role in auth comp file-broker scheduler service-locator session-db session-worker toolbox type-service web-server; do 	
-	
+	echo $role
 	oc get dc $role -o json | jq '.spec.template.spec.containers[1]='"$(cat script-utils/monitoring/monitoring-container.json)" | oc replace dc $role -f -
 	
 	oc env dc $role --containers status role=$role
@@ -54,4 +54,4 @@ for role in auth comp file-broker scheduler service-locator session-db session-w
 	
 done
 
- 
+for d in $(oc get dc -o name); do oc deploy $d --latest; done
