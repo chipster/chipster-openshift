@@ -1,32 +1,30 @@
 while true; do
 
 	influxdb="http://influxdb:8086"
-	port_env=$(echo $role | tr '[:lower:]' '[:upper:]' | tr - _)_SERVICE_PORT
-	port=${!port_env}
-	auth_resp=$(curl -s -S -X POST http://auth:8002/tokens?pretty -u admin:$password)
-	echo auth response "$auth_resp"
+	auth_resp=$(curl -s -S -X POST http://auth:8002/tokens?pretty -u monitoring:$password)
 	token=$(echo "$auth_resp" | grep tokenKey | cut -d '"' -f 4 )
-	echo token $token
+	
+	#echo token $token
+	
+	if [ -z "$token" ]; then	
+		echo authentication error, auth response "$auth_resp"
+	fi
 
-	status=$(curl  -s -S localhost:$port/admin/status?pretty -u token:${token} | grep ":")
+	status=$(curl -s --fail localhost:$admin_port/admin/status?pretty -u token:${token})
+	curl_exit_code=$?
 	
-	echo status "$status"
+	if test "$curl_exit_code" != "0"; then	
+		echo status query failed: "$status"
+	fi
 	
-	echo "$status" | while read line; do
+	echo "$status" | jq -r 'keys[]' | while read key; do
 
-	    key=$(echo "$line" | grep : | cut -d '"' -f 2)
-	    # xargs to trim whitespace
-	    value=$(echo "$line" | grep : | cut -d ':' -f 2 | cut -d ',' -f 1 | xargs)
-	
-	    # if not a number, add quotes to store as a string
-	    if [[ $value != *[[:digit:]]* ]]; then
-	     value="\"$value\""
-	    fi
+	    value=$(echo "$status" | jq ."$key")
 	
 	    db_key=$(echo ${key},role=${role},id=${HOSTNAME})
 	
 	    echo "** save ${db_key} $value"
-	    curl -XPOST "${influxdb}/write?db=db" --data-binary "${db_key} value=$value"
+	    curl -s -S -XPOST "${influxdb}/write?db=db" --data-binary "${db_key} value=$value"
 	done
 
 	sleep 10

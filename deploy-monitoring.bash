@@ -36,22 +36,42 @@ oc expose service grafana
 oc patch dc comp -p "$(cat script-utils/monitoring/resources-comp.json)"
 oc patch dc comp -p "$(cat script-utils/monitoring/monitoring-container.json)"
 
+# create the build config
 # oc delete  bc monitoring ; oc delete is monitoring
 oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile
 
+# run the build with the local files
+oc start-build monitoring --from-dir="."
 
-for d in $(oc get dc -o name); do 
-	echo $d; 
-	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "500m", "memory": "2Gi"}}' | oc replace $d -f -
-done
+# deploy everything
+
+for d in $(oc get dc -o name); do oc deploy $d --latest; done
+
+# add the second container
 
 for role in auth comp file-broker scheduler service-locator session-db session-worker toolbox type-service web-server; do 	
 	echo $role
 	oc get dc $role -o json | jq '.spec.template.spec.containers[1]='"$(cat script-utils/monitoring/monitoring-container.json)" | oc replace dc $role -f -
 	
+	admin_port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-bind-$role | cut -d ":" -f 4)
+	
+	oc env dc $role --containers status admin_port=$admin_port
 	oc env dc $role --containers status role=$role
 	oc env dc $role --containers status password=$password
 	
 done
 
-for d in $(oc get dc -o name); do oc deploy $d --latest; done
+# configure lower resource limits to make space for the second container
+
+for d in $(oc get dc -o name); do 
+	echo $d;
+	# deployment
+	oc get $d -o json | jq '.spec.strategy.resources={ "limits": { "cpu": "1", "memory": "1Gi"}}' | oc replace $d -f -
+	# service 
+	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "500Mi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace $d -f -
+	# monitoring
+	oc get $d -o json | jq '.spec.template.spec.containers[1].resources={ "limits": { "cpu": "100m", "memory": "100Mi"}, "requests": { "cpu": "100m", "memory": "10Mi"}}' | oc replace $d -f -
+done
+
+oc get dc comp -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "7900Mi"}, "requests": { "cpu": "100m", "memory": "10Mi"}}' | oc replace dc comp -f -
+
