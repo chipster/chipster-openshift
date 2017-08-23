@@ -40,3 +40,8 @@ retry oc logs -f bc/comp-base
 # oc delete is comp && oc delete bc comp && \
 oc new-build --name=comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && \
 retry oc logs -f bc/comp
+
+# oc delete is h2 && oc delete bc h2 && \
+oc new-build --name=h2 . -D - < dockerfiles/h2/Dockerfile
+oc start-build h2 --from-file dockerfiles/h2/Dockerfile
+retry oc logs -f bc/h2

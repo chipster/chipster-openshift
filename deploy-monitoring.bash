@@ -52,12 +52,20 @@ for d in $(oc get dc -o name); do
 	# deployment
 	oc get $d -o json | jq '.spec.strategy.resources={ "limits": { "cpu": "1", "memory": "1Gi"}}' | oc replace $d -f -
 	# service 
-	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "200Mi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace $d -f -
+	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "500Mi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace $d -f -
 	# monitoring
 	oc get $d -o json | jq '.spec.template.spec.containers[1].resources={ "limits": { "cpu": "100m", "memory": "50Mi"}, "requests": { "cpu": "100m", "memory": "10Mi"}}' | oc replace $d -f -
 done
 
-oc get dc toolbox -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "500Mi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace dc toolbox -f -
-oc get dc session-db -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "1Gi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace dc session-db -f -
 oc get dc comp -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "7900Mi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace dc comp -f -
 
+# configure health checks
+
+for role in auth comp file-broker scheduler service-locator session-db session-worker toolbox type-service web-server; do 	
+	echo $role
+	
+	admin_port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-bind-$role | cut -d ":" -f 4)
+	
+	oc set probe dc/$role --readiness -- curl --fail http://127.0.0.1:${admin_port}/admin/alive
+	
+done

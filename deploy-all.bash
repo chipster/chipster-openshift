@@ -56,6 +56,12 @@ retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWrit
 # retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
 retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
 
+oc new-app h2 --name auth-h2
+oc volume dc/auth-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=1G --mount-path /opt/h2-data --claim-name auth-h2
+
+oc new-app h2 --name session-db-h2
+oc volume dc/session-db-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=10G --mount-path /opt/h2-data --claim-name session-db-h2
+
 # for tools-bin download
 oc new-app base
 retry oc set volume  dc/base --add -t pvc --mount-path /mnt/tools --claim-name tools

@@ -18,13 +18,25 @@ echo
 set -e
 set -x
 
+function get_db_passowrd {
+	role="$1"
+	pod=$(oc get pod -o name | grep -v deploy | grep $role | head -n 1)
+	conf=$(oc rsh -c $role $pod cat conf/chipster.yaml)
+	password=$(echo conf | grep $role | grep db-pass | cut -d ":" -f 2)
+	echo $password
+}
+
+function generate_password {
+	openssl rand -base64 15
+}
+
 # generate service passwords
 
 function create_password {
   service=$1
   config_key=service-password-${service}
   
-  echo $config_key: $(openssl rand -base64 16) | tee conf/$service.yaml >> conf/auth.yaml
+  echo $config_key: $(generate_password) | tee conf/$service.yaml >> conf/auth.yaml
 }
 
 # generate configs and save them as openshift secrets
@@ -49,6 +61,22 @@ authenticated_services=$(cat ../chipster-web-server/conf/chipster-defaults.yaml 
 for service in $authenticated_services; do
 	create_password $service
 done
+
+# get the db password from the existing instance
+auth_db_pass=$(get_db_password auth)
+session_db_pass=$(get_db_password session-db)
+
+# use these instead to generate new passwords for a new installation  
+#auth_db_pass=$(generate_password)
+#session_db_pass=$(generate_password)
+
+echo auth-db-url: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db >> conf/auth.yaml
+echo auth-db-user: sa >> conf/auth.yaml
+echo auth-db-pass: $auth_db_pass >> conf/auth.yaml
+
+echo session-db-url: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db >> conf/session-db.yaml
+echo session-db-user: sa >> conf/session-db.yaml
+echo session-db-pass: $session_db_pass >> conf/session-db.yaml
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
 
