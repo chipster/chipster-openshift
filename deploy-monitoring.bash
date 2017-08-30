@@ -52,7 +52,7 @@ for d in $(oc get dc -o name); do
 	# deployment
 	oc get $d -o json | jq '.spec.strategy.resources={ "limits": { "cpu": "1", "memory": "1Gi"}}' | oc replace $d -f -
 	# service 
-	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "500Mi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace $d -f -
+	oc get $d -o json | jq '.spec.template.spec.containers[0].resources={ "limits": { "cpu": "1900m", "memory": "1Gi"}, "requests": { "cpu": "200m", "memory": "100Mi"}}' | oc replace $d -f -
 	# monitoring
 	oc get $d -o json | jq '.spec.template.spec.containers[1].resources={ "limits": { "cpu": "100m", "memory": "50Mi"}, "requests": { "cpu": "100m", "memory": "10Mi"}}' | oc replace $d -f -
 done
@@ -69,3 +69,6 @@ for role in auth comp file-broker scheduler service-locator session-db session-w
 	oc set probe dc/$role --readiness -- curl --fail http://127.0.0.1:${admin_port}/admin/alive
 	
 done
+
+oc set probe dc/auth-h2 --readiness --open-tcp=1521
+oc set probe dc/session-db-h2 --readiness --open-tcp=1521

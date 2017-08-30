@@ -44,6 +44,8 @@ deploy_java_service scheduler fi.csc.chipster.scheduler.Scheduler
 deploy_java_service session-worker fi.csc.chipster.sessionworker.SessionWorker
 
 deploy_service toolbox
+# needed for genome parameters
+retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tools
 
 deploy_js_service type-service
 
@@ -51,10 +53,11 @@ deploy_service web-server
 # use the root route
 oc expose service web-server --hostname=$PROJECT.$DOMAIN
  
-deploy_service comp
+deploy_service2 comp
 retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tool
 # retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
-retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
+retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteOnce --claim-size=100G --mount-path /opt/chipster/comp/jobs-data --claim-name comp-jobs-data
+#retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
 
 oc new-app h2 --name auth-h2
 oc volume dc/auth-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=1G --mount-path /opt/h2-data --claim-name auth-h2

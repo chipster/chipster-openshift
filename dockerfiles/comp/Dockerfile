@@ -2,12 +2,15 @@ FROM comp-base
 
 COPY chipster-web-server /opt/
 
-WORKDIR /opt/chipster-web-server
+RUN mkdir -p /opt/chipster/comp \
+  && mv /opt/chipster-web-server/lib /opt/chipster \
+  && cd /opt/chipster \
+  && ln -s /mnt/tools/current tools \
+  && mkdir -p /opt/chipster/comp/security
 
-RUN mkdir -p /opt/chipster && cd /opt/chipster && ln -s /mnt/tools/current tools
+# Legacy DirectoryLayout assumes it's running here
+WORKDIR /opt/chipster/comp
 
-# Legacy DirectoryLayout requires these folders to exist
 USER 0
-RUN cd /opt/chipster-web-server && mkdir security
 
-CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.comp.RestCompServer"]
+CMD ["java", "-cp", "../lib/*:", "fi.csc.chipster.comp.RestCompServer"]

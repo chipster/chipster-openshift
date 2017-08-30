@@ -36,6 +36,7 @@ function delete_service {
   fi
 }
 
+# configure a service in /opt/chipster-web-server
 function configure_service {
   service=$1
 
@@ -58,6 +59,29 @@ function configure_service {
   fi
 }
 
+# configure a service in /opt/chipster/$service/
+function configure_service2 {
+  service=$1
+
+  retry oc set volume dc/$service --add -t emptyDir --mount-path /opt/chipster/$service/logs  	
+  retry	oc set volume dc/$service --add -t secret --secret-name ${service}-conf --mount-path /opt/chipster/$service/conf/
+  
+  internal=$(cat ../chipster/$service/conf/chipster-defaults.yaml | grep url-int-$service:) || true
+  external=$(cat ../chipster/$service/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
+  port=$(cat ../chipster/$service/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
+  
+  # if the service has internal or external address, we have to expose it's port
+  if [ -n "$internal" ] || [ -n "$external" ]; then
+  	oc expose dc $service --port=$port
+  fi
+  
+  if [ $service != "web-server" ]; then 
+  	if [ -n "$external" ]; then
+  		oc expose service $service
+  	fi
+  fi
+}
+
 function deploy_service {
 
   service=$1
@@ -67,6 +91,17 @@ function deploy_service {
   oc new-app $service
   
   configure_service $service
+}
+
+function deploy_service2 {
+
+  service=$1
+
+  delete_service $service
+  
+  oc new-app $service
+  
+  configure_service2 $service
 }
 
 function deploy_js_service {

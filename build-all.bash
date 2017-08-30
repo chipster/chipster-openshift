@@ -5,6 +5,12 @@ set -e
 
 source script-utils/deploy-utils.bash
 
+function update_dockerfile {
+	build_name=$1	
+	oc get bc $build_name -o json | jq .spec.source.dockerfile="$(cat  dockerfiles/$build_name/Dockerfile | jq -s -R .)" | oc replace bc $build_name -f -	
+}
+
+
 # oc delete is base && oc delete bc base && \
 oc new-build --name=base -D - < dockerfiles/base/Dockerfile && \
 retry oc logs -f bc/base
@@ -13,9 +19,16 @@ retry oc logs -f bc/base
 oc new-build https://github.com/chipster/chipster.git -D - < dockerfiles/chipster/Dockerfile &&\
 retry oc logs -f bc/chipster
 
-# oc delete is chipster-web-server && oc delete bc chipster-web-server && \
-oc new-build https://github.com/chipster/chipster-web-server.git -D - < dockerfiles/chipster-web-server/Dockerfile && \
-retry oc logs -f bc/chipster-web-server
+
+oc new-build https://github.com/chipster/chipster-web-server.git -D - < dockerfiles/chipster-web-server/Dockerfile
+
+update_dockerfile chipster-web-server  
+oc start-build chipster-web-server --follow
+#oc start-build chipster-web-server --from- ../chipster-web-server --follow
+
+
+# oc start-build chipster-web-server --from-file dockerfiles/chipster-web-server/Dockerfile --follow
+
 
 # oc delete is chipster-web-server-js && oc delete bc chipster-web-server-js && \
 oc new-build --name chipster-web-server-js https://github.com/chipster/chipster-web-server.git -D - < dockerfiles/chipster-web-server-js/Dockerfile && \
@@ -38,8 +51,9 @@ oc new-build --name=comp-base -D - < dockerfiles/comp-base/Dockerfile  && \
 retry oc logs -f bc/comp-base
 
 # oc delete is comp && oc delete bc comp && \
-oc new-build --name=comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && \
-retry oc logs -f bc/comp
+oc new-build --name=comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile
+update_dockerfile comp
+oc start-build comp --follow
 
 # oc delete is h2 && oc delete bc h2 && \
 oc new-build --name=h2 . -D - < dockerfiles/h2/Dockerfile

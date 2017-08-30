@@ -18,11 +18,11 @@ echo
 set -e
 set -x
 
-function get_db_passowrd {
+function get_db_password {
 	role="$1"
 	pod=$(oc get pod -o name | grep -v deploy | grep $role | head -n 1)
 	conf=$(oc rsh -c $role $pod cat conf/chipster.yaml)
-	password=$(echo conf | grep $role | grep db-pass | cut -d ":" -f 2)
+	password=$(echo "$conf" | grep $role | grep db-pass | cut -d ":" -f 2)
 	echo $password
 }
 

@@ -8,7 +8,8 @@ RUN cd /tmp/build/chipster-web-server \
 	&& gradle distTar \
 	&& tar -zxf build/distributions/chipster-web-server.tar.gz \
 	&& mkdir -p /opt/chipster-web-server/lib \
-	&& mv *.jar /opt/chipster-web-server/lib \
+	&& cp *.jar /opt/chipster-web-server/lib \
+	&& mv *.jar /opt/chipster/lib \
 	&& mv chipster-web-server/lib/*.jar /opt/chipster-web-server/lib \
 	&& mv conf /opt/chipster-web-server/ \
  	&& chmod -R ugo+rwx /opt/chipster-web-server \
