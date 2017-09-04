@@ -25,7 +25,7 @@ oc expose service grafana
 oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile
 
 # run the build with the local files
-oc start-build monitoring --from-dir="."
+oc start-build monitoring --from-dir="." --follow
 
 # deploy everything
 

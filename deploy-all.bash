@@ -42,6 +42,8 @@ add_volume file-broker storage 100G
 deploy_java_service scheduler fi.csc.chipster.scheduler.Scheduler
 
 deploy_java_service session-worker fi.csc.chipster.sessionworker.SessionWorker
+# 
+oc annotate route session-worker --overwrite haproxy.router.opensfhit.io/timeout=300s
 
 deploy_service toolbox
 # needed for genome parameters
