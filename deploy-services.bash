@@ -42,12 +42,9 @@ add_volume file-broker storage 100G
 deploy_java_service scheduler fi.csc.chipster.scheduler.Scheduler
 
 deploy_java_service session-worker fi.csc.chipster.sessionworker.SessionWorker
-# 
+# doesn't work yet in the OpenShift 1.4, session-worker will send dummy bytes for now to keep the connection open 
 oc annotate route session-worker --overwrite haproxy.router.opensfhit.io/timeout=300s
 
-deploy_service toolbox
-# needed for genome parameters
-retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tools
 
 deploy_js_service type-service
 
@@ -60,6 +57,10 @@ retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWrit
 # retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
 retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteOnce --claim-size=100G --mount-path /opt/chipster/comp/jobs-data --claim-name comp-jobs-data
 #retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
+
+deploy_service toolbox
+# needed for genome parameters
+retry oc volume dc/comp --add -t pvc --mount-path /mnt/tools --claim-name tools
 
 oc new-app h2 --name auth-h2
 oc volume dc/auth-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=1G --mount-path /opt/h2-data --claim-name auth-h2
@@ -80,20 +81,21 @@ echo '# login to the container'
 echo 'oc rsh $(oc get pod -l app=base | grep Running | cut -f 1 -d " ") bash'
 echo 'mkdir -p /mnt/tools/current'
 echo 'cd /mnt/tools/current'
+echo ''
 echo '# download the list of packages'
 echo 'curl http://vm0151.kaj.pouta.csc.fi/artefacts/create_tools_images/194/parts/files.txt | grep tar.lz4$ > files.txt'
+echo ''
 echo '# download and extract the packages in parallel'
 echo 'time cat files.txt | parallel -j4 "curl http://vm0151.kaj.pouta.csc.fi/artefacts/create_tools_images/194/parts/{} | lz4c -d | tar -x"'
+echo ''
 echo '# logout from the container'
 echo 'exit'
+echo ''
 echo '# delete the container'
 echo 'oc delete dc base'
 echo ''
 echo '# Optionally, run the following in the container to fix dstat and other programs requiring a username'
 echo 'echo "chipster:x:$(id -u):$(id -g)::/tmp:/bin/bash" >> /etc/passwd'
 echo '------------------------------------------------------------------------------'
-echo '# 2) Finally go to the OpenShift'\''s Configuration tab of each build which has a GitHub source, copy the Github webhook URL' 
-echo '# and paste it to the GitHub'\''s settings page of the repository. Disable the GitHub'\''s SSL check in the webhook'\''s settings.'
-echo '------------------------------------------------------------------------------'
-echo '# 3) Configure user accounts in /opt/chipster-web-server/security/users on auth'
+echo '# 2) Configure user accounts in /opt/chipster-web-server/security/users on auth'
 echo '------------------------------------------------------------------------------'

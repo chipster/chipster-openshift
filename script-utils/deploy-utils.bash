@@ -1,9 +1,11 @@
 #!/bin/bash
 
+# parse the current project name
 function get_project {
   oc project -q
 }
 
+# parse the current project domain (i.e. the address of this OpenShift)
 function get_domain {
   oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
 }
@@ -11,6 +13,7 @@ function get_domain {
 PROJECT=$(get_project)
 DOMAIN=$(get_domain)
 
+# retry the command for max five times or until it's exit value is zero 
 function retry {
   for i in {1..5}; do
     $@ && break
@@ -36,7 +39,7 @@ function delete_service {
   fi
 }
 
-# configure a service in /opt/chipster-web-server
+# configure a service to path /opt/chipster-web-server
 function configure_service {
   service=$1
 
@@ -59,7 +62,7 @@ function configure_service {
   fi
 }
 
-# configure a service in /opt/chipster/$service/
+# configure a service to path /opt/chipster/$service/
 function configure_service2 {
   service=$1
 
