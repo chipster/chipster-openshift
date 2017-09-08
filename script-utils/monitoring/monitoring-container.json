@@ -1,6 +1,6 @@
 {
     "name": "status",
-    "image": "172.30.130.41:5000/chipster-dev/monitoring",
+    "image": "replace-with-monitoring-image-url",
     "resources": {
         "limits": { "cpu": "100m", "memory": "100Mi"}, "requests": { "cpu": "100m", "memory": "10Mi"}
     },
