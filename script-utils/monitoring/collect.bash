@@ -32,7 +32,7 @@ fi
 
 t0=$(date +%s%N)
 
-if ! status=$(curl -s --fail localhost:$admin_port/admin/status?pretty -u token:${token}); then
+if ! status=$(curl -s -S --fail localhost:$admin_port/admin/status?pretty -u token:${token}); then
 	echo status query failed: "$status"
 	exit 1
 fi
