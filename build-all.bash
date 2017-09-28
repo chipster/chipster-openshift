@@ -15,7 +15,7 @@ oc new-build --name toolbox https://github.com/chipster/chipster-tools.git --nam
 PROJECT=$(get_project)
 DOMAIN=$(get_domain)
 
-service_locator="http://service-locator-$PROJECT.$DOMAIN"
+service_locator="https://service-locator-$PROJECT.$DOMAIN"
 echo "Configure web-server to use service-locator: $service_locator"
 
 oc new-build --name web-server https://github.com/chipster/chipster-web.git --name=web-server -D - < dockerfiles/web-server/Dockerfile -e SERVICE_LOCATOR=$service_locator && retry oc logs -f bc/web-server

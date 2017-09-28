@@ -10,6 +10,14 @@ while read line; do
 		proto=$(echo $default_url | cut -d { -f 1)
 		#port=$(echo $default_url | cut -d : -f 3)
 		
+		if [[ $proto == "http://" ]]; then
+			proto="https://"
+		fi
+		
+		if [[ $proto == "ws://" ]]; then
+			proto="wss://"
+		fi
+		
 		if [[ $service == web-server ]]; then
 			echo url-ext-$service: $proto$PROJECT.$DOMAIN
 		else			

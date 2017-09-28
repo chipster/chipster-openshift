@@ -52,7 +52,10 @@ function configure_service {
   
   # if the service has internal or external address, we have to expose it's port
   if [ -n "$internal" ] || [ -n "$external" ]; then
-  	oc expose dc $service --port=$port
+  	# HTTP
+  	#oc expose dc $service --port=$port
+  	# HTTPS
+  	oc create route edge --service $service --port $port --insecure-policy=Redirect
   fi
   
   if [ $service != "web-server" ]; then 

@@ -51,6 +51,7 @@ deploy_js_service type-service
 deploy_service web-server
 # use the root route
 oc expose service web-server --hostname=$PROJECT.$DOMAIN
+#oc create route edge --service web-server --port 8000 --hostname=$PROJECT.$DOMAIN --insecure-policy=Redirect
  
 deploy_service2 comp
 retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tool
