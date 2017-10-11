@@ -18,8 +18,7 @@ DOMAIN=$(get_domain)
 service_locator="https://service-locator-$PROJECT.$DOMAIN"
 echo "Configure web-server to use service-locator: $service_locator"
 
-oc new-build --name web-server-code https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server-code/Dockerfile -e SERVICE_LOCATOR=$service_locator && retry oc logs -f bc/web-server-code
-oc new-build --name web-server https://github.com/chipster/chipster-tools.git -D - < dockerfiles/web-server/Dockerfile && retry oc logs -f bc/web-server
+oc new-build --name web-server https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server/Dockerfile -e SERVICE_LOCATOR=$service_locator && retry oc logs -f bc/web-server
 oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry oc logs -f bc/comp-base
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp
 oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f bc/comp
