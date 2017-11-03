@@ -5,7 +5,8 @@ FROM toolbox
 COPY . /home/user/build/chipster-web
 
 # /opt/chipster-web is created by the manual copy in the toolbox build and /home/user/build is created by the copy above  
-RUN chmod ugo+rwx -R /home/user/build /opt/chipster-web
+RUN mkdir -p /opt/chipster-web/src \
+	&& chmod ugo+rwx -R /home/user/build /opt/chipster-web
 	
 USER 1000
 
@@ -16,7 +17,7 @@ RUN cd /home/user/build/chipster-web \
 	&& npm install \
 	&& rm src/assets/manual \
 	&& ng build --no-progress || true \
-	&& cp -r dist/* /opt/chipster-web/ \	
+	&& cp -r dist/* /opt/chipster-web/src/ \	
 	&& rm -rf /home/user/build
 
 CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.web.WebServer"]

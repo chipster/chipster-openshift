@@ -23,11 +23,6 @@ oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry 
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp
 oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f bc/comp
 
-function update_dockerfile {
-	build_name=$1	
-	oc get bc $build_name -o json | jq .spec.source.dockerfile="$(cat  dockerfiles/$build_name/Dockerfile | jq -s -R .)" | oc replace bc $build_name -f -	
-}
-
 echo ""
 echo "# Build automatically on push"
 echo ""

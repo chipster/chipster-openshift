@@ -142,3 +142,8 @@ function add_volume {
 
 	retry oc set volume dc/$service --add --name $service-$volume_name -t pvc --mount-path /opt/chipster-web-server/$volume_name --claim-name=$service-$volume_name --claim-size=$size --overwrite
 }
+
+function update_dockerfile {
+	build_name=$1	
+	oc get bc $build_name -o json | jq .spec.source.dockerfile="$(cat  dockerfiles/$build_name/Dockerfile | jq -s -R .)" | oc replace bc $build_name -f -	
+}
