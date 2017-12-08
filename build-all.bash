@@ -18,7 +18,7 @@ DOMAIN=$(get_domain)
 service_locator="https://service-locator-$PROJECT.$DOMAIN"
 echo "Configure web-server to use service-locator: $service_locator"
 
-oc new-build --name web-server https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server/Dockerfile -e SERVICE_LOCATOR=$service_locator && retry oc logs -f bc/web-server
+oc new-build --name web-server https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server/Dockerfile -e ba=$service_locator && retry oc logs -f bc/web-server
 oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry oc logs -f bc/comp-base
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp
 oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f bc/comp
@@ -27,7 +27,7 @@ echo ""
 echo "# Build automatically on push"
 echo ""
 echo "# Go to the OpenShift's Configuration tab of each build which has a GitHub source, copy the Github webhook URL" 
-echo "# and paste it to the GitHub's settings page of the repository. Disable the GitHub's SSL check in the webhook's settings."
+echo "# and paste it to the GitHub's settings page of the repository. Content type should be Application/json"
 echo ""
 echo "# How to update builds later?"
 echo ""

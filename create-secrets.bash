@@ -5,7 +5,9 @@ source script-utils/deploy-utils.bash
 PROJECT=$(get_project)
 DOMAIN=$(get_domain)
 
-echo
+
+
+echo "$DOMAIN"
 echo "Create secrets for $PROJECT.$DOMAIN"
 echo
 

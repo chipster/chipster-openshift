@@ -3,6 +3,7 @@ FROM comp-base
 COPY chipster-web-server /opt/
 
 RUN mkdir -p /opt/chipster/comp \
+  && chmod -R ugo+rwx /opt/chipster-web-server \
   && mv /opt/chipster-web-server/lib /opt/chipster \
   && cd /opt/chipster \
   && ln -s /mnt/tools/current tools \

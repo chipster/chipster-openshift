@@ -7,11 +7,13 @@ function get_project {
 
 # parse the current project domain (i.e. the address of this OpenShift)
 function get_domain {
-  oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
+  #oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
+  echo "rahti-int-app.csc.fi"
 }
 
 PROJECT=$(get_project)
 DOMAIN=$(get_domain)
+
 
 # retry the command for max five times or until it's exit value is zero 
 function retry {
@@ -52,9 +54,10 @@ function configure_service {
   
   # if the service has internal or external address, we have to expose it's port
   if [ -n "$internal" ] || [ -n "$external" ]; then
-  	# HTTP
-  	#oc expose dc $service --port=$port
+    echo "Create service $service $port"
+  	oc expose dc $service --port=$port
   	# HTTPS
+  	echo "Create route"
   	oc create route edge --service $service --port $port --insecure-policy=Redirect
   fi
   
@@ -72,9 +75,9 @@ function configure_service2 {
   retry oc set volume dc/$service --add -t emptyDir --mount-path /opt/chipster/$service/logs  	
   retry	oc set volume dc/$service --add -t secret --secret-name ${service}-conf --mount-path /opt/chipster/$service/conf/
   
-  internal=$(cat ../chipster/$service/conf/chipster-defaults.yaml | grep url-int-$service:) || true
-  external=$(cat ../chipster/$service/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
-  port=$(cat ../chipster/$service/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
+  internal=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-int-$service:) || true
+  external=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
+  port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
   
   # if the service has internal or external address, we have to expose it's port
   if [ -n "$internal" ] || [ -n "$external" ]; then
