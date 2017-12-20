@@ -17,7 +17,8 @@ RUN cd /home/user/build/chipster-web \
 	&& npm install \
 	&& rm src/assets/manual \
 	&& ng build --no-progress || true \
-	&& cp -r dist/* /opt/chipster-web/src/ \	
+	&& cp -r dist/* /opt/chipster-web/src/ \
+	&& ls -lah /opt/chipster-web/src/ \
 	&& rm -rf /home/user/build
 
 CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.web.WebServer"]

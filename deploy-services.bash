@@ -25,19 +25,18 @@ set -e
 set -x
 
 deploy_java_service auth fi.csc.chipster.auth.AuthenticationService
-add_volume auth database 1G
 add_volume auth security 1G
 
 deploy_java_service service-locator fi.csc.chipster.servicelocator.ServiceLocator
 
 # oc delete route session-db-events && oc delete service session-db-events
 deploy_java_service session-db fi.csc.chipster.sessiondb.SessionDb
-add_volume session-db database 1G
 oc expose dc session-db --port=8005 --name session-db-events
-oc expose service session-db-events
+oc create route edge --service session-db-events --port=8005 --insecure-policy=Redirect
+
 
 deploy_java_service file-broker fi.csc.chipster.filebroker.FileBroker
-add_volume file-broker storage 100G 
+add_volume file-broker storage 500G
 
 deploy_java_service scheduler fi.csc.chipster.scheduler.Scheduler
 
@@ -50,18 +49,18 @@ deploy_js_service type-service
 
 deploy_service web-server
 # use the root route
-oc expose service web-server --hostname=$PROJECT.$DOMAIN
-#oc create route edge --service web-server --port 8000 --hostname=$PROJECT.$DOMAIN --insecure-policy=Redirect
+#oc expose service web-server --hostname=$PROJECT.$DOMAIN
+oc create route edge --service web-server --port 8000 --hostname=$PROJECT.$DOMAIN --insecure-policy=Redirect
  
 deploy_service2 comp
-retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=500G --mount-path /mnt/tools --claim-name tool
+retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=650G --mount-path /mnt/tools --claim-name tools
 # retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
 retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteOnce --claim-size=100G --mount-path /opt/chipster/comp/jobs-data --claim-name comp-jobs-data
 #retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
 
 deploy_service toolbox
 # needed for genome parameters
-retry oc volume dc/comp --add -t pvc --mount-path /mnt/tools --claim-name tools
+retry oc volume dc/toolbox --add -t pvc --mount-path /mnt/tools --claim-name tools
 
 oc new-app h2 --name auth-h2
 oc volume dc/auth-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=1G --mount-path /opt/h2-data --claim-name auth-h2
@@ -79,7 +78,7 @@ set +x
 echo '------------------------------------------------------------------------------'
 echo '# 1) Download tools by running the following commands:'
 echo '# login to the container'
-echo 'oc rsh $(oc get pod -l app=base | grep Running | cut -f 1 -d " ") bash'
+echo 'oc rsh dc/base bash'
 echo 'mkdir -p /mnt/tools/current'
 echo 'cd /mnt/tools/current'
 echo ''

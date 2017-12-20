@@ -13,14 +13,16 @@ source script-utils/deploy-utils.bash
 
 # deploy Influxdb from the official image
 oc new-app --docker-image=influxdb
-oc set volume dc/influxdb --add --name influxdb -t pvc --mount-path /var/lib/influxdb --claim-name=influxdb --claim-size=4 --overwrite
+oc set volume dc/influxdb --remove --name=influxdb-volume-1
+oc set volume dc/influxdb --add --name influxdb -t pvc --mount-path /var/lib/influxdb --claim-name=influxdb --claim-size=4G --overwrite
 
 # build and deploy Grafana
 oc new-build --name=grafana -D - < dockerfiles/grafana/Dockerfile --to grafana && retry oc logs -f bc/grafana
 oc new-app grafana
-oc set volume dc/grafana --add --name grafana -t pvc --mount-path /usr/share/grafana/data --claim-name=grafana --claim-size=4 --overwrite
+oc set volume dc/grafana --add --name grafana -t pvc --mount-path /usr/share/grafana/data --claim-name=grafana --claim-size=1G --overwrite
 oc expose dc grafana --port=3000
-oc expose service grafana
+oc create route edge --service grafana --port=3000 --insecure-policy=Redirect
+
 
 echo "# run in influxdb container to create the database"
 echo 'curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE db" -X POST'
