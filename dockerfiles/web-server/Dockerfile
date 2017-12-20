@@ -13,7 +13,7 @@ USER 1000
 # remove the symlink becasue ng build doesn't tolerate it
 # the source image already has to manual in place 
 RUN cd /home/user/build/chipster-web \
-	&& sed -i "/export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/assets/app.constants.ts \	
+	&& sed -i "/^export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/assets/app.constants.ts \	
 	&& npm install \
 	&& rm src/assets/manual \
 	&& ng build --no-progress || true \
