@@ -18,4 +18,4 @@ RUN \
 EXPOSE 1521 8081
 
 # Define default command
-CMD java -cp /opt/h2/bin/h2*.jar org.h2.tools.Server -web -webAllowOthers -webPort 8081 -tcp -tcpAllowOthers -tcpPort 1521 -baseDir /opt/h2-data
+CMD java -XX:+UseSerialGC -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xss228k -Xms32m -Xmx128m -cp /opt/h2/bin/h2*.jar org.h2.tools.Server -web -webAllowOthers -webPort 8081 -tcp -tcpAllowOthers -tcpPort 1521 -baseDir /opt/h2-data
