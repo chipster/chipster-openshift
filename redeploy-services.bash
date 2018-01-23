@@ -4,5 +4,5 @@
 # running this manually is fine, e.g. after running create-secrets.bash
    
 for d in auth service-locator session-db file-broker scheduler comp session-worker type-service web-server toolbox; do 
-	oc deploy $d --latest
+	oc rollout latest $d
 done
