@@ -23,7 +23,7 @@ RUN mkdir ~/.npm-global \
 ENV PATH="/home/user/.npm-global/bin:${PATH}"
  
 RUN npm install -g typescript \
-	&& npm install -g @angular/cli@1.3.2 \
+	&& npm install -g @angular/cli \
 	&& npm cache clean --force
 	
 #RUN which nodejs \
