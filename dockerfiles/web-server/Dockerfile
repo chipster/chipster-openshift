@@ -16,7 +16,7 @@ RUN cd /home/user/build/chipster-web \
 	&& sed -i "/^export const ServiceLocator/c\export const ServiceLocator = '${SERVICE_LOCATOR}';" src/assets/app.constants.ts \	
 	&& npm install \
 	&& rm src/assets/manual \
-	&& ng build --no-progress || true \
+	&& ng build --prod --no-progress || true \
 	&& cp -r dist/* /opt/chipster-web/src/ \
 	&& ls -lah /opt/chipster-web/src/ \
 	&& rm -rf /home/user/build
