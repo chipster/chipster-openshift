@@ -93,7 +93,7 @@ function create_secret {
   	--from-file=chipster.yaml=conf/${service}.yaml \
   	--from-file=chipster-defaults.yaml=../chipster-web-server/conf/chipster-defaults.yaml \
   	--from-file=comp-chipster-config.xml=../chipster-web-server/conf/comp-chipster-config.xml \
-  	--from-file=jaas.config=../chipster-web-server/conf/jaas.config
+  	--from-file=jaas.config=../chipster-private/confs/rahti-int/jaas.config
 }
 
 for service in $services; do
