@@ -5,7 +5,7 @@ COPY . /tmp/build/chipster-web-server/
 # build the new chipster project
 RUN cd /tmp/build/chipster-web-server \
 	&& cp /opt/chipster/lib/chipster-*.jar . \
-	&& gradle distTar \
+	&& ./gradlew distTar \
 	&& tar -zxf build/distributions/chipster-web-server.tar.gz \
 	&& mkdir -p /opt/chipster-web-server/lib \
 	&& cp *.jar /opt/chipster-web-server/lib \

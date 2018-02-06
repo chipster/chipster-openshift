@@ -50,22 +50,31 @@ function configure_service {
   
   internal=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-int-$service:) || true
   external=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
+  ext_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-ext-$service:) || true
   port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
+  port_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-bind-$service: | cut -d : -f 4) || true
   
   # if the service has internal or external address, we have to expose it's port
   if [ -n "$internal" ] || [ -n "$external" ]; then
     echo "Create service $service $port"
   	oc expose dc $service --port=$port
+  	
   	# HTTPS
   	echo "Create route"
-  	oc create route edge --service $service --port $port --insecure-policy=Redirect
+  	if [ $service != "web-server" ]; then 
+  	  if [ -n "$external" ]; then
+	  	oc create route edge --service $service --port $port --insecure-policy=Redirect 
+  	  fi
+    fi
   fi
   
-  if [ $service != "web-server" ]; then 
-  	if [ -n "$external" ]; then
-  		oc expose service $service
-  	fi
-  fi
+  if [ -n "$ext_admin" ]; then
+    echo "Create admin service $service $port"
+  	oc expose dc $service --port=$port_admin --name $service-admin
+  	# HTTPS
+  	echo "Create route"
+  	oc create route edge --service $service-admin --port $port_admin --insecure-policy=Redirect
+  fi 
 }
 
 # configure a service to path /opt/chipster/$service/
@@ -77,17 +86,27 @@ function configure_service2 {
   
   internal=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-int-$service:) || true
   external=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
+  ext_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-ext-$service:) || true
   port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
+  port_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-bind-$service: | cut -d : -f 4) || true
   
   # if the service has internal or external address, we have to expose it's port
   if [ -n "$internal" ] || [ -n "$external" ]; then
   	oc expose dc $service --port=$port
+  	
+  	if [ $service != "web-server" ]; then 
+  	  if [ -n "$external" ]; then
+	  	oc create route edge --service $service --port $port --insecure-policy=Redirect 
+  	  fi
+    fi
   fi
   
-  if [ $service != "web-server" ]; then 
-  	if [ -n "$external" ]; then
-  		oc expose service $service
-  	fi
+  if [ -n "$ext_admin" ]; then
+    echo "Create admin service $service $port"
+  	oc expose dc $service --port=$port_admin --name $service-admin
+  	# HTTPS
+  	echo "Create route"
+  	oc create route edge --service $service-admin --port $port_admin --insecure-policy=Redirect
   fi
 }
 
@@ -136,14 +155,32 @@ function deploy_java_service {
 
 function add_volume {
 	service=$1
-	volume_name=$2
+	pvc_name=$2
 	size=$3
+	mount_path=$4
+	access_mode=$5
 	
-	if [[ $(oc get pvc $service-$volume_name 2> /dev/null) ]]; then
-  	  oc delete pvc $service-$volume_name
+	dc_volume_name=$pvc_name-volume
+	
+	# oc delete pvc $pvc_name
+	
+	if ! [[ $(oc get pvc $pvc_name 2> /dev/null) ]]; then
+	  # create pvc
+	  echo "
+apiVersion: \"v1\"
+kind: \"PersistentVolumeClaim\"
+metadata:
+  name: \"$pvc_name\"
+spec:
+  accessModes:
+    - \"$access_mode\"
+  resources:
+    requests:
+      storage: \"$size\"" | oc create -f -
     fi
-
-	retry oc set volume dc/$service --add --name $service-$volume_name -t pvc --mount-path /opt/chipster-web-server/$volume_name --claim-name=$service-$volume_name --claim-size=$size --overwrite
+    
+	# oc set volume dc/$service --remove --name $dc_volume_name 
+    oc set volume dc/$service --add --claim-name $pvc_name --mount-path $mount_path --name $dc_volume_name
 }
 
 function update_dockerfile {

@@ -9,10 +9,10 @@ echo
 echo "Deploy all for $PROJECT.$DOMAIN"
 echo
 
-if [[ $(oc get dc) ]] || [[ $(oc get service) ]] || [[ $(oc get routes) ]] ; then
+if [[ $(oc get dc) ]] || [[ $(oc get service -o name | grep -v glusterfs-dynamic-) ]] || [[ $(oc get routes) ]] ; then
   echo "The project is not empty. Run the following command to remove all deployments:"
   echo ""
-  echo "    oc delete dc --all; oc delete service --all; oc delete routes --all; oc delete pods --all"
+  echo '    oc delete dc --all; oc delete routes --all; oc delete pods --all; for s in $(oc get service -o name | grep -v glusterfs-dynamic-); do oc delete $s; done'
   echo ""
   echo "and if your want to remove volumes too:"
   echo ""
@@ -24,8 +24,14 @@ fi
 set -e
 set -x
 
+oc new-app h2 --name auth-h2
+add_volume auth-h2 auth-h2-data 1G /opt/h2-data ReadWriteMany
+
+oc new-app h2 --name session-db-h2
+add_volume session-db-h2 session-db-h2-data 10G /opt/h2-data ReadWriteMany
+
 deploy_java_service auth fi.csc.chipster.auth.AuthenticationService
-add_volume auth security 1G
+add_volume auth auth-security 1G /opt/chipster-web-server/security ReadWriteMany
 
 deploy_java_service service-locator fi.csc.chipster.servicelocator.ServiceLocator
 
@@ -36,7 +42,7 @@ oc create route edge --service session-db-events --port=8005 --insecure-policy=R
 
 
 deploy_java_service file-broker fi.csc.chipster.filebroker.FileBroker
-add_volume file-broker storage 500G
+add_volume file-broker file-broker-storage 200G /opt/chipster-web-server/storage ReadWriteMany
 
 deploy_java_service scheduler fi.csc.chipster.scheduler.Scheduler
 
@@ -53,24 +59,17 @@ deploy_service web-server
 oc create route edge --service web-server --port 8000 --hostname=$PROJECT.$DOMAIN --insecure-policy=Redirect
  
 deploy_service2 comp
-retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=650G --mount-path /mnt/tools --claim-name tools
-# retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=100G --mount-path /mnt/tools --claim-name tools
-retry oc volume dc/comp --add --type=persistentVolumeClaim --claim-mode=ReadWriteOnce --claim-size=100G --mount-path /opt/chipster/comp/jobs-data --claim-name comp-jobs-data
-#retry oc set volume dc/comp --add -t emptyDir --mount-path /opt/chipster-web-server/jobs-data
+add_volume comp tools 600G /mnt/tools ReadWriteMany
+add_volume comp comp-jobs-data 100G /opt/chipster/comp/jobs-data ReadWriteOnce
 
 deploy_service toolbox
 # needed for genome parameters
-retry oc volume dc/toolbox --add -t pvc --mount-path /mnt/tools --claim-name tools
-
-oc new-app h2 --name auth-h2
-oc volume dc/auth-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=1G --mount-path /opt/h2-data --claim-name auth-h2
-
-oc new-app h2 --name session-db-h2
-oc volume dc/session-db-h2 --add --type=persistentVolumeClaim --claim-mode=ReadWriteMany --claim-size=10G --mount-path /opt/h2-data --claim-name session-db-h2
+add_volume toolbox tools 600G /mnt/tools ReadWriteMany
 
 # for tools-bin download
 oc new-app base
-retry oc set volume  dc/base --add -t pvc --mount-path /mnt/tools --claim-name tools
+add_volume base tools 600G /mnt/tools ReadWriteMany
+
 
 set +e
 set +x
@@ -82,11 +81,12 @@ echo 'oc rsh dc/base bash'
 echo 'mkdir -p /mnt/tools/current'
 echo 'cd /mnt/tools/current'
 echo ''
-echo '# download the list of packages'
-echo 'curl http://vm0151.kaj.pouta.csc.fi/artefacts/create_tools_images/194/parts/files.txt | grep tar.lz4$ > files.txt'
+echo '# download tool binaries'
+echo 'wget http://vm0151.kaj.pouta.csc.fi/artefacts/create_tools_images/chipster-3.12.3/tools.tar.gz'
 echo ''
-echo '# download and extract the packages in parallel'
-echo 'time cat files.txt | parallel -j4 "curl http://vm0151.kaj.pouta.csc.fi/artefacts/create_tools_images/194/parts/{} | lz4c -d | tar -x"'
+echo '# extract tool binaries'
+echo 'tar -xtf tools.tar.gz'
+echo 'rm tools.tar.gz
 echo ''
 echo '# logout from the container'
 echo 'exit'
@@ -95,7 +95,7 @@ echo '# delete the container'
 echo 'oc delete dc base'
 echo ''
 echo '# Optionally, run the following in the container to fix dstat and other programs requiring a username'
-echo 'echo "chipster:x:$(id -u):$(id -g)::/tmp:/bin/bash" >> /etc/passwd'
+echo 'bash /fix-username.bash'
 echo '------------------------------------------------------------------------------'
 echo '# 2) Configure user accounts in /opt/chipster-web-server/security/users on auth'
 echo '------------------------------------------------------------------------------'

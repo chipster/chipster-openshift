@@ -18,7 +18,7 @@ DOMAIN=$(get_domain)
 service_locator="https://service-locator-$PROJECT.$DOMAIN"
 echo "Configure web-server to use service-locator: $service_locator"
 
-oc new-build --name web-server https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server/Dockerfile -e ba=$service_locator && retry oc logs -f bc/web-server
+oc new-build --name web-server https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server/Dockerfile -e SERVICE_LOCATOR=$service_locator && retry oc logs -f bc/web-server
 oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry oc logs -f bc/comp-base
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp
 oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f bc/comp
@@ -38,7 +38,7 @@ echo "# Build the latest github code"
 echo "oc start-build bc/BUILD_NAME --follow"
 echo ""
 echo "# Build your local code"
-echo "oc start-build BUILD_NAME --from- ../REPOSITORY --follow"
+echo "oc start-build BUILD_NAME --from-dir ../REPOSITORY --follow"
 echo ""
 echo "# Remove the build (prefer the above commands for updates instead, because this will break the GitHub webhook)"
 echo "oc delete is BUILD_NAME && oc delete bc BUILD_NAME"
