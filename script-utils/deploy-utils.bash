@@ -74,6 +74,8 @@ function configure_service {
   	# HTTPS
   	echo "Create route"
   	oc create route edge --service $service-admin --port $port_admin --insecure-policy=Redirect
+  	echo "Create IP whitelist"
+  	oc annotate route $service-admin "$(cat ../chipster-private/confs/rahti-int/admin-route-annotations)" --overwrite
   fi 
 }
 
@@ -107,6 +109,8 @@ function configure_service2 {
   	# HTTPS
   	echo "Create route"
   	oc create route edge --service $service-admin --port $port_admin --insecure-policy=Redirect
+  	echo "Create IP whitelist"
+  	oc annotate route $service-admin "$(cat ../chipster-private/confs/rahti-int/admin-route-annotations)" --overwrite
   fi
 }
 

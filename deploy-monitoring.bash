@@ -32,6 +32,8 @@ echo "# Data source type: InfluxDB"
 echo "# Http Url: http://influxdb:8086"
 echo "# Access: proxy"
 echo "# Database: db"
+echo "# User: "
+echo "# Password: "
 echo ""
 
 # create the build config
