@@ -36,14 +36,14 @@ Install Apache, mod_shib and shibd
 RUN apt install -y shibboleth-sp2-common libapache2-mod-shib2 apache2 shibboleth-sp2-utils
 ```	
 
-It's not allowed to run services with root privileges in OpenShift at the moment. We have to make some adjustments to allow Apache and shibd to run as a regular user. The OpenShift will create a new user (with high UID) for running these services and adds that user a group ´root´, so it's enough to give necessary permissions for that group.  
+It's not allowed to run services with root privileges in OpenShift at the moment. We have to make some adjustments to allow Apache and shibd to run as a regular user. The OpenShift will create a new user (with high UID) for running these services and adds that user a group `root`, so it's enough to give necessary permissions for that group.  
 
 ```dockerfile
 RUN chgrp -R root /var/log/apache2/ /var/lock/apache2/ /var/run/apache2/ \
 	&& chmod -R g+w /var/log/apache2/ /var/lock/apache2/ /var/run/apache2/
 ```	
 
-By default Apache tries to bind to port 80, which isn't allowed for normal users. Let's disable that by replacing the  file with an empty file. We'll add a new minimal configuration file to ´sites-enabled´ to be able to test that Apache starts. It will be overridden by the real configuration later. 
+By default Apache tries to bind to port 80, which isn't allowed for normal users. Let's disable that by replacing the  file with an empty file. We'll add a new minimal configuration file to `sites-enabled` to be able to test that Apache starts. It will be overridden by the real configuration later. 
 	
 ```dockerfile
 RUN mv /etc/apache2/ports.conf /etc/apache2/ports.conf.original \
@@ -51,7 +51,7 @@ RUN mv /etc/apache2/ports.conf /etc/apache2/ports.conf.original \
 	&& touch /etc/apache2/ports.conf 
 ```
 
-We are going to configure the Apache and shibd by mounting a new directtory (called *secret* in OpenShift) containing the configuration files. For Apache we can simply mount it to ´/etc/apache2/sites-enabled´, where Apache will automatically look for all files ending with ´.conf´. On the contrary, shibd has a lot of configuration files in the same directory and we want to replace only some of them, so we can't simply replace the whole directory. Instead we create a new directory ´/etc/shibboleth/secret´ and replace the relevant configuration files with a symlink pointing to that directory. The default `shibbleth2.xml´ is copied to the folder ´secret´ so that we can test that the *shibd* starts even before we have configured it. 
+We are going to configure the Apache and shibd by mounting a new directtory (called *secret* in OpenShift) containing the configuration files. For Apache we can simply mount it to `/etc/apache2/sites-enabled`, where Apache will automatically look for all files ending with `.conf`. On the contrary, shibd has a lot of configuration files in the same directory and we want to replace only some of them, so we can't simply replace the whole directory. Instead we create a new directory `/etc/shibboleth/secret` and replace the relevant configuration files with a symlink pointing to that directory. The default `shibbleth2.xml` is copied to the folder `secret` so that we can test that the *shibd* starts even before we have configured it. 
 
 
 ```dockerfile 	
@@ -64,7 +64,7 @@ RUN mkdir /etc/shibboleth/secret \
 	&& ln -s secret/attribute-map.xml attribute-map.xml
 ```	
 	
-Also shibd expects rights to write in a few directories under ´/var´ like Apache.
+Also shibd expects rights to write in a few directories under `/var` like Apache.
 
 ```dockerfile
 RUN mkdir -p /var/run/shibboleth /var/cache/shibboleth /var/log/shibboleth \
@@ -73,13 +73,13 @@ RUN mkdir -p /var/run/shibboleth /var/cache/shibboleth /var/log/shibboleth \
 ```	
 	
 Set the command for starting services. Usually each process should be in its own container, but these pocesses were made to 
-run in the same machine. Starting two processes like this won't handle the shutdown signals correctly (´exec´ fixes it only for one process), so your login requests may fail during the deployments. If you try to fix this with a process manager like *supervisord*, be warned that the shibd process saves same state about the login session, which probably has to sorted out also to get error-free rolling updates.
+run in the same machine. Starting two processes like this won't handle the shutdown signals correctly (`exec` fixes it only for one process), so your login requests may fail during the deployments. If you try to fix this with a process manager like *supervisord*, be warned that the shibd process saves same state about the login session, which probably has to sorted out also to get error-free rolling updates.
 
 ```dockerfile
 CMD ["bash", "-c", "/etc/init.d/apache2 start; exec shibd -F start"]
 ```
 
-Now we have the dockerfile and we can build an image in OpenShift. Unfortunately the ´oc´ command doesn't accept the file path directly, but we have pass it from the standard input.
+Now we have the dockerfile and we can build an image in OpenShift. Unfortunately the `oc` command doesn't accept the file path directly, but we have pass it from the standard input.
 
 ```bash
 oc new-build --name shibboleth -D - < dockerfiles/shibboleth/Dockerfile
@@ -100,7 +100,7 @@ The image is ready. Let's deploy it.
 oc new-app shibboleth
 ```
 
-Expose the Apache's port 8000 and terminate the TLS on the load balancer. Disable redirects from *http* to *https* by setting ´--insecure-policy=None´, because the same is recommended also in more traditional setups (where TLS is terminated in the Apache). This will use a OpenShift's wildcard TLS certificate. Consider getting a host-specific certificate and terminating the TLS in the Apache instead. I'm not aware of any direct risk associated with this wildcard solution, but your own certificate would be definitely better. 
+Expose the Apache's port 8000 and terminate the TLS on the load balancer. Disable redirects from *http* to *https* by setting `--insecure-policy=None`, because the same is recommended also in more traditional setups (where TLS is terminated in the Apache). This will use a OpenShift's wildcard TLS certificate. Consider getting a host-specific certificate and terminating the TLS in the Apache instead. I'm not aware of any direct risk associated with this wildcard solution, but your own certificate would be definitely better. 
 
 ```bash
 oc expose dc shibboleth --port=8000  	
@@ -121,7 +121,7 @@ Create a directory for the configuration files, perhaps under a private version 
 mkdir -p ../PRIV_REPO/confs/apache/
 ```
 
-Create file ´shibboleth.conf´ to this directory. The only thing we need to change is the last line. We have to tell the SERVICE_URL for the mod_shib. The mod_shib needs to know that its external address starts with ´https://´ due to the TLS termination in the load balancer. 
+Create file `shibboleth.conf` to this directory. The only thing we need to change is the last line. We have to tell the SERVICE_URL for the mod_shib. The mod_shib needs to know that its external address starts with `https://` due to the TLS termination in the load balancer. 
 
 ```apache
 # reverse proxy module
@@ -168,9 +168,9 @@ oc set volume dc/shibboleth --add -t secret --secret-name shibboleth-apache-conf
 
 We need a private key and its certificate to sign our authentication messages to the IdP and decrypt information we get from it. Luckily a self-signed certificate is enough, so we can simply generate these. We are going to generate the key in the container and then copy it to your laptop.
 
-The first parameter is the hostname of the service, for which SERVICE_URL works fine. The second parameter is the entityID of your service. Basically you can invent any unique string for it, but SERVICE_URL is a good choice. We need some place with write permissions to save the keys for a minute. We'll use /tmp now, because there we have write permissions. The permissions don't allow the shib-keygen to change the permissions and group of the key files, but that doesn't matter, because you can do it later on your own machine. There should be a ´oc cp´ command for copying files, but for some reason it didn't do anything (´oc cp shibboleth:/tmp/sp-cert.pem ~/secure/sp-cert.pem´), so I used ´oc rsh´ instead.
+The first parameter is the hostname of the service, for which SERVICE_URL works fine. The second parameter is the entityID of your service. Basically you can invent any unique string for it, but SERVICE_URL is a good choice. We need some place with write permissions to save the keys for a minute. We'll use /tmp now, because there we have write permissions. The permissions don't allow the shib-keygen to change the permissions and group of the key files, but that doesn't matter, because you can do it later on your own machine. There should be a `oc cp` command for copying files, but for some reason it didn't do anything (`oc cp shibboleth:/tmp/sp-cert.pem ~/secure/sp-cert.pem`), so I used `oc rsh` instead.
 
-Store the private key sp-cert.pem in a such place on your computer that you don't accidentally  make it public (for example by pushing it to a code repo). I'll use the dir ´~/secure/´ in these exapmles. The second file, ´sp-cert.pem´ will be public anyway, but let's keep it in the same directory, because we are going to use them together.
+Store the private key sp-cert.pem in a such place on your computer that you don't accidentally  make it public (for example by pushing it to a code repo). I'll use the dir `~/secure/` in these exapmles. The second file, `sp-cert.pem` will be public anyway, but let's keep it in the same directory, because we are going to use them together.
 
 ```bash
 oc rsh dc/shibboleth shib-keygen -h SERVICE_URL -y 3 -e SERVICE_URL -o /tmp
@@ -181,7 +181,7 @@ chmod go-rwx ~/secure/sp-key.pem
 oc rsh dc/shibboleth rm /tmp/sp-*.pem
 ```
 
-´´´
+```
 > Generating a 2048 bit RSA private key
 > ....................................................+++
 > ......................+++
@@ -193,7 +193,7 @@ oc rsh dc/shibboleth rm /tmp/sp-*.pem
 > chgrp: changing group of '/var/run/shibboleth/sp-key.pem': Operation not permitted
 > chgrp: changing group of '/var/run/shibboleth/sp-cert.pem': Operation not permitted
 > command terminated with exit code 1
-´´´
+```
 
 The SAML2 metadata describes all the member SPs and IdPs of the federation. The federation signs it with their own private key and we can check its authenticity with their certificate. Download their certificate to the same folder.
 
@@ -220,7 +220,7 @@ oc cp dc/shibboleth:/etc/shibboleth/attribute-map.xml.original ../PRIV_REPO/conf
 
 Configure the shibboleth2.xml according to the instructions of your federation (e.g. [Haka testi in Finnish](https://wiki.eduuni.fi/display/CSCHAKA/Shibboleth+SP+asennus)). 
 
-Fill in the ´entityID´ you used in when generating the keys, most likely your SERVICE_URL. Set ´signing="front"´, because authentication requests must be signed with your private key in Haka. Set ´attributePrefix="AJP_"´, because the Apache mod_ajp_proxy will pass through only variables starting with prefix ´AJP_´.
+Fill in the `entityID` you used in when generating the keys, most likely your SERVICE_URL. Set `signing="front"`, because authentication requests must be signed with your private key in Haka. Set `attributePrefix="AJP_"`, because the Apache mod_ajp_proxy will pass through only variables starting with prefix `AJP_`.
 
 ```xml
 <ApplicationDefaults entityID="SERVICE_URL" REMOTE_USER="eppn persistent-id targeted-id" signing="front" encryption="false" attributePrefix="AJP_">
@@ -328,29 +328,29 @@ None
 | Last Name        | 
 | E-Mail           | 
 
-Click *Submit SP Description* and you should get an email when the federation has processed your registration. The email contains the credentials of the test account, which you can use to log in to your service. Navigate a browser to ´SERVICE_URL/Shibboleth.sso/Login´. You should be redirected first to the Discovery Service and then to the Login form. Fill in the credentials of the test user and you should be back in your own service. See 'SERVICE_URL/Shibboleth.sso/Session´and now you should have an active authentication session. You can logout by going to 'SERVICE_URL/Shibboleth.sso/Logout´.
+Click *Submit SP Description* and you should get an email when the federation has processed your registration. The email contains the credentials of the test account, which you can use to log in to your service. Navigate a browser to `SERVICE_URL/Shibboleth.sso/Login`. You should be redirected first to the Discovery Service and then to the Login form. Fill in the credentials of the test user and you should be back in your own service. See 'SERVICE_URL/Shibboleth.sso/Session`and now you should have an active authentication session. You can logout by going to 'SERVICE_URL/Shibboleth.sso/Logout`.
 
 If this doesn't work, see Apache log file
-´´´bash
+```bash
 oc rsh dc/shibboleth cat /var/log/apache2/error.log
-´´´
+```
 *shibd* log file
-´´´bash
+```bash
 oc rsh dc/shibboleth cat /var/log/shibboleth/shibd.log
-´´´
+```
 
 Your service's metadata
-´´´bash
+```bash
 curl SERVICE_URL/Shibboleth.sso/Metadata
-´´´
+```
 
 ### Configure attribute mapping
 
-Before your service gets the attributes you requested, those must be mapped. By default only to eduPersonPrincipalName attribute is mapped to "eppn" variable. Edit the file ~/PRIV_REPO/confs/shibd/attribute-map.xml and uncomment or add the mapping for your attributes. The `urn:oid:´refers to the *cn* attribute and this maps it to the variable with the same name. 
+Before your service gets the attributes you requested, those must be mapped. By default only to eduPersonPrincipalName attribute is mapped to "eppn" variable. Edit the file ~/PRIV_REPO/confs/shibd/attribute-map.xml and uncomment or add the mapping for your attributes. The `urn:oid:`refers to the *cn* attribute and this maps it to the variable with the same name. 
 
 ```xml
 <Attribute name="urn:oid:2.5.4.3" id="cn"/>
-´´´
+```
 
 Update the configuration files.
 
@@ -358,7 +358,7 @@ Update the configuration files.
 bash update_shibd_confs.bash ~/secure/ ../PRIV_REPO/confs/shibd/
 ```
 
-Login again in 'SERVICE_URL/Shibboleth.sso/Login´ and now you should see your new attributes listend in 'SERVICE_URL/Shibboleth.sso/Session´. The values are hidden, but don't worry, you will see them soon in our test application.
+Login again in 'SERVICE_URL/Shibboleth.sso/Login` and now you should see your new attributes listend in 'SERVICE_URL/Shibboleth.sso/Session`. The values are hidden, but don't worry, you will see them soon in our test application.
 
 ## Application
 ### Java project
