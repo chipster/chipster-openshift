@@ -271,19 +271,23 @@ Your service is ready to be registered. In case of Haka, go to [Haka resource re
 
 **Organiztion information**
 
-| Select organization                                 | <fill-in>
+Select your organization.
 
 **SP Basic Information**
 
+| Setting                                             | Value
+| --------------------------------------------------- |---
 | Entity Id                                           | SERVICE_URL
-| Service Name (Finnish)                              | <fill-in>
-| Service Description (Finnish)                       | <fill-in>
+| Service Name (Finnish)                              | 
+| Service Description (Finnish)                       | 
 | Service Login Page URL                              | SERVICE_URL/Shibboleth.sso/Login
 | Discovery Response URL                              | SERVICE_URL/Shibboleth.sso/Login
 | urn:oasis:names:tc:SAML:2.0:nameid-format:transient | x
   
 **SP SAML Endpoints**
 
+| Setting                                             | Value
+| --------------------------------------------------- |---
 | URL index #1                                        | SERVICE_URL/Shibboleth.sso/SAML2/POST
 
 **Certificates**
@@ -299,8 +303,10 @@ Select the attributes you need and explain why. See
 
 Our example application will use two attributes:
 
-| eduPersonPrincipalName   | x  | Technical user identifier
-| cn                       | x  | Human-readable name of the user
+| Setting                  | Selected | Reason
+| ---                      | ---      | ---
+| eduPersonPrincipalName   | x        | Technical user identifier
+| cn                       | x        | Human-readable name of the user
 
 In Test-Haka, select at least the `cn` attribute, becuase the test user's name contains an accented character, which allows
 us to test a character encoding issue later. 
@@ -311,14 +317,16 @@ None
 
 **Contact Information**
 
+| Setting          | Value
+| ---              | ---
 | Contact type     | Technical
-| First Name       | <fill-in>
-| Last Name        | <fill-in>
-| E-Mail           | <fill-in>
+| First Name       | 
+| Last Name        | 
+| E-Mail           | 
 | Contact type     | Support
-| First Name       | <fill-in>
-| Last Name        | <fill-in>
-| E-Mail           | <fill-in>
+| First Name       | 
+| Last Name        | 
+| E-Mail           | 
 
 Click *Submit SP Description* and you should get an email when the federation has processed your registration. The email contains the credentials of the test account, which you can use to log in to your service. Navigate a browser to ´SERVICE_URL/Shibboleth.sso/Login´. You should be redirected first to the Discovery Service and then to the Login form. Fill in the credentials of the test user and you should be back in your own service. See 'SERVICE_URL/Shibboleth.sso/Session´and now you should have an active authentication session. You can logout by going to 'SERVICE_URL/Shibboleth.sso/Logout´.
 
