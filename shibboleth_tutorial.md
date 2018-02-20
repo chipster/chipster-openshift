@@ -12,7 +12,7 @@ This tutorial shows how to get the authentication information to a small example
 
 There are two ways to pass to authentication information from Apache to your application: *request environment variables* and *HTTP headers*. The Shibboleth documentation favors the first one, but it may not be possible in all programming languages.  With a quick googling it looks like request environment variables work in Java and Python for example, but maybe not in NodeJS. If you decide to use language where only HTTP headers are supported, please make sure you understand its [security implications](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSpoofChecking).
 
-The tutorial assumes you have the command line tools ´oc´ (OpenShift command line client), ´wget´ and ´jq´ (for parsing yaml) already installed on your development machine. 
+The tutorial assumes you have the command line tools `oc` (OpenShift command line client), `wget` and `jq` (for parsing yaml) already installed on your development machine. 
 
 ## Container
 
