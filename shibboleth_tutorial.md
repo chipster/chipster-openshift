@@ -182,18 +182,18 @@ oc rsh dc/shibboleth rm /tmp/sp-*.pem
 ```
 
 ```
-> Generating a 2048 bit RSA private key
-> ....................................................+++
-> ......................+++
-> unable to write 'random state'
-> writing new private key to '/var/run/shibboleth/sp-key.pem'
-> -----
-> chown: changing ownership of '/var/run/shibboleth/sp-key.pem': Operation not permitted
-> chown: changing ownership of '/var/run/shibboleth/sp-cert.pem': Operation not permitted
-> chgrp: changing group of '/var/run/shibboleth/sp-key.pem': Operation not permitted
-> chgrp: changing group of '/var/run/shibboleth/sp-cert.pem': Operation not permitted
-> command terminated with exit code 1
-```
+Generating a 2048 bit RSA private key
+....................................................+++
+......................+++
+unable to write 'random state'
+writing new private key to '/var/run/shibboleth/sp-key.pem'
+-----
+chown: changing ownership of '/var/run/shibboleth/sp-key.pem': Operation not permitted
+chown: changing ownership of '/var/run/shibboleth/sp-cert.pem': Operation not permitted
+chgrp: changing group of '/var/run/shibboleth/sp-key.pem': Operation not permitted
+chgrp: changing group of '/var/run/shibboleth/sp-cert.pem': Operation not permitted
+command terminated with exit code 1
+````
 
 The SAML2 metadata describes all the member SPs and IdPs of the federation. The federation signs it with their own private key and we can check its authenticity with their certificate. Download their certificate to the same folder.
 
