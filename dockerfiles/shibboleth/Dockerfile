@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 
-# install apache and shibd
+# install apache, shibd and java
 RUN apt update -y \
-	&& apt install -y shibboleth-sp2-common libapache2-mod-shib2 apache2 shibboleth-sp2-utils \
+	&& apt install -y shibboleth-sp2-common libapache2-mod-shib2 apache2 shibboleth-sp2-utils openjdk-8-jdk gradle \
 	&& apt clean
 
 # create a separate dir for relevant shibd confs so that we don't hide other files when we mount a secret volume over it
