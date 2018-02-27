@@ -42,6 +42,17 @@ while read line; do
 done < ../chipster-web-server/conf/chipster-defaults.yaml
 
 while read line; do
+	if [[ $line == url-m2m-int-* ]]; then
+		service=$(echo $line | cut -d : -f 1 | sed s/url-m2m-int-//)
+		default_url=$(echo $line | cut -d " " -f 2)
+		proto=$(echo $default_url | cut -d { -f 1)
+		port=$(echo $default_url | cut -d : -f 3)
+		
+		echo url-m2m-int-$service: $proto$service-m2m:$port		
+	fi
+done < ../chipster-web-server/conf/chipster-defaults.yaml
+
+while read line; do
 	if [[ $line == url-int-* ]]; then
 		service=$(echo $line | cut -d : -f 1 | sed s/url-int-//)
 		default_url=$(echo $line | cut -d " " -f 2)
