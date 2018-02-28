@@ -39,6 +39,13 @@ function create_password {
   echo $config_key: $(generate_password) | tee conf/$service.yaml >> conf/auth.yaml
 }
 
+function create_sso_password {
+  service=$1
+  config_key=sso-service-password-${service}
+  
+  echo $config_key: $(generate_password) | tee conf/$service.yaml >> conf/auth.yaml
+}
+
 # generate configs and save them as openshift secrets
 
 rm -f conf/*
@@ -63,11 +70,6 @@ for service in $authenticated_services; do
 	create_password $service
 done
 
-# Mostly the usernames and services are equal, but not for haka/shibboleth
-#
-# The create_password function above created the file based on the username "shibboleth", but
-# everything else assumes the file is named after the service "haka". 
-mv conf/shibboleth.yaml conf/haka.yaml
 
 # get the db password from the existing instance
 auth_db_pass=$(get_db_password auth)
@@ -90,6 +92,8 @@ echo session-db-pass: $session_db_pass >> conf/session-db.yaml
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
 
+# Haka Single sign-on
+create_sso_password haka
 echo url-ext-haka: https://haka-$PROJECT.$DOMAIN >> conf/service-locator.yaml
 
 function create_secret {
