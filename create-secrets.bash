@@ -48,7 +48,7 @@ function create_sso_password {
 
 # generate configs and save them as openshift secrets
 
-rm -f conf/*
+rm -rf conf/*
 
 services="session-db 
 	service-locator
@@ -110,6 +110,7 @@ function create_secret {
   	--from-file=jaas.config=../chipster-private/confs/rahti-int/jaas.config
 }
 
+
 for service in $services; do
 	# deployment assumes that there is a configuration secret for each service	
 	echo "url-int-service-locator: http://service-locator:8003" >> conf/$service.yaml
@@ -117,4 +118,18 @@ for service in $services; do
 	create_secret $service
 done
 
-rm conf/*
+# Configuration for the Angular app
+if [[ $(oc get secret web-server-app-conf) ]]; then
+  oc delete secret web-server-app-conf  
+fi
+
+mkdir -p conf/web-server-app-conf
+
+cat ../chipster-web/src/assets/conf/chipster.yaml | \
+  sed "s#^service-locator: http://localhost:8003#service-locator: https://service-locator-$PROJECT.$DOMAIN#" \
+  > conf/web-server-app-conf/chipster.yaml
+
+oc create secret generic web-server-app-conf \
+  --from-file=chipster.yaml=conf/web-server-app-conf/chipster.yaml
+
+rm -rf conf/*

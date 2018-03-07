@@ -57,6 +57,7 @@ deploy_service web-server
 # use the root route
 #oc expose service web-server --hostname=$PROJECT.$DOMAIN
 oc create route edge --service web-server --port 8000 --hostname=$PROJECT.$DOMAIN --insecure-policy=Redirect
+oc set volume dc/web-server --add -t secret --secret-name web-server-app-conf --mount-path /opt/chipster-web/src/assets/conf/
  
 deploy_service2 comp
 add_volume comp tools 600G /mnt/tools ReadWriteMany
