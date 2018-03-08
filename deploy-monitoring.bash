@@ -1,11 +1,12 @@
 #!/bin/bash
 
+password=$(oc rsh dc/auth cat security/users | grep monitoring | cut -d ":" -f 2)
+
 if [ -z "$password" ]
 then
       echo "Error: \$password is empty"
       echo "Monitoring requires a Chipster user account."
-      echo "Create a new user called \"monitoring\" on the auth service and save "
-      echo "it's password to the env \$password before running this script."
+      echo "Create a new user called \"monitoring\" on the auth service."
       exit 1 
 fi
 
@@ -22,6 +23,8 @@ oc new-app grafana
 oc set volume dc/grafana --add --name grafana -t pvc --mount-path /usr/share/grafana/data --claim-name=grafana --claim-size=1G --overwrite
 oc expose dc grafana --port=3000
 oc create route edge --service grafana --port=3000 --insecure-policy=Redirect
+oc rsh dc/grafana grafana-cli admin reset-admin-password --homepath "/usr/share/grafana" "$(cat ../chipster-private/confs/rahti-int/grafana-admin-password)" 
+oc annotate route grafana "$(cat ../chipster-private/confs/rahti-int/admin-route-annotations)" --overwrite
 
 
 echo "# run in influxdb container to create the database"

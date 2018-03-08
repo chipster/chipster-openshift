@@ -33,6 +33,19 @@ add_volume session-db-h2 session-db-h2-data 10G /opt/h2-data ReadWriteMany
 deploy_java_service auth fi.csc.chipster.auth.AuthenticationService
 add_volume auth auth-security 1G /opt/chipster-web-server/security ReadWriteMany
 
+echo "Waiting for the auth container to start"
+sleep 15
+
+# check connection first, otherwise connection errors cause the users file to be overwritten
+if oc rsh dc/auth hostname && oc rsh dc/auth ls /opt/chipster-web-server/security/users; then
+  echo "Using old accounts"
+else
+  echo Create default accounts
+  # copy with "oc rsh", because oc cp would require a pod name
+  cat ../chipster-private/confs/rahti-int/users | oc rsh dc/auth bash -c "cat - > /opt/chipster-web-server/security/users"
+fi
+
+
 deploy_java_service service-locator fi.csc.chipster.servicelocator.ServiceLocator
 
 # oc delete route session-db-events && oc delete service session-db-events

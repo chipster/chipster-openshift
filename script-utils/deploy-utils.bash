@@ -80,7 +80,7 @@ function configure_service {
   	oc annotate route $service-admin "$(cat ../chipster-private/confs/rahti-int/admin-route-annotations)" --overwrite
   fi
   
-  if [ -n "$int_m2m" ]; then
+  if [ -n "$port_m2m" ]; then
     echo "Create m2m service $service $port_m2m"
   	oc expose dc $service --port=$port_m2m --name $service-m2m  	
   fi 
