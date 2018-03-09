@@ -10,3 +10,5 @@ oc new-build --name shibboleth-java --source-image=chipster-web-server --source-
 
 oc set volume dc/haka --add -t emptyDir --mount-path /opt/chipster-web-server/logs  	
 oc set volume dc/haka --add -t secret --secret-name haka-conf --mount-path /opt/chipster-web-server/conf/
+
+oc expose dc auth --port=8013 --name auth-m2m  	

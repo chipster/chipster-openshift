@@ -51,10 +51,8 @@ function configure_service {
   internal=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-int-$service:) || true
   external=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
   ext_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-ext-$service:) || true
-  int_m2m=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-m2m-int-$service:) || true
   port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
   port_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-bind-$service: | cut -d : -f 4) || true
-  port_m2m=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-m2m-bind-$service: | cut -d : -f 4) || true
   
   # if the service has internal or external address, we have to expose it's port
   if [ -n "$internal" ] || [ -n "$external" ]; then
@@ -78,11 +76,6 @@ function configure_service {
   	oc create route edge --service $service-admin --port $port_admin --insecure-policy=Redirect
   	echo "Create IP whitelist"
   	oc annotate route $service-admin "$(cat ../chipster-private/confs/rahti-int/admin-route-annotations)" --overwrite
-  fi
-  
-  if [ -n "$port_m2m" ]; then
-    echo "Create m2m service $service $port_m2m"
-  	oc expose dc $service --port=$port_m2m --name $service-m2m  	
   fi 
 }
 
