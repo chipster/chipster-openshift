@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: {{service}}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{service}}
+    spec:
+      containers:
+      - name: {{service}}
+        image: "{{&image}}"
+        ports:     
+        {{#api-port}}           
+        - name: api
+          containerPort: "{{api-port}}"
+        {{/api-port}}
+        - name: admin
+          containerPort: "{{admin-port}}"
+        volumeMounts:
+        - mountPath: "{{&work-dir}}/logs"
+          name: logs
+        - mountPath: "{{&work-dir}}/conf"
+          name: conf
+        readinessProbe:
+          exec:
+            command:
+            - curl
+            - '--fail'
+            - 'http://127.0.0.1:{{admin-port}}/admin/alive'
+        env:
+        - name: JAVA_CLASS
+          value: {{java-class}}
+        resources:
+          limits:
+            cpu: 1900m
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 100Mi            
+      - name: status
+        env:
+        - name: admin_port
+          value: "{{admin-port}}"
+        - name: role
+          value: {{service}}
+        image: 'docker-registry.default.svc:5000/{{project}}/monitoring'
+        readinessProbe:
+          exec:
+            command:
+            - curl
+            - '--fail'
+            - 'http://127.0.0.1:{{admin-port}}/admin/alive'
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 10Mi          
+      volumes:
+      - emptyDir: {}
+        name: logs
+      - name: conf
+        secret:
+          defaultMode: 420
+          secretName:  {{service}}-conf
+  replicas: 1

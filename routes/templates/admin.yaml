@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: {{service}}-admin
+  annotations: 
+    # use the ampersand in the template to prevent spaces being escaped
+    haproxy.router.openshift.io/ip_whitelist: "{{&admin-ip-whitelist}}"
+spec:
+  to:
+    kind: Service
+    name: {{service}}-admin
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge

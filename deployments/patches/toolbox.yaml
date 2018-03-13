@@ -1,0 +1,13 @@
+---
+spec:
+  template:    
+    spec:
+      containers:
+      - name: toolbox
+        volumeMounts:
+        - mountPath: /mnt/tools
+          name: tools-bin
+      volumes:
+      - name: tools-bin
+        persistentVolumeClaim:
+          claimName: tools-bin

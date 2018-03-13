@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: session-db-events
+spec:
+  to:
+    kind: Service
+    name: session-db-events
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge

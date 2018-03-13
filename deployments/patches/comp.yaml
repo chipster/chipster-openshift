@@ -1,0 +1,18 @@
+---
+spec:
+  template:    
+    spec:
+      containers:
+      - name: comp
+        volumeMounts:
+        - mountPath: /opt/chipster/comp/jobs-data
+          name: jobs-data
+        - mountPath: /mnt/tools
+          name: tools-bin
+      volumes:
+      - name: jobs-data
+        persistentVolumeClaim:
+          claimName: comp-jobs-data
+      - name: tools-bin
+        persistentVolumeClaim:
+          claimName: tools-bin

@@ -1,0 +1,13 @@
+---
+spec:
+  template:    
+    spec:
+      containers:
+      - name: web-server
+        volumeMounts:
+        - mountPath: /opt/chipster-web/src/assets/conf
+          name: app-conf
+      volumes:
+      - name: app-conf
+        secret:
+          secretName: web-server-app-conf

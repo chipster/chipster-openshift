@@ -1,0 +1,13 @@
+---
+spec:
+  template:    
+    spec:
+      containers:
+      - name: auth
+        volumeMounts:
+        - mountPath: /opt/chipster-web-server/security
+          name: security
+      volumes:
+      - name: security
+        persistentVolumeClaim:
+          claimName: auth-security
