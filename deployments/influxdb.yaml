@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: influxdb
+spec:
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb
+        ports:                
+        - name: api
+          containerPort: 8086
+        volumeMounts:
+        - mountPath: /var/lib/influxdb
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: influxdb
+  replicas: 1
+          

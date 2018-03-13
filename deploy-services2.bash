@@ -2,6 +2,20 @@
 
 set -e
 
+# parse the current project name
+function get_project {
+  oc project -q
+}
+
+# parse the current project domain (i.e. the address of this OpenShift)
+function get_domain {
+  #oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
+  echo "rahti-int-app.csc.fi"
+}
+
+export PROJECT=$(get_project)
+export DOMAIN=$(get_domain)
+
 if [[ $(oc get dc) ]] || [[ $(oc get service -o name | grep -v glusterfs-dynamic-) ]] || [[ $(oc get routes) ]] ; then
   echo "The project is not empty"
   echo ""
@@ -77,6 +91,19 @@ else
   # copy with "oc rsh", because oc cp would require a pod name
   cat ../chipster-private/confs/rahti-int/users | oc rsh dc/auth bash -c "cat - > /opt/chipster-web-server/security/users"
 fi
+
+# create a db to influxdb
+oc rsh dc/influxdb curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE db" -X POST
+
+oc rsh dc/grafana grafana-cli admin reset-admin-password --homepath "/usr/share/grafana" "$(cat ../chipster-private/confs/rahti-int/grafana-admin-password)" 
+
+grafana_password="$(cat ../chipster-private/confs/rahti-int/grafana-admin-password)"
+curl https://grafana-$PROJECT.$DOMAIN/api/datasources -u admin:$grafana_password -X POST --data-binary '{ "name": "InfluxDB", "type": "influxdb", "url": "http://influxdb:8086", "access": "proxy", "basicAuth": false, "database": "db" }' -H Content-Type:application/json
+curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat script-utils/monitoring/dashboard-summary.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat script-utils/monitoring/dashboard-websocket.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat script-utils/monitoring/dashboard-load.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat script-utils/monitoring/dashboard-rest.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+
 
 echo '------------------------------------------------------------------------------'
 echo '# 1) Download tools by running the following commands:'

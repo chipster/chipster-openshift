@@ -20,6 +20,9 @@ spec:
         volumeMounts:
         - mountPath: /opt/h2-data
           name: h2-data
+        readinessProbe:
+          tcpSocket:
+            port: 1521
       volumes:
       - name: h2-data
         persistentVolumeClaim:

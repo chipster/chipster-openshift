@@ -46,6 +46,8 @@ spec:
           value: "{{admin-port}}"
         - name: role
           value: {{service}}
+        - name: password
+          value: {{monitoring-password}}
         image: 'docker-registry.default.svc:5000/{{project}}/monitoring'
         readinessProbe:
           exec:

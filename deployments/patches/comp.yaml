@@ -4,6 +4,13 @@ spec:
     spec:
       containers:
       - name: comp
+        resources:
+          limits:
+            cpu: 1900m
+            memory: 7900Mi
+          requests:
+            cpu: 200m
+            memory: 100Mi
         volumeMounts:
         - mountPath: /opt/chipster/comp/jobs-data
           name: jobs-data

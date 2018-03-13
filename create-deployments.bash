@@ -1,18 +1,9 @@
 #!/bin/bash
 
-# parse the current project name
-function get_project {
-  oc project -q
-}
+#FIXME move to secret
+monitoring_password=$(oc rsh dc/auth cat security/users | grep monitoring | cut -d ":" -f 2)
 
-# parse the current project domain (i.e. the address of this OpenShift)
-function get_domain {
-  #oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
-  echo "rahti-int-app.csc.fi"
-}
-
-PROJECT=$(get_project)
-DOMAIN=$(get_domain)
+echo project: $PROJECT domain: $DOMAIN
 
 function get_image {
   build_name="$1"
@@ -49,6 +40,7 @@ function configure_service {
       \"project\": \"$PROJECT\",
       \"image\": \"$image\",
       \"work-dir\": \"$work_dir\",
+      \"monitoring-password\": \"$monitoring_password\",
       \"admin-ip-whitelist\": \"$(cat ../chipster-private/confs/rahti-int/admin-ip-whitelist)\"
       }" # no comma after the last line!
 
@@ -91,6 +83,8 @@ view="{
       }"
 
 echo "$view" | mustache - routes/templates/web-server.yaml > generated/routes/web-server.yaml &
+echo "$view" | mustache - routes/templates/grafana.yaml > generated/routes/grafana.yaml &
+echo "$view" | mustache - deployments/templates/grafana.yaml > generated/deployments/grafana.yaml &
 
 # shared templates and shared image
 configure_java_service auth fi.csc.chipster.auth.AuthenticationService &
