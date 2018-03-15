@@ -68,4 +68,15 @@ python-pip \
 parallel \
 curl \
 rsync \
+#libssl-dev for compiling python
+libssl-dev \
+#libbz2-dev for R-3.3+
+libbz2-dev \
+htop \
+# libnlopt0 for Seurat
+libnlopt0 \
+#libnlopt-dev for Seurat
+libnlopt-dev \
+#liblzo2-devor rseqc 
+liblzo2-dev \
 && apt-get clean
