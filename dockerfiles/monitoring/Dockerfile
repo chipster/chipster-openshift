@@ -2,7 +2,7 @@ FROM base
 
 WORKDIR /home/user
 
-COPY script-utils/monitoring/ /home/user/
+COPY monitoring/ /home/user/
 
 RUN ls -lah
 

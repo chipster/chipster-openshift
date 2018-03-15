@@ -2,11 +2,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: session-db-events
+  name: {{service}}
 spec:
   selector:
-    app: session-db
+    app: {{service}}
   ports:
   - protocol: TCP
-    port: 8005
-    targetPort: events
+    port: 80
+    targetPort: api

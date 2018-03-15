@@ -3,6 +3,8 @@ apiVersion: v1
 kind: DeploymentConfig
 metadata:
   name: {{service}}
+  labels:
+    app: {{service}}
 spec:
   template:
     metadata:
@@ -11,7 +13,7 @@ spec:
     spec:
       containers:
       - name: {{service}}
-        image: "{{&image}}"
+        image: docker-registry.default.svc:5000/{{project}}/{{image}}
         ports:     
         {{#api-port}}           
         - name: api
@@ -39,7 +41,7 @@ spec:
             memory: 1Gi
           requests:
             cpu: 200m
-            memory: 100Mi            
+            memory: 100Mi
       - name: status
         env:
         - name: admin_port
@@ -47,7 +49,10 @@ spec:
         - name: role
           value: {{service}}
         - name: password
-          value: {{monitoring-password}}
+          valueFrom:
+            secretKeyRef:
+              name: monitoring-conf
+              key: password
         image: 'docker-registry.default.svc:5000/{{project}}/monitoring'
         readinessProbe:
           exec:
@@ -70,3 +75,12 @@ spec:
           defaultMode: 420
           secretName:  {{service}}-conf
   replicas: 1
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        containerNames:
+          - {{service}}
+        from:
+          kind: ImageStreamTag
+          name: {{image}}:latest
+      type: ImageChange

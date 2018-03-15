@@ -6,8 +6,8 @@ spec:
       - name: comp
         resources:
           limits:
-            cpu: 1900m
-            memory: 7900Mi
+            cpu: {{comp-cores}}m
+            memory: {{comp-ram}}Mi
           requests:
             cpu: 200m
             memory: 100Mi

@@ -2,11 +2,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: grafana
+  name: {{service}}-admin
 spec:
   selector:
-    app: grafana
+    app: {{service}}
   ports:
   - protocol: TCP
-    port: 3000
-    targetPort: api
+    port: 80
+    targetPort: admin

@@ -19,3 +19,5 @@ function retry {
   done	
 }
 
+export PROJECT=$(get_project)
+export DOMAIN=$(get_domain)

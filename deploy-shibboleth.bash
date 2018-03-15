@@ -1,7 +1,6 @@
+#!/bin/bash
+
 set -e 
-
-# oc new-build . -D - < dockerfiles/shibboleth-java/Dockerfile --name shibboleth-java
-
 
 bash ../shibboleth-openshift/deploy-shibboleth.bash --name haka --support chipster@csc.fi --logo https://raw.githubusercontent.com/chipster/chipster-web/master/src/assets/web-header-image.png
 

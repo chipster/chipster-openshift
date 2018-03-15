@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-tools-bin
+spec:
+  parallelism: 1    
+  completions: 1    
+  template:         
+    metadata:
+      name: download-tools-bin
+    spec:
+      containers:
+      - name: download-tools-bin
+        image: docker-registry.default.svc:5000/{{project}}/base
+        command: ["bash", "-c", "cd /mnt/tools; mkdir current; cd current; curl http://vm0151.kaj.pouta.csc.fi/artefacts/create_tools_images/chipster-3.12.3/tools.tar.gz | tar -zx"]
+        volumeMounts:        
+        - mountPath: /mnt/tools
+          name: tools-bin
+      volumes:
+      - name: tools-bin
+        persistentVolumeClaim:
+          claimName: tools-bin
+      restartPolicy: OnFailure

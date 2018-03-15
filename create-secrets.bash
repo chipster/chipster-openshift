@@ -2,28 +2,33 @@
 
 source script-utils/deploy-utils.bash
 
-PROJECT=$(get_project)
-DOMAIN=$(get_domain)
-
 echo "$DOMAIN"
 echo "Create secrets for $PROJECT.$DOMAIN"
 echo
 
-#if [[ $(oc get all) ]]
-#then
-#  echo "The project is not empty"
-#  exit 1
-#fi 
-
 set -e
-set -x
 
 function get_db_password {
-	role="$1"
-	pod=$(oc get pod -o name | grep -v deploy | grep $role | head -n 1)
-	conf=$(oc rsh -c $role $pod cat conf/chipster.yaml)
-	password=$(echo "$conf" | grep $role | grep db-pass | cut -d ":" -f 2 | tr -d '\r')
-	echo $password
+  role="$1"
+  oc get secret $role-conf -o json | jq .data.\"chipster.yaml\" -r | base64 --decode | grep $role-db-pass | cut -d ":" -f 2
+}
+
+function get_or_create_db_password {
+  role="$1"
+
+  if oc get secret $role-conf > /dev/null 2>&1; then
+    old_password=$(get_db_password $role)
+    if [[ -z "$old_password" ]]; then
+	  >&2 echo "db password $role-db-pass was empty"
+	  generate_password
+	else
+	  >&2 echo "use old password for $role-db-pass"
+	  echo "$old_password"
+	fi
+  else
+    >&2 echo "secret $role-conf not found"
+  	generate_password
+  fi
 }
 
 function generate_password {
@@ -49,6 +54,7 @@ function create_sso_password {
 # generate configs and save them as openshift secrets
 
 rm -rf conf/*
+mkdir -p conf
 
 services="session-db 
 	service-locator
@@ -70,25 +76,27 @@ for service in $authenticated_services; do
 	create_password $service
 done
 
-
-# get the db password from the existing instance
-auth_db_pass=$(get_db_password auth)
-session_db_pass=$(get_db_password session-db)
-
-# use these instead to generate new passwords for a new installation  
-#auth_db_pass=$(generate_password)
-#session_db_pass=$(generate_password)
+auth_db_pass=$(get_or_create_db_password auth)
+session_db_db_pass=$(get_or_create_db_password session-db)
 
 echo auth-db-url: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db >> conf/auth.yaml
 echo auth-db-user: sa >> conf/auth.yaml
 echo auth-db-pass: $auth_db_pass >> conf/auth.yaml
 
+# monitoring password
+monitoring_password=$(generate_password)
+echo auth-monitoring-password:  $monitoring_password >> conf/auth.yaml
+if [[ $(oc get secret monitoring-conf) ]]; then
+  oc delete secret monitoring-conf
+fi
+oc create secret generic monitoring-conf --from-literal=password=$monitoring_password
+
 # sso has to be enabled explicitly
 echo url-m2m-bind-auth: http://0.0.0.0:8013 >> conf/auth.yaml
 
-echo session-db-url: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db >> conf/session-db.yaml
-echo session-db-user: sa >> conf/session-db.yaml
-echo session-db-pass: $session_db_pass >> conf/session-db.yaml
+echo session-db-db-url: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db >> conf/session-db.yaml
+echo session-db-db-user: sa >> conf/session-db.yaml
+echo session-db-db-pass: $session_db_db_pass >> conf/session-db.yaml
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
 
@@ -113,7 +121,7 @@ function create_secret {
 
 for service in $services; do
 	# deployment assumes that there is a configuration secret for each service	
-	echo "url-int-service-locator: http://service-locator:8003" >> conf/$service.yaml
+	echo "url-int-service-locator: http://service-locator" >> conf/$service.yaml
 	
 	create_secret $service
 done
@@ -132,4 +140,4 @@ cat ../chipster-web/src/assets/conf/chipster.yaml | \
 oc create secret generic web-server-app-conf \
   --from-file=chipster.yaml=conf/web-server-app-conf/chipster.yaml
 
-rm -rf conf/*
+rm -rf conf/

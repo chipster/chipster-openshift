@@ -2,16 +2,18 @@
 apiVersion: v1
 kind: DeploymentConfig
 metadata:
-  name: auth-h2
+  name: session-db-h2
+  labels:
+    app: session-db
 spec:
   template:
     metadata:
       labels:
-        app: auth-h2
+        app: session-db-h2
     spec:
       containers:
-      - name: auth-h2
-        image: docker-registry.default.svc:5000/chipster-dev/h2
+      - name: session-db-h2
+        image: docker-registry.default.svc:5000/{{project}}/h2
         ports:                
         - name: h2-server
           containerPort: 1521
@@ -20,9 +22,12 @@ spec:
         volumeMounts:
         - mountPath: /opt/h2-data
           name: h2-data
+        readinessProbe:
+          tcpSocket:
+            port: 1521
       volumes:
       - name: h2-data
         persistentVolumeClaim:
-          claimName: auth-h2-data
+          claimName: session-db-h2-data
   replicas: 1
           

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then 
-	echo "Usage: bash update_dockerfile.bash BUILD_NAME"
+	echo "Usage: bash update-dockerfile.bash BUILD_NAME"
 	echo ""
 	echo "Replaces the dockerfile in given the OpenShfit build with the file dockerfiles/BUILD_NAME/Dockerfile"
 	echo "" 
