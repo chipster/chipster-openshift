@@ -8,7 +8,15 @@ function get_project {
 # parse the current project domain (i.e. the address of this OpenShift)
 function get_domain {
   #oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
-  echo "rahti-int-app.csc.fi"
+  console=$(oc status | grep "In project" | cut -d / -f 3 | cut -d : -f 1)
+
+  if [[ $console == "rahti.csc.fi" ]]; then
+    echo "rahtiapp.fi"
+  elif [[ $console == "rahti-int.csc.fi" ]]; then
+    echo "rahti-int-app.csc.fi"
+  else
+    >&2 echo "no app url defined for OpenShift console " + $console
+  fi
 }
 
 # retry the command for max five times or until it's exit value is zero 
