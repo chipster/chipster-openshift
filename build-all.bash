@@ -5,18 +5,37 @@ set -e
 
 source script-utils/deploy-utils.bash
 
-oc new-build --name base -D - < dockerfiles/base/Dockerfile && retry oc logs -f bc/base
-oc new-build --name chipster https://github.com/chipster/chipster.git -D - < dockerfiles/chipster/Dockerfile && retry oc logs -f bc/chipster
-oc new-build --name chipster-web-server https://github.com/chipster/chipster-web-server.git -D - < dockerfiles/chipster-web-server/Dockerfile  && retry oc logs -f bc/chipster-web-server
-oc new-build --name chipster-web-server-js https://github.com/chipster/chipster-web-server.git -D - < dockerfiles/chipster-web-server-js/Dockerfile && retry oc logs -f bc/chipster-web-server-js
-oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - < dockerfiles/toolbox/Dockerfile && retry oc logs -f bc/toolbox
-oc new-build --name web-server https://github.com/chipster/chipster-web.git -D - < dockerfiles/web-server/Dockerfile && retry oc logs -f bc/web-server
-oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry oc logs -f bc/comp-base
-oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp
-oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f bc/comp
+branch="$1"
 
-oc new-build --name=grafana -D - < dockerfiles/grafana/Dockerfile --to grafana && retry oc logs -f bc/grafana
-oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile && retry oc logs -f bc/monitoring
+if [ -z "$branch" ]; then
+  echo Error: branch not set.
+  echo ""
+  echo Usage: build-all.bash BRANCH
+  echo 
+  exit 1
+fi
+
+# from ubuntu
+oc new-build --name base -D - < dockerfiles/base/Dockerfile && retry oc logs -f bc/base &
+oc new-build --name=grafana -D - < dockerfiles/grafana/Dockerfile --to grafana && retry oc logs -f bc/grafana &
+wait
+
+# from base
+oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry oc logs -f bc/comp-base &
+oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f bc/comp &
+oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile && retry oc logs -f bc/monitoring &
+oc new-build --name chipster-web-server-js https://github.com/chipster/chipster-web-server.git#$branch -D - < dockerfiles/chipster-web-server-js/Dockerfile && retry oc logs -f bc/chipster-web-server-js &
+oc new-build --name chipster https://github.com/chipster/chipster.git#$branch -D - < dockerfiles/chipster/Dockerfile && retry oc logs -f bc/chipster &
+wait
+
+# from comp-base
+oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp &
+
+# run serially
+oc new-build --name chipster-web-server https://github.com/chipster/chipster-web-server.git#$branch -D - < dockerfiles/chipster-web-server/Dockerfile  && retry oc logs -f bc/chipster-web-server
+oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - < dockerfiles/toolbox/Dockerfile && retry oc logs -f bc/toolbox
+oc new-build --name web-server https://github.com/chipster/chipster-web.git#$branch -D - < dockerfiles/web-server/Dockerfile && retry oc logs -f bc/web-server
+wait
 
 echo ""
 echo "# Build automatically on push"

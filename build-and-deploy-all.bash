@@ -4,7 +4,7 @@
 # - update one: bash update-dockerfile NAME; oc start-build NAME
 # - update all: update-all-builds.bash
 # - remove all: oc delete build --all; oc delete imagestream --all
-bash build-all.bash
+bash build-all.bash master
 
 # run if configuration has changed (and bash rollout-services.bash if running only this)
 bash create-secrets.bash
