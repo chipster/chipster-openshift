@@ -5,7 +5,7 @@ set -e
 echo project: $PROJECT domain: $DOMAIN
 
 max_pods=$(oc get quota -o json | jq .items[].spec.hard.pods -r | grep -v null)
-max_storage=$(oc get quota -o json | jq .items[].spec.hard.\"requests.storage\" -r | grep -v null | sed s/Gi//)
+max_storage=$(oc get quota -o json | jq .items[].spec.hard.\"requests.storage\" -r | grep -v null | sed s/Gi// | sed s/Ti/000/)
 max_ram=$(oc get limits -o json | jq .items[].spec.limits[].max.memory -r | sed s/Gi//g | sort -n | head -n 1)
 max_cores=$(oc get limits -o json | jq .items[].spec.limits[].max.cpu -r | sort -n | head -n 1)
 
@@ -96,7 +96,7 @@ view="{
       \"project\": \"$PROJECT\",
       \"app-domain\": \"$DOMAIN\",
       \"comp-data-size\": \"$(echo $max_storage '* 0.05 / 1' | bc)\",
-      \"file-broker-storage-size\": \"$(echo $max_storage '* 0.5 / 1' | bc)\",
+      \"file-broker-storage-size\": \"$(echo '(' $max_storage ' - 500) * 0.75 / 1' | bc)\",
       \"tools-size\": \"$tools_size\",
       \"optional-replicas\": \"$optional_replicas\",
       \"comp-ram\": \"$comp_ram\",

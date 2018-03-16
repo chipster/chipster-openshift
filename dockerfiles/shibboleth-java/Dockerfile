@@ -2,7 +2,8 @@ FROM shibboleth
 	
 COPY chipster-web-server /opt/
 
-RUN chmod -R ugo+rwx /opt/chipster-web-server
+RUN  mkdir -p /opt/chipster-web-server/webroot \
+    && chmod -R ugo+rwx /opt/chipster-web-server
 
 WORKDIR /opt/chipster-web-server
 	

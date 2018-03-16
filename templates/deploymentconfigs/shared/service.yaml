@@ -27,11 +27,10 @@ spec:
         - mountPath: "{{&work-dir}}/conf"
           name: conf
         readinessProbe:
-          exec:
-            command:
-            - curl
-            - '--fail'
-            - 'http://127.0.0.1:{{admin-port}}/admin/alive'
+          httpGet:
+            path: /admin/alive
+            port: {{admin-port}}
+            scheme: HTTP
         env:
         - name: JAVA_CLASS
           value: {{java-class}}
@@ -55,11 +54,10 @@ spec:
               key: password
         image: 'docker-registry.default.svc:5000/{{project}}/monitoring'
         readinessProbe:
-          exec:
-            command:
-            - curl
-            - '--fail'
-            - 'http://127.0.0.1:{{admin-port}}/admin/alive'
+          httpGet:
+            path: /admin/alive
+            port: {{admin-port}}
+            scheme: HTTP
         resources:
           limits:
             cpu: 100m
@@ -77,10 +75,11 @@ spec:
   replicas: 1
   triggers:
     - type: ConfigChange
-    - imageChangeParams:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
         containerNames:
           - {{service}}
         from:
           kind: ImageStreamTag
           name: {{image}}:latest
-      type: ImageChange

@@ -86,7 +86,7 @@ echo auth-db-pass: $auth_db_pass >> conf/auth.yaml
 # monitoring password
 monitoring_password=$(generate_password)
 echo auth-monitoring-password:  $monitoring_password >> conf/auth.yaml
-if [[ $(oc get secret monitoring-conf) ]]; then
+if oc get secret monitoring-conf > /dev/null 2>&1; then
   oc delete secret monitoring-conf
 fi
 oc create secret generic monitoring-conf --from-literal=password=$monitoring_password
@@ -107,7 +107,7 @@ echo url-ext-haka: https://haka-$PROJECT.$DOMAIN >> conf/service-locator.yaml
 function create_secret {
   service=$1
   secret_name=${service}-conf
-  if [[ $(oc get secret $secret_name) ]]; then
+  if oc get secret $secret_name > /dev/null 2>&1; then
   	oc delete secret $secret_name  
   fi
   # copy the old config file for comp, because mounting the secret will hide other files in the conf dir
@@ -127,7 +127,7 @@ for service in $services; do
 done
 
 # Configuration for the Angular app
-if [[ $(oc get secret web-server-app-conf) ]]; then
+if oc get secret web-server-app-conf > /dev/null 2>&1; then
   oc delete secret web-server-app-conf  
 fi
 
