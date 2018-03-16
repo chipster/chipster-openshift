@@ -8,4 +8,4 @@ view="{
       \"project\": \"$PROJECT\"
       }"
 
-echo "$view" | mustache - templates/jobs/download-tools-bin.yaml > oc create -f - 
+echo "$view" | mustache - templates/jobs/download-tools-bin.yaml | oc create -f - 
