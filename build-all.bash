@@ -19,6 +19,7 @@ fi
 oc new-build --name base -D - < dockerfiles/base/Dockerfile && retry oc logs -f bc/base &
 oc new-build --name=grafana -D - < dockerfiles/grafana/Dockerfile --to grafana && retry oc logs -f bc/grafana &
 wait
+sleep 1
 
 # from base
 oc new-build --name comp-base -D - < dockerfiles/comp-base/Dockerfile  && retry oc logs -f bc/comp-base &
@@ -27,6 +28,7 @@ oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile && ret
 oc new-build --name chipster-web-server-js https://github.com/chipster/chipster-web-server.git#$branch -D - < dockerfiles/chipster-web-server-js/Dockerfile && retry oc logs -f bc/chipster-web-server-js &
 oc new-build --name chipster https://github.com/chipster/chipster.git#$branch -D - < dockerfiles/chipster/Dockerfile && retry oc logs -f bc/chipster &
 wait
+sleep 1
 
 # from comp-base
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp &

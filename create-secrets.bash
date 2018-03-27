@@ -102,7 +102,7 @@ bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.ya
 
 # Haka Single sign-on
 create_sso_password haka
-echo url-ext-haka: https://haka-$PROJECT.$DOMAIN >> conf/service-locator.yaml
+echo url-ext-haka: https://$PROJECT.$DOMAIN/sso/haka >> conf/service-locator.yaml
 
 function create_secret {
   service=$1
