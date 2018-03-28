@@ -6,5 +6,9 @@
 for d in auth service-locator session-db file-broker scheduler comp session-worker type-service web-server toolbox haka; do 
 	echo $d
 	oc rollout cancel dc/$d
+done
+
+for d in auth service-locator session-db file-broker scheduler comp session-worker type-service web-server toolbox haka; do 
+	echo $d
 	oc rollout latest $d
 done

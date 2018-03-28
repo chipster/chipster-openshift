@@ -10,29 +10,7 @@ set -e
 
 function get_db_password {
   role="$1"
-  oc get secret $role-conf -o json | jq .data.\"chipster.yaml\" -r | base64 --decode | grep $role-db-pass | cut -d ":" -f 2
-}
-
-function get_or_create_db_password {
-  role="$1"
-
-  if oc get secret $role-conf > /dev/null 2>&1; then
-    old_password=$(get_db_password $role)
-    if [[ -z "$old_password" ]]; then
-	  >&2 echo "db password $role-db-pass was empty"
-	  generate_password
-	else
-	  >&2 echo "use old password for $role-db-pass"
-	  echo "$old_password"
-	fi
-  else
-    >&2 echo "secret $role-conf not found"
-  	generate_password
-  fi
-}
-
-function generate_password {
-	openssl rand -base64 15
+  oc get secret passwords -o json | jq -r .data[\"$role-db-password\"] | base64 --decode
 }
 
 # generate service passwords
@@ -76,8 +54,8 @@ for service in $authenticated_services; do
 	create_password $service
 done
 
-auth_db_pass=$(get_or_create_db_password auth)
-session_db_db_pass=$(get_or_create_db_password session-db)
+auth_db_pass=$(get_db_password auth)
+session_db_db_pass=$(get_db_password session-db)
 
 echo auth-db-url: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db >> conf/auth.yaml
 echo auth-db-user: sa >> conf/auth.yaml

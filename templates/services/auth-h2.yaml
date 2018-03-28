@@ -5,7 +5,7 @@ metadata:
   name: auth-h2
 spec:
   selector:
-    app: session-db-h2
+    app: auth-h2
   ports:
   - protocol: TCP
     port: 1521

@@ -27,5 +27,9 @@ function retry {
   done	
 }
 
+function generate_password {
+	openssl rand -base64 15
+}
+
 export PROJECT=$(get_project)
 export DOMAIN=$(get_domain)

@@ -6,6 +6,9 @@
 # - remove all: oc delete build --all; oc delete imagestream --all
 bash build-all.bash master
 
+# run only once, because we can't change the db password without deleting the db
+bash generate-passowrds.bash
+
 # run if configuration has changed (and bash rollout-services.bash if running only this)
 bash create-secrets.bash
 
