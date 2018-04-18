@@ -79,6 +79,12 @@ else
   tools_size="5"
 fi
 
+if [ $max_storage -gt 900 ]; then
+  file_broker_storage_size="$(echo '(' $max_storage ' - 500) * 0.75 / 1' | bc)"
+else
+  file_broker_storage_size="10"
+fi 
+
 # don't start optional services if the pod quota is low
 if [ $max_pods -gt 25 ]; then
   optional_replicas="1"
@@ -96,7 +102,7 @@ view="{
       \"project\": \"$PROJECT\",
       \"app-domain\": \"$DOMAIN\",
       \"comp-data-size\": \"$(echo $max_storage '* 0.05 / 1' | bc)\",
-      \"file-broker-storage-size\": \"$(echo '(' $max_storage ' - 500) * 0.75 / 1' | bc)\",
+      \"file-broker-storage-size\": \"$file_broker_storage_size\",
       \"tools-size\": \"$tools_size\",
       \"optional-replicas\": \"$optional_replicas\",
       \"comp-ram\": \"$comp_ram\",
