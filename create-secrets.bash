@@ -10,16 +10,26 @@ set -e
 
 function get_db_password {
   role="$1"
-  oc get secret passwords -o json | jq -r .data[\"$role-db-password\"] | base64 --decode
+  get_password "$role-db-password"
+}
+
+function get_service_password {
+  role="$1"
+  get_password "service-password-$role"
+}
+
+function get_password {
+  key="$1"
+  oc get secret passwords -o json | jq -r .data[\"$key\"] | base64 --decode
 }
 
 # generate service passwords
 
-function create_password {
+function write_password {
   service=$1
   config_key=service-password-${service}
   
-  echo $config_key: $(generate_password) | tee conf/$service.yaml >> conf/auth.yaml
+  echo $config_key: $(get_service_password $service) | tee conf/$service.yaml >> conf/auth.yaml
 }
 
 function create_sso_password {
@@ -51,7 +61,7 @@ services="session-db
 authenticated_services=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep ^service-password- | cut -d : -f 1 | sed s/service-password-//)
 
 for service in $authenticated_services; do
-	create_password $service
+	write_password $service
 done
 
 auth_db_pass=$(get_db_password auth)
