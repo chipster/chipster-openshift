@@ -8,10 +8,10 @@ function secret_to_dir {
   
   mkdir -p $dir
 
-  keys="$(oc get secret comp-conf -o json | jq .data | jq keys[] -r)"
+  keys="$(oc get secret $secret -o json | jq .data | jq keys[] -r)"
   while read -r key; do
     echo "copying $key to $dir/$key"
-	oc get secret comp-conf -o json | jq .data.\"$key\" -r | base64 -D > $dir/$key
+	oc get secret $secret -o json | jq .data.\"$key\" -r | base64 -D > $dir/$key
   done <<< "$keys"
 }
 
@@ -35,30 +35,45 @@ function dir_to_secret {
 
 mkdir -p mylly-conf
 
-# configure the app to use Kielipankki tools and manuals 
-oc get secret web-server-app-conf -o json | jq .data[\"chipster.yaml\"] -r | base64 -D \
-  | yq w - modules [] \
+# configure the app to use Kielipankki tools and manuals
+secret_to_dir web-server-app-conf mylly-conf/web-server-app-conf 
+    yq n modules [] \
   | yq w - modules[0] Kielipankki \
-  | yq w - manual-postfix .en.src.html \
-  | yq w - manual-relative-link-prefix https://www.kielipankki.fi/support/mylly/tool-placeholder/ \
-   > mylly-conf/web-server-app-conf.yaml
-oc delete secret web-server-app-conf
-oc create secret generic web-server-app-conf --from-file=chipster.yaml=mylly-conf/web-server-app-conf.yaml
+  | yq w - manual-path assets/manual/kielipankki/manual/ \
+  | yq w - manual-tool-postfix .en.src.html \
+  | yq w - app-name Mylly \
+  | yq w - custom-css assets/manual/kielipankki/manual/app-mylly-styles.css \
+  | yq w - favicon assets/manual/kielipankki/manual/app-mylly-favicon.png \
+  | yq w - home-path assets/manual/kielipankki/manual/app-home.html \
+  | yq w - home-header-path assets/manual/kielipankki/manual/app-home-header.html \
+  | yq w - contact-path assets/manual/kielipankki/manual/app-contact.html \
+   > mylly-conf/web-server-app-conf/mylly.yaml
+dir_to_secret web-server-app-conf mylly-conf/web-server-app-conf
 
 # there are multiple files in this secret
-secret_to_dir comp-conf mylly-conf/comp
-cat mylly-conf/comp/chipster.yaml | yq w - comp-module-filter-mode include > mylly-conf/comp/chipster.yaml_new
-rm mylly-conf/comp/chipster.yaml
-mv mylly-conf/comp/chipster.yaml_new mylly-conf/comp/chipster.yaml
-dir_to_secret comp-conf mylly-conf/comp
+secret_to_dir comp-conf mylly-conf/comp-conf
+cat mylly-conf/comp-conf/chipster.yaml | yq w - comp-module-filter-mode include > mylly-conf/comp-conf/chipster.yaml_new
+rm mylly-conf/comp-conf/chipster.yaml
+mv mylly-conf/comp-conf/chipster.yaml_new mylly-conf/comp-conf/chipster.yaml
+dir_to_secret comp-conf mylly-conf/comp-conf
 
 rm -rf mylly-conf
 
+oc new-build --name toolbox-mylly https://github.com/CSCfi/Kielipankki-mylly.git -D - < dockerfiles/toolbox/Dockerfile && sleep 1 && oc logs -f bc/toolbox-mylly
+
 oc delete bc toolbox
 oc delete is toolbox
-oc new-build --name toolbox https://github.com/CSCfi/Kielipankki-mylly.git -D - < dockerfiles/toolbox/Dockerfile
-sleep 1
-oc logs -f bc/toolbox
+
+# We need both tools and manual from the toolbox-mylly image, but the oc command takes only one source-image-path.
+# Use it to get the tools and configure the image change trigger.
+oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - \
+  --source-image=toolbox-mylly --source-image-path=/opt/chipster-web-server/tools/kielipankki/:tools/ \
+  < dockerfiles/toolbox/Dockerfile
+  
+# Modify the build config to copy also the manual
+#TODO The files end up to /opt/chipster-web/src/assets/manual/kielipankki/manual. What creates the last manual folder?
+oc get bc toolbox -o json | jq '.spec.source.images[0].paths[1]={"destinationDir": "manual/kielipankki/", "sourcePath": "/opt/chipster-web/src/assets/manual/"}' | oc replace bc toolbox -f -
+oc start-build toolbox --follow
 
 
 bash rollout-services.bash
