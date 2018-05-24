@@ -148,6 +148,7 @@ configure_java_service session-db fi.csc.chipster.sessiondb.SessionDb &
 configure_java_service file-broker fi.csc.chipster.filebroker.FileBroker &
 configure_java_service scheduler fi.csc.chipster.scheduler.Scheduler &
 configure_java_service session-worker fi.csc.chipster.sessionworker.SessionWorker &
+configure_java_service job-history fi.csc.chipster.jobhistory.JobHistoryService &
 
 # shared templates and custom image 
 
