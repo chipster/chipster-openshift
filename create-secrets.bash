@@ -82,6 +82,20 @@ echo db-pass-auth: $auth_db_pass | tee -a conf/backup.yaml >> conf/auth.yaml
 echo db-url-job-history: jdbc:h2:tcp://job-history-h2:1521/database/chipster-job-history-db | tee -a conf/backup.yaml >> conf/job-history.yaml
 echo db-pass-job-history: $job_history_db_pass | tee -a conf/backup.yaml >> conf/job-history.yaml
 
+# DB restore from backup
+#
+# - go to pouta.csc.fi -> Object Store -> Containers to see the backups. Copy the name of the backup to the config item below. 
+# - uncomment the row(s) below
+# - run "bash create-secrets.bash" and "bash rollout-services.bash" to prevent the actual service from starting. Backup service won't restore yet because the DB isn't empty
+# - delete the pvc of those databases
+# - run "bash create-pvcs.bash" to create new volumes
+# - run "oc rollout latest <service>-h2" to make the database recognize that the DB is gone
+# - run "bash rollout-services.bash" which should now start the restore (check from the backup service's logs)
+# - comment the following lines again
+# - run "bash create-secrets.bash" and "bash rollout-services.bash" to remove the restore configuration and start the services
+#echo db-restore-key-auth: auth-db-backup_2018-05-24T12:37.sql | tee -a conf/backup.yaml >> conf/auth.yaml
+#echo db-restore-key-session-db: session-db-db-backup_2018-05-24T12:37.sql | tee -a conf/backup.yaml >> conf/session-db.yaml
+
 # monitoring password
 monitoring_password=$(generate_password)
 echo auth-monitoring-password:  $monitoring_password >> conf/auth.yaml
