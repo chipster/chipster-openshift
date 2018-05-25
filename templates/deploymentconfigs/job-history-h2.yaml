@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: job-history-h2
+  labels:
+    app: job-history
+spec:
+  template:
+    metadata:
+      labels:
+        app: job-history
+    spec:
+      containers:
+      - name: job-history-h2
+        image: docker-registry.default.svc:5000/{{project}}/h2
+        ports:
+        - name: h2-server
+          containerPort: 1521
+        - name: h2-console
+          containerPort: 8081
+        volumeMounts:
+        - mountPath: /opt/h2-data
+          name: h2-data
+        readinessProbe:
+          tcpSocket:
+            port: 1521
+      volumes:
+      - name: h2-data
+        persistentVolumeClaim:
+          claimName: job-history-h2-data
+  replicas: 1

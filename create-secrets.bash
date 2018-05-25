@@ -56,7 +56,8 @@ services="session-db
 	web-server
 	type-service
 	haka
-	backup"
+	backup
+	job-history"
 	
 
 authenticated_services=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep ^service-password- | cut -d : -f 1 | sed s/service-password-//)
@@ -73,9 +74,13 @@ fi
 
 auth_db_pass=$(get_db_password auth)
 session_db_db_pass=$(get_db_password session-db)
+job_history_db_pass=$(get_db_password job-history)
 
 echo db-url-auth: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db | tee -a conf/backup.yaml >> conf/auth.yaml
 echo db-pass-auth: $auth_db_pass | tee -a conf/backup.yaml >> conf/auth.yaml
+
+echo db-url-job-history: jdbc:h2:tcp://job-history-h2:1521/database/chipster-job-history-db | tee -a conf/backup.yaml >> conf/job-history.yaml
+echo db-pass-job-history: $job_history_db_pass | tee -a conf/backup.yaml >> conf/job-history.yaml
 
 # monitoring password
 monitoring_password=$(generate_password)
