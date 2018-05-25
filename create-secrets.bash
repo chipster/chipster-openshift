@@ -55,7 +55,8 @@ services="session-db
 	toolbox
 	web-server
 	type-service
-	haka"
+	haka
+	backup"
 	
 
 authenticated_services=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep ^service-password- | cut -d : -f 1 | sed s/service-password-//)
@@ -64,12 +65,17 @@ for service in $authenticated_services; do
 	write_password $service
 done
 
+backup_conf="../chipster-private/confs/$PROJECT.$DOMAIN/db-backups.yaml"
+
+if [ -f "$backup_conf" ]; then
+  cat $backup_conf >> conf/backup.yaml
+fi
+
 auth_db_pass=$(get_db_password auth)
 session_db_db_pass=$(get_db_password session-db)
 
-echo auth-db-url: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db >> conf/auth.yaml
-echo auth-db-user: sa >> conf/auth.yaml
-echo auth-db-pass: $auth_db_pass >> conf/auth.yaml
+echo db-url-auth: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db | tee -a conf/backup.yaml >> conf/auth.yaml
+echo db-pass-auth: $auth_db_pass | tee -a conf/backup.yaml >> conf/auth.yaml
 
 # monitoring password
 monitoring_password=$(generate_password)
@@ -82,9 +88,8 @@ oc create secret generic monitoring-conf --from-literal=password=$monitoring_pas
 # sso has to be enabled explicitly
 echo url-m2m-bind-auth: http://0.0.0.0:8013 >> conf/auth.yaml
 
-echo session-db-db-url: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db >> conf/session-db.yaml
-echo session-db-db-user: sa >> conf/session-db.yaml
-echo session-db-db-pass: $session_db_db_pass >> conf/session-db.yaml
+echo db-url-session-db: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db | tee -a conf/backup.yaml >> conf/session-db.yaml
+echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
 
