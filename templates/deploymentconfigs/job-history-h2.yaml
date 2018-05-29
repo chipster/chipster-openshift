@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-        app: job-history
+        app: job-history-h2
     spec:
       containers:
       - name: job-history-h2
