@@ -40,7 +40,7 @@ function configure_service {
       \"image\": \"$image\",
       \"work-dir\": \"$work_dir\",
       \"admin-ip-whitelist\": \"$(cat ../chipster-private/confs/rahti-int/admin-ip-whitelist)\"
-      }" # no comma after the last line!
+  }" # no comma after the last line!
 
   #echo "$view"
 
@@ -75,15 +75,13 @@ mkdir -p processed-templates/pvcs
 # fixed size for tools-bin if there is enough quota
 if [ $max_storage -gt 900 ]; then
   tools_size="500"
+  file_broker_storage_size="$(echo '(' $max_storage ' - 500) * 0.75 / 1' | bc)"
+  influxdb_size="50"
 else
   tools_size="5"
-fi
-
-if [ $max_storage -gt 900 ]; then
-  file_broker_storage_size="$(echo '(' $max_storage ' - 500) * 0.75 / 1' | bc)"
-else
   file_broker_storage_size="10"
-fi 
+  influxdb_size="1"
+fi
 
 # don't start optional services if the pod quota is low
 if [ $max_pods -gt 25 ]; then
@@ -104,11 +102,12 @@ view="{
       \"comp-data-size\": \"$(echo $max_storage '* 0.05 / 1' | bc)\",
       \"file-broker-storage-size\": \"$file_broker_storage_size\",
       \"tools-size\": \"$tools_size\",
+      \"influxdb-size\": \"$influxdb_size\",
       \"optional-replicas\": \"$optional_replicas\",
       \"comp-ram\": \"$comp_ram\",
       \"comp-cores\": \"$comp_cores\",
       \"admin-ip-whitelist\": \"$(cat ../chipster-private/confs/rahti-int/admin-ip-whitelist)\"
-      }"
+}"
 
 #echo "$view"
 
