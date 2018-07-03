@@ -106,7 +106,9 @@ oc create secret generic monitoring-conf --from-literal=password=$monitoring_pas
 
 # sso has to be enabled explicitly
 echo url-m2m-bind-auth: http://0.0.0.0:8013 >> conf/auth.yaml
+
 echo auth-jaas-prefix: csc >> conf/auth.yaml
+echo session-db-restrict-sharing-to-everyone: csc/example_session_owner >> conf/session-db.yaml
 
 echo db-url-session-db: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db | tee -a conf/backup.yaml >> conf/session-db.yaml
 echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
