@@ -10,7 +10,9 @@ RUN mkdir -p /opt/chipster/comp \
   && cp -r /opt/chipster-web-server/lib /opt/chipster \
   && mkdir -p /opt/chipster/comp/security \
   && mkdir -p /home/user/.cache \
-  && chown $(whoami) /home/user/.cache
+  && chown $(whoami) /home/user/.cache \
+  && mkdir -p /homeappl \
+  && ln -s /appl /homeappl/appl_taito
   
 RUN curl -s https://korp.csc.fi/download/.mylly/kielipankki_local_root_install.sh | bash
   

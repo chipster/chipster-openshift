@@ -14,7 +14,7 @@ spec:
         volumeMounts:
         - mountPath: /opt/chipster/comp/jobs-data
           name: jobs-data
-        - mountPath: /homeappl/appl_taito
+        - mountPath: /appl
           name: tools-bin
       volumes:
       - name: jobs-data
