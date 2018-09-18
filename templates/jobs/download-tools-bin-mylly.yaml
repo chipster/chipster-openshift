@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-tools-bin-mylly
+spec:
+  parallelism: 1    
+  completions: 1    
+  template:         
+    metadata:
+      name: download-tools-bin
+    spec:
+      containers:
+      - name: download-tools-bin
+        image: docker-registry.default.svc:5000/{{project}}/base
+        command: ["bash", "-c", "cd /appl; curl -s https://korp.csc.fi/download/.mylly/kielipankki_shared_install.sh | bash"]
+        volumeMounts:        
+        - mountPath: /appl
+          name: tools-bin
+      volumes:
+      - name: tools-bin
+        persistentVolumeClaim:
+          claimName: tools-bin-mylly
+      restartPolicy: OnFailure

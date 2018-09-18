@@ -30,6 +30,9 @@ oc new-build --name chipster https://github.com/chipster/chipster.git#$branch -D
 wait
 sleep 1
 
+# from chipster-web-server
+oc new-build --name comp-mylly -D - < dockerfiles/comp-mylly/Dockerfile  && retry oc logs -f bc/comp &
+
 # from comp-base
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp &
 

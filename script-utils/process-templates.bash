@@ -158,3 +158,10 @@ configure_service web-server web-server /opt/chipster-web-server &
 configure_service comp comp /opt/chipster/comp &
 
 wait
+
+
+# create mylly config by replacing almost all ocurrances of comp to comp-mylly, except the paths
+cat processed-templates/deploymentconfigs/comp.yaml \
+	| sed s/comp/comp-mylly/g \
+	| sed s_/opt/chipster/comp-mylly_/opt/chipster/comp_g \
+	> processed-templates/deploymentconfigs/comp-mylly.yaml 

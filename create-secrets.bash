@@ -94,7 +94,7 @@ echo db-pass-job-history: $job_history_db_pass | tee -a conf/backup.yaml >> conf
 # - comment the following lines again
 # - run "bash create-secrets.bash" and "bash rollout-services.bash" to remove the restore configuration and start the services
 #echo db-restore-key-auth: auth-db-backup_2018-05-24T12:37.sql | tee -a conf/backup.yaml >> conf/auth.yaml
-#echo db-restore-key-session-db: session-db-db-backup_2018-05-24T12:37.sql | tee -a conf/backup.yaml >> conf/session-db.yaml
+#echo db-restore-key-session-db: session-db-db-backup_2018-09-05T05:10:00.230Z.sql | tee -a conf/backup.yaml >> conf/session-db.yaml
 
 # monitoring password
 monitoring_password=$(generate_password)
@@ -110,7 +110,7 @@ echo url-m2m-bind-auth: http://0.0.0.0:8013 >> conf/auth.yaml
 echo auth-jaas-prefix: csc >> conf/auth.yaml
 echo session-db-restrict-sharing-to-everyone: csc/example_session_owner >> conf/session-db.yaml
 
-echo db-url-session-db: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db | tee -a conf/backup.yaml >> conf/session-db.yaml
+echo 'db-url-session-db: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db;DB_CLOSE_ON_EXIT=FALSE;MULTI_THREADED=TRUE' | tee -a conf/backup.yaml >> conf/session-db.yaml
 echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
@@ -140,6 +140,13 @@ for service in $services; do
 	
 	create_secret $service
 done
+
+# Mylly
+cp conf/comp.yaml conf/comp-mylly.yaml
+echo "comp-module-filter-name: kielipankki" >> conf/comp-mylly.yaml
+echo "comp-module-filter-mode: include" >> conf/comp-mylly.yaml
+create_secret comp-mylly
+
 
 # Configuration for the Angular app
 if oc get secret web-server-app-conf > /dev/null 2>&1; then

@@ -1,0 +1,25 @@
+---
+spec:
+  template:    
+    spec:
+      containers:
+      - name: comp-mylly
+        resources:
+          limits:
+            cpu: {{comp-cores}}m
+            memory: {{comp-ram}}Mi
+          requests:
+            cpu: 200m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /opt/chipster/comp/jobs-data
+          name: jobs-data
+        - mountPath: /homeappl/appl_taito
+          name: tools-bin
+      volumes:
+      - name: jobs-data
+        persistentVolumeClaim:
+          claimName: comp-jobs-data-mylly
+      - name: tools-bin
+        persistentVolumeClaim:
+          claimName: tools-bin-mylly
