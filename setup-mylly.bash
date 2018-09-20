@@ -59,7 +59,7 @@ dir_to_secret comp-conf mylly-conf/comp-conf
 
 rm -rf mylly-conf
 
-oc new-build --name toolbox-mylly https://github.com/CSCfi/Kielipankki-mylly.git -D - < dockerfiles/toolbox/Dockerfile && sleep 1 && oc logs -f bc/toolbox-mylly
+oc new-build --name toolbox-mylly https://github.com/CSCfi/Kielipankki-mylly.git#dev-tools -D - < dockerfiles/toolbox/Dockerfile && sleep 1 && oc logs -f bc/toolbox-mylly
 
 oc delete bc toolbox
 oc delete is toolbox
