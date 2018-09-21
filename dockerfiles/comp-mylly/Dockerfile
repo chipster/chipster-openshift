@@ -14,7 +14,7 @@ RUN mkdir -p /opt/chipster/comp \
   && mkdir -p /homeappl \
   && ln -s /appl /homeappl/appl_taito
   
-RUN curl -s https://korp.csc.fi/download/.mylly/kielipankki_local_root_install.sh | bash
+RUN curl -s https://korp.csc.fi/download/.mylly/kielipankki_local_root_install.sh | sed 's/pip /pip2 /g' | bash
   
 # Legacy DirectoryLayout assumes it's running here
 WORKDIR /opt/chipster/comp
