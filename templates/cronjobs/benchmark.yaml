@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: Chipster benchmark cronjob
+  annotations:
+    description: ""
+    tags: "nodejs,typescript,chipster"
+objects:
+- apiVersion: batch/v1beta1
+  kind: CronJob
+  metadata:
+    name: benchmark  
+  spec:
+    schedule: "* * * * *"
+    jobTemplate:         
+      spec:
+        parallelism: 1
+        completions: 1
+        template:
+          spec:
+            containers:
+            - name: benchmark
+              image: docker-registry.default.svc:5000/${PROJECT}/cli-client
+              command: ["node", "src/benchmark", "${CHIPSTER_URL}", "-u", "${USERNAME}", "-p", "${PASSWORD}", "--influx", "${INFLUX_URL}"]
+            restartPolicy: Never
+parameters:
+- description: OpenShift project
+  name: PROJECT
+- description: Chipster username 
+  name: USERNAME
+- description: Chipster password
+  name: PASSWORD
+- description: Address of the Chipster server
+  name: CHIPSTER_URL
+- description: Address of the influxdb
+  name: INFLUX_URL
