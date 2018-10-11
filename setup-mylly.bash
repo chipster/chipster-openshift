@@ -50,15 +50,6 @@ secret_to_dir web-server-app-conf mylly-conf/web-server-app-conf
    > mylly-conf/web-server-app-conf/mylly.yaml
 dir_to_secret web-server-app-conf mylly-conf/web-server-app-conf
 
-# there are multiple files in this secret
-secret_to_dir comp-conf mylly-conf/comp-conf
-cat mylly-conf/comp-conf/chipster.yaml | yq w - comp-module-filter-mode include > mylly-conf/comp-conf/chipster.yaml_new
-rm mylly-conf/comp-conf/chipster.yaml
-mv mylly-conf/comp-conf/chipster.yaml_new mylly-conf/comp-conf/chipster.yaml
-dir_to_secret comp-conf mylly-conf/comp-conf
-
-rm -rf mylly-conf
-
 oc new-build --name toolbox-mylly https://github.com/CSCfi/Kielipankki-mylly.git#dev-tools -D - < dockerfiles/toolbox/Dockerfile && sleep 1 && oc logs -f bc/toolbox-mylly
 
 oc delete bc toolbox
@@ -74,6 +65,5 @@ oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - 
 #TODO The files end up to /opt/chipster-web/src/assets/manual/kielipankki/manual. What creates the last manual folder?
 oc get bc toolbox -o json | jq '.spec.source.images[0].paths[1]={"destinationDir": "manual/kielipankki/", "sourcePath": "/opt/chipster-web/src/assets/manual/"}' | oc replace bc toolbox -f -
 oc start-build toolbox --follow
-
 
 bash rollout-services.bash
