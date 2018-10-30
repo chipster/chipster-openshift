@@ -1,0 +1,10 @@
+modules:
+- Kielipankki
+manual-path: assets/manual/kielipankki/manual/
+manual-tool-postfix: .en.src.html
+app-name: Mylly
+custom-css: assets/manual/kielipankki/manual/app-mylly-styles.css
+favicon: assets/manual/kielipankki/manual/app-mylly-favicon.png
+home-path: assets/manual/kielipankki/manual/app-home.html
+home-header-path: assets/manual/kielipankki/manual/app-home-header.html
+contact-path: assets/manual/kielipankki/manual/app-contact.html

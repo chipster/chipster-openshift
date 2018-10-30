@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: job-history-h2-data
+  name: auth-postgress-data
 spec:
   accessModes:
     - ReadWriteMany

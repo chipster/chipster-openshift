@@ -11,3 +11,4 @@ spec:
       - name: db-backups
         persistentVolumeClaim:
           claimName: db-backups
+  replicas: {{optional-replicas}}

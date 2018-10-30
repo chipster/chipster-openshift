@@ -74,7 +74,7 @@ mkdir -p processed-templates/pvcs
 
 # fixed size for tools-bin if there is enough quota
 if [ $max_storage -gt 900 ]; then
-  tools_size="500"
+  tools_size="400"
   file_broker_storage_size="$(echo '(' $max_storage ' - 500) * 0.75 / 1' | bc)"
   influxdb_size="50"
 else

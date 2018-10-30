@@ -10,8 +10,8 @@ set -e
 
 oc create secret generic passwords \
   --from-literal=auth-db-password=$(generate_password) \
-  --from-literal=session-db-db-password=$(generate_password)
-  
+  --from-literal=session-db-db-password=$(generate_password) \
+  --from-literal=job-history-db-password=$(generate_password)
   
 authenticated_services=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep ^service-password- | cut -d : -f 1 | sed s/service-password-//)
 

@@ -12,7 +12,7 @@ spec:
       containers:
       - name: download-tools-bin
         image: docker-registry.default.svc:5000/{{project}}/base
-        command: ["bash", "-c", "cd /mnt/tools; mkdir current; cd current; curl http://bio.nic.funet.fi/pub/sci/molbio/chipster/dist/virtual_machines/3.12.3/tools/tools.tar.gz | tar -zx"]
+        command: ["bash", "-c", "set -x; set -e; cd /mnt/tools; mkdir -p current; cd current; url='https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/229/parts'; curl -s $url/files.txt | grep lz4$ | parallel -j 8 \"curl $url/{} | lz4 -d | tar -x\""]
         volumeMounts:        
         - mountPath: /mnt/tools
           name: tools-bin

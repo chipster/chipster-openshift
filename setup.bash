@@ -6,7 +6,7 @@ if oc rsh dc/auth hostname && oc rsh dc/auth ls /opt/chipster-web-server/securit
 else
   echo Create default accounts
   # copy with "oc rsh", because oc cp would require a pod name
-  cat ../chipster-private/confs/rahti-int/users | oc rsh dc/auth bash -c "cat - > /opt/chipster-web-server/security/users"
+  cat ../chipster-private/confs/$PROJECT.$DOMAIN/users | oc rsh dc/auth bash -c "cat - > /opt/chipster-web-server/security/users"
 fi
 
 # create a db to influxdb

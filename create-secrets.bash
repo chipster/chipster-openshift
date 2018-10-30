@@ -8,21 +8,6 @@ echo
 
 set -e
 
-function get_db_password {
-  role="$1"
-  get_password "$role-db-password"
-}
-
-function get_service_password {
-  role="$1"
-  get_password "service-password-$role"
-}
-
-function get_password {
-  key="$1"
-  oc get secret passwords -o json | jq -r .data[\"$key\"] | base64 --decode
-}
-
 # generate service passwords
 
 function write_password {
@@ -76,10 +61,10 @@ auth_db_pass=$(get_db_password auth)
 session_db_db_pass=$(get_db_password session-db)
 job_history_db_pass=$(get_db_password job-history)
 
-echo db-url-auth: jdbc:h2:tcp://auth-h2:1521/database/chipster-auth-db | tee -a conf/backup.yaml >> conf/auth.yaml
+echo db-url-auth: jdbc:postgresql://auth-postgres:5432/auth_db | tee -a conf/backup.yaml >> conf/auth.yaml
 echo db-pass-auth: $auth_db_pass | tee -a conf/backup.yaml >> conf/auth.yaml
 
-echo db-url-job-history: jdbc:h2:tcp://job-history-h2:1521/database/chipster-job-history-db | tee -a conf/backup.yaml >> conf/job-history.yaml
+echo db-url-job-history: jdbc:postgresql://job-history-postgres:5432/job_history_db | tee -a conf/backup.yaml >> conf/job-history.yaml
 echo db-pass-job-history: $job_history_db_pass | tee -a conf/backup.yaml >> conf/job-history.yaml
 
 # DB restore from backup
@@ -110,7 +95,10 @@ echo url-m2m-bind-auth: http://0.0.0.0:8013 >> conf/auth.yaml
 echo auth-jaas-prefix: csc >> conf/auth.yaml
 echo session-db-restrict-sharing-to-everyone: csc/example_session_owner >> conf/session-db.yaml
 
-echo 'db-url-session-db: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db;DB_CLOSE_ON_EXIT=FALSE;MULTI_THREADED=TRUE' | tee -a conf/backup.yaml >> conf/session-db.yaml
+#echo 'db-url-session-db: jdbc:h2:tcp://session-db-h2:1521/database/chipster-session-db;DB_CLOSE_ON_EXIT=FALSE;MULTI_THREADED=TRUE' | tee -a conf/backup.yaml >> conf/session-db.yaml
+#echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
+
+echo 'db-url-session-db: jdbc:postgresql://session-db-postgres:5432/session_db_db' | tee -a conf/backup.yaml >> conf/session-db.yaml
 echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
