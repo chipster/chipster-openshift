@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: auth-postgress-data
+  name: auth-postgres-data
 spec:
   accessModes:
     - ReadWriteMany
