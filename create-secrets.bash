@@ -143,11 +143,25 @@ fi
 
 mkdir -p conf/web-server-app-conf
 
-cat ../chipster-web/src/assets/conf/chipster.yaml | \
-  sed "s#^service-locator: http://localhost:8003#service-locator: https://service-locator-$PROJECT.$DOMAIN#" \
+cat ../chipster-web/src/assets/conf/chipster.yaml \
+  | yq w - service-locator https://service-locator-$PROJECT.$DOMAIN \
+  | yq w - example-session-owner-user-id csc/example_session_owner \
   > conf/web-server-app-conf/chipster.yaml
+  
+yq n modules [] \
+  | yq w - modules[0] Kielipankki \
+  | yq w - manual-path assets/manual/kielipankki/manual/ \
+  | yq w - manual-tool-postfix .en.src.html \
+  | yq w - app-name Mylly \
+  | yq w - custom-css assets/manual/kielipankki/manual/app-mylly-styles.css \
+  | yq w - favicon assets/manual/kielipankki/manual/app-mylly-favicon.png \
+  | yq w - home-path assets/manual/kielipankki/manual/app-home.html \
+  | yq w - home-header-path assets/manual/kielipankki/manual/app-home-header.html \
+  | yq w - contact-path assets/manual/kielipankki/manual/app-contact.html \
+   > conf/web-server-app-conf/mylly.yaml
 
 oc create secret generic web-server-app-conf \
-  --from-file=chipster.yaml=conf/web-server-app-conf/chipster.yaml
+  --from-file=chipster.yaml=conf/web-server-app-conf/chipster.yaml \
+  --from-file=mylly.yaml=conf/web-server-app-conf/mylly.yaml
 
 rm -rf conf/
