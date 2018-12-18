@@ -103,6 +103,9 @@ echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/s
 
 bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
 
+# contact support email settings
+cat "../chipster-private/confs/$PROJECT.$DOMAIN/session-worker.yaml" >> conf/session-worker.yaml
+
 # Haka Single sign-on
 create_sso_password haka
 echo url-ext-haka: https://$PROJECT.$DOMAIN/sso/haka >> conf/service-locator.yaml
