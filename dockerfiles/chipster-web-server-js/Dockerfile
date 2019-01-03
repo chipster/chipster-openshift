@@ -11,7 +11,8 @@ RUN cd /tmp/build/chipster-web-server/js/type-service \
 	&& mv src/*.js /opt/chipster-web-server/js/type-service/src \
 	&& mv *.json /opt/chipster-web-server/js/type-service/ \
 	&& mv node_modules /opt/chipster-web-server/js/type-service \
-	&& mv /tmp/build/chipster-web-server/conf /opt/chipster-web-server/ \
+	&& mkdir -p /opt/chipster-web-server/src/main/resources \
+	&& mv /tmp/build/chipster-web-server/src/main/resources/chipster-defaults.yaml /opt/chipster-web-server/src/main/resources/ \
  	&& chmod -R ugo+rwx /opt/chipster-web-server \
  	&& rm -rf /tmp/build/chipster-web-server
 
