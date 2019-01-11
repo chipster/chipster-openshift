@@ -6,8 +6,6 @@ echo project: $PROJECT domain: $DOMAIN
 
 max_pods=$(oc get quota -o json | jq .items[].spec.hard.pods -r | grep -v null)
 max_storage=$(oc get quota -o json | jq .items[].spec.hard.\"requests.storage\" -r | grep -v null | sed s/Gi// | sed s/Ti/000/)
-max_ram=$(oc get limits -o json | jq .items[].spec.limits[].max.memory -r | sed s/Gi//g | sort -n | head -n 1)
-max_cores=$(oc get limits -o json | jq .items[].spec.limits[].max.cpu -r | sort -n | head -n 1)
 
 function configure_java_service {
   service=$1
@@ -25,11 +23,11 @@ function configure_service {
   work_dir=$3
   java_class=$4
 
-  internal=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-int-$service:) || true
-  external=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-ext-$service:) || true
-  ext_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-ext-$service:) || true
-  port=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
-  port_admin=$(cat ../chipster-web-server/conf/chipster-defaults.yaml | grep url-admin-bind-$service: | cut -d : -f 4) || true
+  internal=$(cat ../chipster-web-server/src/main/resources/chipster-defaults.yaml | grep url-int-$service:) || true
+  external=$(cat ../chipster-web-server/src/main/resources/chipster-defaults.yaml | grep url-ext-$service:) || true
+  ext_admin=$(cat ../chipster-web-server/src/main/resources/chipster-defaults.yaml | grep url-admin-ext-$service:) || true
+  port=$(cat ../chipster-web-server/src/main/resources/chipster-defaults.yaml | grep url-bind-$service: | cut -d : -f 4) || true
+  port_admin=$(cat ../chipster-web-server/src/main/resources/chipster-defaults.yaml | grep url-admin-bind-$service: | cut -d : -f 4) || true
 
   view="{
       \"service\": \"$service\", 
@@ -90,10 +88,6 @@ else
   optional_replicas="0"
 fi
 
-# leave some for the monitoring container
-comp_ram=$(echo $max_ram '* 1000 - 100' | bc )
-comp_cores=$(echo $max_cores '* 1000 - 100' | bc )
-
 # service specific templates
 
 view="{
@@ -104,8 +98,6 @@ view="{
       \"tools-size\": \"$tools_size\",
       \"influxdb-size\": \"$influxdb_size\",
       \"optional-replicas\": \"$optional_replicas\",
-      \"comp-ram\": \"$comp_ram\",
-      \"comp-cores\": \"$comp_cores\",
       \"admin-ip-whitelist\": \"$(cat ../chipster-private/confs/rahti-int/admin-ip-whitelist)\"
 }"
 
@@ -116,10 +108,20 @@ for f in templates/deploymentconfigs/*.yaml; do
   echo "$view" | mustache - $f > processed-templates/deploymentconfigs/$name.yaml &
 done
 
-# patches don't use the variables yet but let's process them anyway because of consistency
 for f in templates/deploymentconfigs/patches/*.yaml; do
   name=$(basename $f .yaml)
-  echo "$view" | mustache - $f > processed-templates/deploymentconfigs/patches/$name.yaml &
+  resultPath="processed-templates/deploymentconfigs/patches/$name.yaml"  
+  echo "$view" | mustache - $f > $resultPath
+  
+  # apply installation specific configurations
+  scriptPath="../chipster-private/confs/$PROJECT.$DOMAIN/templates/deploymentconfigs/patches/$name.bash"
+  if [ -f $scriptPath ]; then
+  	tempPath="${resultPath}_temp"
+    mv $resultPath $tempPath
+    # yq merge didn't have option that would override resource values from one file and keep the volumeMounts from another
+    bash $scriptPath $tempPath $resultPath
+    rm $tempPath
+  fi
 done
 
 for f in templates/services/*.yaml; do

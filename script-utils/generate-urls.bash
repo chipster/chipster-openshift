@@ -24,7 +24,7 @@ while read line; do
 			echo url-ext-$service: $proto$service-$PROJECT.$DOMAIN
 		fi
 	fi
-done < ../chipster-web-server/conf/chipster-defaults.yaml
+done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
 # admin route urls
 while read line; do
@@ -39,7 +39,7 @@ while read line; do
 		
 		echo url-admin-ext-$service: $proto$service-admin-$PROJECT.$DOMAIN		
 	fi
-done < ../chipster-web-server/conf/chipster-defaults.yaml
+done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
 # m2m urls
 while read line; do
@@ -50,7 +50,7 @@ while read line; do
 		
 		echo url-m2m-int-$service: $proto$service-m2m
 	fi
-done < ../chipster-web-server/conf/chipster-defaults.yaml
+done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
 # internal service urls
 while read line; do
@@ -61,4 +61,4 @@ while read line; do
 		
 		echo url-int-$service: $proto$service
 	fi
-done < ../chipster-web-server/conf/chipster-defaults.yaml
+done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml

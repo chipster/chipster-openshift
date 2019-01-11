@@ -1,7 +1,7 @@
 terms-of-use-auths: ['haka']
 terms-of-use-path: assets/csc-terms-of-use-v1.html
 terms-of-use-version: 1
-service-locator: https://service-locator-mylly-dev.rahtiapp.fi
+service-locator: https://service-locator-chipster.rahtiapp.fi
 #service-locator: https://service-locator-chipster.rahti-int-app.csc.fi
 
 home-path: assets/manual/app-home.html

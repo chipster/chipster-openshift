@@ -39,8 +39,9 @@ spec:
             cpu: 1900m
             memory: 1Gi
           requests:
-            cpu: 200m
-            memory: 100Mi
+            # requests equals limits to prevent these services from getting killed when the host runs out of memory
+            cpu: 1900m
+            memory: 1Gi
       - name: status
         env:
         - name: admin_port
