@@ -110,7 +110,7 @@ for service in $authenticated_services; do
 done
 
 
-touch conf/backup.yaml
+echo "{}" >  conf/backup.yaml
 merge_custom_confs backup.yaml
 
 auth_db_pass=$(get_db_password auth)
