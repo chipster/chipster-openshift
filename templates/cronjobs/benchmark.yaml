@@ -21,7 +21,7 @@ objects:
             containers:
             - name: benchmark
               image: docker-registry.default.svc:5000/${PROJECT}/cli-client
-              command: ["node", "src/benchmark", "${CHIPSTER_URL}", "-u", "${USERNAME}", "-p", "${PASSWORD}", "--influx", "${INFLUX_URL}"]
+              command: ["node", "lib/benchmark", "${CHIPSTER_URL}", "-u", "${USERNAME}", "-p", "${PASSWORD}", "--influx", "${INFLUX_URL}"]
             restartPolicy: Never
 parameters:
 - description: OpenShift project
