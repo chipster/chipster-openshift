@@ -1,0 +1,105 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.29">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/chipster/chipster-openshift.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+        <relativeTargetDir>chipster-openshift</relativeTargetDir>
+      </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+    </extensions>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>if [ -d chipster-web-server ]; then
+  pushd chipster-web-server; git pull; popd
+else
+  git clone --depth=1 https://github.com/chipster/chipster-web-server.git
+fi
+
+ls -lah
+
+oc login https://rahti.csc.fi:8443 --token=$OPENSHIFT_TOKEN
+
+oc project $OPENSHIFT_PROJECT
+
+project=&quot;$(oc project -q)&quot;
+if [ &quot;$project&quot; != &quot;$OPENSHIFT_PROJECT&quot; ]; then
+  echo &quot;project change failed, stop here&quot;
+  exit 1
+fi
+
+mkdir -p chipster-private/confs/rahti-int
+
+echo $FIREWALL &gt; chipster-private/confs/rahti-int/admin-ip-whitelist 
+
+oc delete pvc --all
+oc delete dc --all
+oc delete secret passwords
+oc delete route --all
+oc delete service --all
+
+pushd chipster-openshift
+bash generate-passwords.bash
+
+bash create-pvcs.bash
+
+bash create-secrets.bash
+
+bash deploy-postgres.bash
+
+bash deploy-services.bash
+
+#bash rollout-services.bash
+
+#bash setup-mylly.bash
+
+#bash setup.bash</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper plugin="credentials-binding@1.15">
+      <bindings>
+        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+          <credentialsId>OPENSHIFT_PROJECT</credentialsId>
+          <variable>OPENSHIFT_PROJECT</variable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+          <credentialsId>OPENSHIFT_TOKEN</credentialsId>
+          <variable>OPENSHIFT_TOKEN</variable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+          <credentialsId>FIREWALL</credentialsId>
+          <variable>FIREWALL</variable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+      </bindings>
+    </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
+  </buildWrappers>
+</project>
