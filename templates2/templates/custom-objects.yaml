@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: chipster-custom-objects
+objects:
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: session-db-events
+  spec:
+    host: session-db-events-${PROJECT}.${DOMAIN}
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: session-db-events
+      weight: 100
+    wildcardPolicy: None
+    
+#- apiVersion: v1
+#  kind: Route
+#  metadata:
+#    name: web-server
+#  spec:
+#    host: ${PROJECT}.${DOMAIN}
+#    tls:
+#      insecureEdgeTerminationPolicy: Redirect
+#      termination: edge
+#    to:
+#      kind: Service
+#      name: web-server
+#      weight: 100
+#    wildcardPolicy: None
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: session-db-events
+  spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: events
+    selector:
+      app: session-db
+    sessionAffinity: None
+    type: ClusterIP
+    
+parameters:
+- name: PROJECT
+- name: DOMAIN

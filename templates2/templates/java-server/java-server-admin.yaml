@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ${NAME}-admin
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ${NAME}-admin
+  spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: admin
+    selector:
+      app: ${NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+    
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: ${NAME}-admin
+  spec:
+    host: ${NAME}-admin-${PROJECT}.${DOMAIN}
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: ${NAME}-admin
+      weight: 100
+    wildcardPolicy: None
+
+parameters:
+- name: NAME
+- name: PROJECT
+- name: DOMAIN

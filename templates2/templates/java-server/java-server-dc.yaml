@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ${NAME}-dc
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    generation: 1
+    labels:
+      app: ${{NAME}}
+    name: ${{NAME}}
+  spec:
+    replicas: 1
+    selector:
+      app: ${{NAME}}
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: ${{NAME}}
+      spec:
+        containers:
+        - env:
+          - name: JAVA_CLASS
+            value: ${{JAVA_CLASS}}
+          image: docker-registry.default.svc:5000/${PROJECT}/${IMAGE}
+          imagePullPolicy: Always
+          name: ${{NAME}}
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: ${{ADMIN_PORT}}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 1900m
+              memory: 1Gi
+            requests:
+              cpu: 1900m
+              memory: 1Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/chipster-web-server/logs
+            name: logs
+          - mountPath: /opt/chipster-web-server/conf
+            name: conf
+        - env:
+          - name: admin_port
+            value: "${ADMIN_PORT}"
+          - name: role
+            value: ${{NAME}}
+          - name: password
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: monitoring-conf
+          image: docker-registry.default.svc:5000/${PROJECT}/monitoring
+          imagePullPolicy: Always
+          name: status
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: ${{ADMIN_PORT}}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 10Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: logs
+        - name: conf
+          secret:
+            defaultMode: 420
+            secretName: ${NAME}-conf
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - auth
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server:latest
+          namespace: ${{PROJECT}}
+      type: ImageChange
+      
+parameters:
+- name: NAME
+- name: API_PORT 
+- name: ADMIN_PORT
+- name: JAVA_CLASS
+- name: PROJECT
+- name: IMAGE
