@@ -17,21 +17,6 @@ objects:
       name: session-db-events
       weight: 100
     wildcardPolicy: None
-    
-#- apiVersion: v1
-#  kind: Route
-#  metadata:
-#    name: web-server
-#  spec:
-#    host: ${PROJECT}.${DOMAIN}
-#    tls:
-#      insecureEdgeTerminationPolicy: Redirect
-#      termination: edge
-#    to:
-#      kind: Service
-#      name: web-server
-#      weight: 100
-#    wildcardPolicy: None
 
 - apiVersion: v1
   kind: Service

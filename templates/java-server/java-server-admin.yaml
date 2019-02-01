@@ -13,11 +13,9 @@ objects:
       protocol: TCP
       targetPort: admin
     selector:
-      app: ${NAME}
+      app: ${{NAME}}
     sessionAffinity: None
     type: ClusterIP
-  status:
-    loadBalancer: {}
     
 - apiVersion: v1
   kind: Route

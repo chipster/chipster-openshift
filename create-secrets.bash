@@ -14,7 +14,10 @@
 # 4. chipster-private/confs/$PROJECT.$DOMAIN/
 #    - Configuration of single project
 
-source script-utils/deploy-utils.bash
+source scripts/utils.bash
+
+export PROJECT=$(get_project)
+export DOMAIN=$(get_domain)
 
 echo "$DOMAIN"
 echo "Create secrets for $PROJECT.$DOMAIN"

@@ -6,7 +6,6 @@ objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
-    generation: 1
     labels:
       app: ${{NAME}}
     name: ${{NAME}}
@@ -33,7 +32,7 @@ objects:
         - env:
           - name: JAVA_CLASS
             value: ${{JAVA_CLASS}}
-          image: docker-registry.default.svc:5000/${PROJECT}/${IMAGE}
+          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/${IMAGE}
           imagePullPolicy: Always
           name: ${{NAME}}
           readinessProbe:
@@ -69,7 +68,7 @@ objects:
               secretKeyRef:
                 key: password
                 name: monitoring-conf
-          image: docker-registry.default.svc:5000/${PROJECT}/monitoring
+          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/monitoring
           imagePullPolicy: Always
           name: status
           readinessProbe:
@@ -108,11 +107,11 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - auth
+        - ${{NAME}}
         from:
           kind: ImageStreamTag
-          name: chipster-web-server:latest
-          namespace: ${{PROJECT}}
+          name: ${IMAGE}:latest
+          namespace: ${{IMAGE_PROJECT}}
       type: ImageChange
       
 parameters:
@@ -122,3 +121,4 @@ parameters:
 - name: JAVA_CLASS
 - name: PROJECT
 - name: IMAGE
+- name: IMAGE_PROJECT

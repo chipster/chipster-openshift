@@ -2,7 +2,7 @@
 
 set -e
 
-source script-utils/deploy-utils.bash
+source scripts/utils.bash
 
 oc new-app centos/postgresql-95-centos7 --name auth-postgres \
     -e POSTGRESQL_USER=user \

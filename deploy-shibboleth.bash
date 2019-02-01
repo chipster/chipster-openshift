@@ -2,7 +2,7 @@
 
 set -e
 
-source script-utils/deploy-utils.bash
+source scripts/utils.bash
 
 bash ../shibboleth-openshift/deploy-shibboleth.bash \
   --name haka \

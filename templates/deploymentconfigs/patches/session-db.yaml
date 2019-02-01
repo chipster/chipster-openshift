@@ -1,9 +1,0 @@
----
-spec:
-  template:   
-    spec:
-      containers:
-      - name: session-db        
-        ports:                
-        - name: events
-          containerPort: 8005

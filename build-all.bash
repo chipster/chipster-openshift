@@ -3,7 +3,10 @@
 set -x
 set -e
 
-source script-utils/deploy-utils.bash
+source scripts/utils.bash
+
+export PROJECT=$(get_project)
+export DOMAIN=$(get_domain)
 
 branch="$1"
 

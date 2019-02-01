@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source script-utils/deploy-utils.bash
+source scripts/utils.bash
 
 echo "$DOMAIN"
 echo "Create passwords for $PROJECT.$DOMAIN"
