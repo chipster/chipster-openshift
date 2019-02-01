@@ -78,6 +78,6 @@ patch_kind_and_name $template_dir/web-server-dc.yaml DeploymentConfig web-server
   spec.template.spec.volumes[2].secret.secretName: web-server-app-conf
 " false
 
-patch_kind_and_name $template_dir/web-server-api.yaml Route web-server "
+patch_kind_and_name $template_dir/web-server-api-route.yaml Route web-server "
   spec.host: $PROJECT.$DOMAIN
 " false

@@ -18,26 +18,29 @@ function configure_java_service {
   java_class=$2  
   image="chipster-web-server"
   work_dir="/opt/chipster-web-server"
-  configure_service "$service" "$image" "$work_dir" "$java_class"
+  role=$service
+  configure_service "$service" "$image" "$role" "$work_dir" "$java_class"
 }
 
 # configure a service to path /opt/chipster-web-server
 function configure_service {
   service=$1
   image=$2
-  work_dir=$3
-  java_class=$4
-
-  internal=$(cat $chipster_defaults_path | grep url-int-$service:) || true
-  external=$(cat $chipster_defaults_path | grep url-ext-$service:) || true
-  ext_admin=$(cat $chipster_defaults_path | grep url-admin-ext-$service:) || true
-  port=$(cat $chipster_defaults_path | grep url-bind-$service: | cut -d : -f 4) || true
-  port_admin=$(cat $chipster_defaults_path | grep url-admin-bind-$service: | cut -d : -f 4) || true
+  role=$3
+  work_dir=$4
+  java_class=$5
+    
+  api_port=$(yq r $chipster_defaults_path url-bind-$role | cut -d : -f 3) || true
+  admin_port=$(yq r $chipster_defaults_path url-admin-bind-$role | cut -d : -f 3) || true
+  
+  create_api_service=$(yq r $chipster_defaults_path url-int-$role) || true
+  create_api_route=$(yq r $chipster_defaults_path url-ext-$role) || true
+  create_admin_service_and_route=$(yq r $chipster_defaults_path url-admin-ext-$role) || true
   
   oc process -f templates/java-server/java-server-dc.yaml --local \
   -p NAME=$service \
-  -p API_PORT=$port \
-  -p ADMIN_PORT=$port_admin \
+  -p API_PORT=$api_port \
+  -p ADMIN_PORT=$admin_port \
   -p JAVA_CLASS=$java_class \
   -p PROJECT=$PROJECT \
   -p IMAGE=$image \
@@ -47,45 +50,50 @@ function configure_service {
   # configure ports for services that have them
   admin_port_index=0
 
-  if [ -n "$port" ]; then
+  if [ -n "$create_api_service" ]; then
   	
     admin_port_index=1
     patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
-      spec.template.spec.containers[0].ports[0].containerPort: $port
+      spec.template.spec.containers[0].ports[0].containerPort: $api_port
       spec.template.spec.containers[0].ports[0].name: api
       spec.template.spec.containers[0].ports[0].protocol: TCP
     " false
-  fi
-  
-  if [ -n "$port_admin" ]; then
-  
-    patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
-      spec.template.spec.containers[0].ports[$admin_port_index].containerPort: $port_admin
-      spec.template.spec.containers[0].ports[$admin_port_index].name: admin
-      spec.template.spec.containers[0].ports[$admin_port_index].protocol: TCP
-    " false
-  fi
-  
-  if [ -n "$internal" ] || [ -n "$external" ]; then
+    
     # create OpenShift service
-    oc process -f templates/java-server/java-server-api.yaml --local \
+    oc process -f templates/java-server/java-server-api-service.yaml --local \
     -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
-    > $template_dir/$service-api.yaml
+    > $template_dir/$service-api-service.yaml
+  fi
+    
+  if [ -n "$create_api_route" ]; then
+  
+    # create OpenShift service
+    oc process -f templates/java-server/java-server-api-route.yaml --local \
+    -p NAME=$service \
+    -p PROJECT=$PROJECT \
+    -p DOMAIN=$DOMAIN \
+    > $template_dir/$service-api-route.yaml  
         
     ip_whitelist="$(get_deploy_config ip-whitelist-api)"
     
     if [ -n "$ip_whitelist" ]; then
-      apply_firewall $template_dir/$service-api.yaml "$ip_whitelist"
+      apply_firewall $template_dir/$service-api-route.yaml "$ip_whitelist"
     else
       echo "no firewall configured for route $service"  
     fi
   fi
   
-  # create route if necessary
-  if [ -n "$ext_admin" ]; then
-    # create route
+  if [ -n "$create_admin_service_and_route" ]; then
+  
+    patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
+      spec.template.spec.containers[0].ports[$admin_port_index].containerPort: $admin_port
+      spec.template.spec.containers[0].ports[$admin_port_index].name: admin
+      spec.template.spec.containers[0].ports[$admin_port_index].protocol: TCP
+    " false
+  
+    # create service and route
     oc process -f templates/java-server/java-server-admin.yaml --local \
     -p NAME=$service \
     -p PROJECT=$PROJECT \
@@ -104,9 +112,6 @@ function configure_service {
 function get_deploy_config {
 
   key="$1"
-
-  deploy_config_path_shared="../chipster-private/confs/chipster-all/deploy.yaml"
-  deploy_config_path_project="../chipster-private/confs/$PROJECT.$DOMAIN/deploy.yaml"
 
   # if project specific file exists
   if [ -f $deploy_config_path_project ]; then
@@ -147,15 +152,29 @@ DOMAIN=$(get_domain)
 
 echo project: $PROJECT domain: $DOMAIN
 
+private_config_path="../chipster-private/confs"
+
+deploy_config_path_shared="$private_config_path/chipster-all/deploy.yaml"
+deploy_config_path_project="$private_config_path/$PROJECT.$DOMAIN/deploy.yaml"
+
 chipster_defaults_path="../chipster-web-server/src/main/resources/chipster-defaults.yaml"
-mylly=false
 
-image_project="chipster-jenkins"
+mylly=$(get_deploy_config mylly)
+if [ -z "$mylly" ]; then  
+  mylly=false
+fi
 
-template_dir="tmp/chipster_template_parts"
+image_project=$(get_deploy_config image_project)
+if [ -z "$image_project" ]; then
+  echo "image_project is not configure, assuming all images are found from the current project"
+  image_project=$PROJECT
+fi
 
+build_dir="build"
+template_dir="$build_dir/parts"
+
+rm -rf $build_dir
 mkdir -p $template_dir
-rm -f $template_dir/*
 
 # shared templates and shared image
 
@@ -172,27 +191,17 @@ configure_java_service job-history fi.csc.chipster.jobhistory.JobHistoryService 
 
 # shared templates and custom image 
 
-configure_service toolbox toolbox /opt/chipster-web-server &
-configure_service type-service chipster-web-server-js /opt/chipster-web-server &
-configure_service web-server web-server /opt/chipster-web-server &
-configure_service comp comp /opt/chipster/comp &
+configure_service toolbox toolbox toolbox /opt/chipster-web-server &
+configure_service type-service chipster-web-server-js type-service /opt/chipster-web-server &
+configure_service web-server web-server web-server /opt/chipster-web-server &
+configure_service comp comp comp /opt/chipster/comp &
+
+if [ "$mylly" = true ]; then
+  configure_service comp-mylly comp-mylly comp /opt/chipster/comp &
+fi
 
 wait
 
-if [ "$mylly" = true ]; then
-  # create mylly config by replacing almost all ocurrances of comp to comp-mylly, except the paths
-  # TODO use yq or jq instead of sed
-  
-  # delete the old dc, otherwise updates fail as the comp version won't match with the old comp-mylly version
-  if oc get dc/comp-mylly > /dev/null 2>&1 ; then
-    oc delete dc/comp-mylly
-  fi
-  
-  oc get dc/comp -o yaml \
-	| sed s/comp/comp-mylly/g \
-	| sed s_/opt/chipster/comp-mylly_/opt/chipster/comp_g \
-	| yq r - items >> $chipster_template
-fi
 
 oc process -f templates/custom-objects.yaml --local \
     -p PROJECT=$PROJECT \
@@ -220,20 +229,25 @@ if [ "$max_pods" -lt 40 ]; then
   bash templates/patch-low-pod-quota.bash $template_dir
 fi
  
-template="tmp/chipster_template.yaml"
+template="$build_dir/chipster_template.yaml"
 yq merge --append $template_dir/*.yaml > $template
 
-scriptPath="../chipster-private/confs/$PROJECT.$DOMAIN/chipster-template-patch.bash"
+sharedScriptPath="$private_config_path/chipster-all/chipster-template-patch.bash"
+projectScriptPath="$private_config_path/$PROJECT.$DOMAIN/chipster-template-patch.bash"
 
-if [ -f $scriptPath ]; then
-  echo "apply project specific customizations in $scriptPath"
-  bash $scriptPath $template
+if [ -f $sharedScriptPath ]; then
+  echo "apply shared customizations in $sharedScriptPath"
+  bash $sharedScriptPath $template
+fi
+
+if [ -f $projectScriptPath ]; then
+  echo "apply project specific customizations in $projectScriptPath"
+  bash $projectScriptPath $template
 fi
 
 echo "apply the template to the server"
-oc apply -f $template | tee tmp/apply.out | grep -v unchanged
-echo $(cat tmp/apply.out | grep unchanged | wc -l) unchanged 
-rm tmp/apply.out
+apply_out="$build_dir/apply.out"
+oc apply -f $template | tee $apply_out | grep -v unchanged
+echo $(cat $apply_out | grep unchanged | wc -l) objects unchanged 
 
-rm $template
-rm -f $template_dir/*
+rm -rf $build_dir
