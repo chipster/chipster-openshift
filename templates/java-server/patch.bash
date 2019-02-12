@@ -26,6 +26,8 @@ patch_kind_and_name $template_dir/comp-mylly-dc.yaml DeploymentConfig comp-mylly
   spec.template.spec.containers[0].resources.limits.memory: 7900Mi
   spec.template.spec.containers[0].resources.requests.cpu: 1000m
   spec.template.spec.containers[0].resources.requests.memory: 4000Mi
+  spec.template.spec.containers[0].volumeMounts[0].mountPath: /opt/chipster/comp/logs
+  spec.template.spec.containers[0].volumeMounts[1].mountPath: /opt/chipster/comp/conf
   spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/comp/jobs-data
   spec.template.spec.containers[0].volumeMounts[2].name: jobs-data
   spec.template.spec.containers[0].volumeMounts[3].mountPath: /appl
@@ -42,6 +44,8 @@ patch_kind_and_name $template_dir/comp-dc.yaml DeploymentConfig comp "
   spec.template.spec.containers[0].resources.limits.memory: 7900Mi
   spec.template.spec.containers[0].resources.requests.cpu: 1000m
   spec.template.spec.containers[0].resources.requests.memory: 4000Mi
+  spec.template.spec.containers[0].volumeMounts[0].mountPath: /opt/chipster/comp/logs
+  spec.template.spec.containers[0].volumeMounts[1].mountPath: /opt/chipster/comp/conf  
   spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/comp/jobs-data
   spec.template.spec.containers[0].volumeMounts[2].name: jobs-data
   spec.template.spec.containers[0].volumeMounts[3].mountPath: /mnt/tools

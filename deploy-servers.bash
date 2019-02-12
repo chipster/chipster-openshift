@@ -37,6 +37,8 @@ function configure_service {
   create_api_route=$(yq r $chipster_defaults_path url-ext-$role) || true
   create_admin_service_and_route=$(yq r $chipster_defaults_path url-admin-ext-$role) || true
   
+  #echo "$service 	$api_port 	$admin_port 	$create_api_service 	$create_api_route 	$create_admin_service_and_route"
+  
   oc process -f templates/java-server/java-server-dc.yaml --local \
   -p NAME=$service \
   -p API_PORT=$api_port \
@@ -50,7 +52,7 @@ function configure_service {
   # configure ports for services that have them
   admin_port_index=0
 
-  if [ -n "$create_api_service" ]; then
+  if [ "$create_api_service" != "null" ]; then
   	
     admin_port_index=1
     patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
@@ -67,7 +69,7 @@ function configure_service {
     > $template_dir/$service-api-service.yaml
   fi
     
-  if [ -n "$create_api_route" ]; then
+  if [ "$create_api_route" != "null" ]; then
   
     # create OpenShift service
     oc process -f templates/java-server/java-server-api-route.yaml --local \
@@ -85,7 +87,7 @@ function configure_service {
     fi
   fi
   
-  if [ -n "$create_admin_service_and_route" ]; then
+  if [ "$create_admin_service_and_route" != "null" ]; then
   
     patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
       spec.template.spec.containers[0].ports[$admin_port_index].containerPort: $admin_port
@@ -227,6 +229,10 @@ max_pods=$(oc get quota -o json | jq .items[].spec.hard.pods -r | grep -v null)
 if [ "$max_pods" -lt 40 ]; then
   echo "disabled non-critical services because of low pod quota"
   bash templates/patch-low-pod-quota.bash $template_dir
+  
+  oc get dc job-history-postgres -o yaml | yq w - spec.replicas 0 | oc apply -f -
+else
+  oc get dc job-history-postgres -o yaml | yq w - spec.replicas 1 | oc apply -f -
 fi
  
 template="$build_dir/chipster_template.yaml"
