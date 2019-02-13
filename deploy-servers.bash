@@ -39,6 +39,8 @@ function configure_service {
   
   #echo "$service 	$api_port 	$admin_port 	$create_api_service 	$create_api_route 	$create_admin_service_and_route"
   
+  mkdir -p $template_dir/$service
+  
   oc process -f templates/java-server/java-server-dc.yaml --local \
   -p NAME=$service \
   -p API_PORT=$api_port \
@@ -47,7 +49,7 @@ function configure_service {
   -p PROJECT=$PROJECT \
   -p IMAGE=$image \
   -p IMAGE_PROJECT=$image_project \
-  > $template_dir/$service-dc.yaml
+  > $template_dir/$service/dc.yaml
   
   # configure ports for services that have them
   admin_port_index=0
@@ -55,7 +57,7 @@ function configure_service {
   if [ "$create_api_service" != "null" ]; then
   	
     admin_port_index=1
-    patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
+    patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service "
       spec.template.spec.containers[0].ports[0].containerPort: $api_port
       spec.template.spec.containers[0].ports[0].name: api
       spec.template.spec.containers[0].ports[0].protocol: TCP
@@ -66,7 +68,7 @@ function configure_service {
     -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
-    > $template_dir/$service-api-service.yaml
+    > $template_dir/$service/api-service.yaml
   fi
     
   if [ "$create_api_route" != "null" ]; then
@@ -76,12 +78,12 @@ function configure_service {
     -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
-    > $template_dir/$service-api-route.yaml  
+    > $template_dir/$service/api-route.yaml  
         
     ip_whitelist="$(get_deploy_config ip-whitelist-api)"
     
     if [ -n "$ip_whitelist" ]; then
-      apply_firewall $template_dir/$service-api-route.yaml "$ip_whitelist"
+      apply_firewall $template_dir/$service/api-route.yaml "$ip_whitelist"
     else
       echo "no firewall configured for route $service"  
     fi
@@ -89,7 +91,7 @@ function configure_service {
   
   if [ "$create_admin_service_and_route" != "null" ]; then
   
-    patch_kind_and_name $template_dir/$service-dc.yaml DeploymentConfig $service "
+    patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service "
       spec.template.spec.containers[0].ports[$admin_port_index].containerPort: $admin_port
       spec.template.spec.containers[0].ports[$admin_port_index].name: admin
       spec.template.spec.containers[0].ports[$admin_port_index].protocol: TCP
@@ -100,15 +102,20 @@ function configure_service {
     -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
-    > $template_dir/$service-admin.yaml
+    > $template_dir/$service/admin.yaml
     
     ip_whitelist="$(get_deploy_config ip-whitelist-admin)"
     if [ -n "$ip_whitelist" ]; then
-      apply_firewall $template_dir/$service-admin.yaml "$ip_whitelist"
+      apply_firewall $template_dir/$service/admin.yaml "$ip_whitelist"
     else
       echo "no firewall configured for route $service-admin" 
     fi
   fi
+  
+  # merge to one file for each service to make it easier to know the right file names for patches 
+  yq merge --append $template_dir/$service/*.yaml > $template_dir/$service.yaml
+  rm $template_dir/$service/*.yaml
+  rmdir $template_dir/$service
 }
 
 function get_deploy_config {
@@ -166,6 +173,9 @@ if [ -z "$mylly" ]; then
   mylly=false
 fi
 
+shibboleth=$(get_deploy_config shibboleth)
+
+
 image_project=$(get_deploy_config image_project)
 if [ -z "$image_project" ]; then
   echo "image_project is not configure, assuming all images are found from the current project"
@@ -200,6 +210,41 @@ configure_service comp comp comp /opt/chipster/comp &
 
 if [ "$mylly" = true ]; then
   configure_service comp-mylly comp-mylly comp /opt/chipster/comp &
+else
+  echo "skipping mylly"
+fi
+
+if [ -n "$shibboleth" ]; then
+  
+  if oc get dc haka -o json | jq '.spec.template.spec.containers[0].volumeMounts[0].mountPath' | grep logs; then
+    echo "dc haka was patched with earlier version of this script. Move "logs" and "confs" to be the last in the volumes and volumeMounts arrays."
+    exit 1
+  else
+  
+    # it would be nicer if the shibboleth script would only create the template locally and we could patch before it's 
+    # applied to the server. Unfortunately it has created the object already on the server, so we have to patch it there for now   
+    echo "configure $shibboleth"
+    
+    json="$(oc get dc haka -o json)"
+    echo "$json" \
+      | jq '.spec.template.spec.containers[0].volumeMounts[3]={"mountPath": "/opt/chipster-web-server/logs", "name": "logs"}' \
+      | jq '.spec.template.spec.containers[0].volumeMounts[4]={"mountPath": "/opt/chipster-web-server/conf", "name": "conf"}' \
+      | jq '.spec.template.spec.volumes[3]={"emptyDir": {}, "name": "logs"}' \
+	  | jq '.spec.template.spec.volumes[4]={"name": "conf", "secret": {"defaultMode": 420, "secretName": "haka-conf"}}' \
+	  | oc apply -f -
+	  
+	m2m_port=$(yq r $chipster_defaults_path url-m2m-int-auth | cut -d : -f 3) || true  
+	
+	patch_kind_and_name $template_dir/auth.yaml DeploymentConfig auth "
+      spec.template.spec.containers[0].ports[2].containerPort: $m2m_port
+      spec.template.spec.containers[0].ports[2].name: m2m
+      spec.template.spec.containers[0].ports[2].protocol: TCP
+    " false
+    
+    oc apply -f templates/auth-m2m.yaml
+  fi
+else
+  echo "skipping shibboleth"
 fi
 
 wait
@@ -234,22 +279,22 @@ if [ "$max_pods" -lt 40 ]; then
 else
   oc get dc job-history-postgres -o yaml | yq w - spec.replicas 1 | oc apply -f -
 fi
- 
-template="$build_dir/chipster_template.yaml"
-yq merge --append $template_dir/*.yaml > $template
 
 sharedScriptPath="$private_config_path/chipster-all/chipster-template-patch.bash"
 projectScriptPath="$private_config_path/$PROJECT.$DOMAIN/chipster-template-patch.bash"
 
 if [ -f $sharedScriptPath ]; then
   echo "apply shared customizations in $sharedScriptPath"
-  bash $sharedScriptPath $template
+  bash $sharedScriptPath $template_dir
 fi
 
 if [ -f $projectScriptPath ]; then
   echo "apply project specific customizations in $projectScriptPath"
-  bash $projectScriptPath $template
+  bash $projectScriptPath $template_dir
 fi
+ 
+template="$build_dir/chipster_template.yaml"
+yq merge --append $template_dir/*.yaml > $template
 
 echo "apply the template to the server"
 apply_out="$build_dir/apply.out"

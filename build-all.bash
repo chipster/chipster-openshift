@@ -33,17 +33,29 @@ oc new-build --name chipster https://github.com/chipster/chipster.git#$branch -D
 wait
 sleep 1
 
-# from chipster-web-server
-oc new-build --name comp-mylly -D - < dockerfiles/comp-mylly/Dockerfile  && retry oc logs -f bc/comp &
-
 # from comp-base
 oc new-build --name comp --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/comp/Dockerfile  && retry oc logs -f bc/comp &
 
 # run serially
 oc new-build --name chipster-web-server https://github.com/chipster/chipster-web-server.git#$branch -D - < dockerfiles/chipster-web-server/Dockerfile  && retry oc logs -f bc/chipster-web-server
-oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - < dockerfiles/toolbox/Dockerfile && retry oc logs -f bc/toolbox
+#oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - < dockerfiles/toolbox/Dockerfile && retry oc logs -f bc/toolbox
 oc new-build --name web-server https://github.com/chipster/chipster-web.git#$branch -D - < dockerfiles/web-server/Dockerfile && retry oc logs -f bc/web-server
-wait
+
+# Mylly
+oc new-build --name comp-mylly -D - < dockerfiles/comp-mylly/Dockerfile  && retry oc logs -f bc/comp &
+oc new-build --name toolbox-mylly https://github.com/CSCfi/Kielipankki-mylly.git#dev-tools -D - < dockerfiles/toolbox/Dockerfile && retry oc logs -f bc/toolbox-mylly
+
+# We need both tools and manual from the toolbox-mylly image, but the oc command takes only one source-image-path.
+# Use it to get the tools and configure the image change trigger.
+oc new-build --name toolbox https://github.com/chipster/chipster-tools.git -D - \
+  --source-image=toolbox-mylly --source-image-path=/opt/chipster-web-server/tools/kielipankki/:tools/ \
+  < dockerfiles/toolbox/Dockerfile
+  
+# Modify the build config to copy also the manual
+#TODO The files end up to /opt/chipster-web/src/assets/manual/kielipankki/manual. What creates the last manual folder?
+oc get bc toolbox -o json | jq '.spec.source.images[0].paths[1]={"destinationDir": "manual/kielipankki/", "sourcePath": "/opt/chipster-web/src/assets/manual/"}' | oc replace bc toolbox -f -
+oc start-build toolbox --follow
+
 
 echo ""
 echo "# Build automatically on push"

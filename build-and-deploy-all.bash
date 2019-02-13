@@ -15,16 +15,15 @@ bash create-secrets.bash
 # deploy databases
 bash deploy-postgres.bash
 
+# optional
+#bash deploy-shibboleth.bash
+
 # run if the templates have changed or there are new services
 # - remove all: bash remove-all-services.bash
 bash deploy-servers.bash
 
 # run always after create-secrets.bash
 bash rollout-services.bash
-
-# optional
-#bash deploy-shibboleth.bash
-#bash setup-mylly.bash
 
 # create default users in auth and configure grafana password and dashboards (not started with the default quota)
 bash setup.bash

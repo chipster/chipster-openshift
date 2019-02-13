@@ -2,11 +2,11 @@
 
 source scripts/utils.bash
 
-patch_kind_and_name $1/backup-dc.yaml DeploymentConfig backup "
+patch_kind_and_name $1/backup.yaml DeploymentConfig backup "
   spec.replicas: 0
 " false
 
-patch_kind_and_name $1/job-history-dc.yaml DeploymentConfig job-history "
+patch_kind_and_name $1/job-history.yaml DeploymentConfig job-history "
   spec.replicas: 0
 " false
 
