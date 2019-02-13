@@ -151,7 +151,7 @@ oc create secret generic monitoring-conf --from-literal=password=$monitoring_pas
 echo 'db-url-session-db: jdbc:postgresql://session-db-postgres:5432/session_db_db' | tee -a conf/backup.yaml >> conf/session-db.yaml
 echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
 
-bash script-utils/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
+bash scripts/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
 
 # Haka Single sign-on
 # this should be in the project specific configuration, but it doesn't support variables yet 
