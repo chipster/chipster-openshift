@@ -69,9 +69,9 @@ echo "$DEPLOY_CONF" &gt; chipster-private/confs/chipster-all/deploy.yaml
 # ldap won't work, but the script wants this
 touch chipster-private/confs/rahti-int/jaas.config 
 
+oc delete secret passwords || true
 oc delete pvc --all
 oc delete dc --all
-oc delete secret passwords || true
 oc delete route --all
 oc delete service --all
 
