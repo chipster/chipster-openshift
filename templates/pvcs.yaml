@@ -7,17 +7,6 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: auth-postgres-data
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 100Mi
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
     name: auth-security
   spec:
     accessModes:
@@ -85,28 +74,6 @@ objects:
   kind: PersistentVolumeClaim
   metadata:
     name: influxdb
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 1Gi
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: job-history-postgres-data
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 100Mi
-
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: session-db-postgres-data
   spec:
     accessModes:
     - ReadWriteMany

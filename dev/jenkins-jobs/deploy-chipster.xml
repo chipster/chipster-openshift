@@ -81,13 +81,11 @@ bash generate-passwords.bash
 
 bash create-secrets.bash
 
-bash -x deploy-postgres.bash
+bash deploy-postgres.bash fast
 
 bash deploy-servers.bash
 
 #bash rollout-services.bash
-
-#bash setup-mylly.bash
 
 #bash setup.bash</command>
     </hudson.tasks.Shell>

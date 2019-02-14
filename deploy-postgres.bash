@@ -38,12 +38,14 @@ echo "$template" | oc process -f - --local \
   -p POSTGRESQL_PASSWORD=$(get_db_password auth) \
   -p POSTGRESQL_USER=user \
   -p NAMESPACE=openshift \
-  -p VOLUME_CAPACITY=1Gi \
+  -p VOLUME_CAPACITY=100Mi \
   -p POSTGRESQL_VERSION=9.5 \
   | oc apply -f - 
 
-# for some reason glusterfs services won't get created, if we create pvcs too fast  
-wait_pvc_bound auth-postgres
+# for some reason glusterfs services won't get created, if we create pvcs too fast
+if [ -z "$is_fast" ]; then  
+  wait_pvc_bound auth-postgres
+fi
   
 echo "$template" | oc process -f - --local \
   -p POSTGRESQL_DATABASE=session_db_db \
@@ -51,11 +53,13 @@ echo "$template" | oc process -f - --local \
   -p POSTGRESQL_PASSWORD=$(get_db_password session-db) \
   -p POSTGRESQL_USER=user \
   -p NAMESPACE=openshift \
-  -p VOLUME_CAPACITY=10Gi \
+  -p VOLUME_CAPACITY=1Gi \
   -p POSTGRESQL_VERSION=9.5 \
   | oc apply -f -
-  
-wait_pvc_bound session-db-postgres
+
+if [ -z "$is_fast" ]; then  
+  wait_pvc_bound session-db-postgres
+fi
   
 echo "$template" | oc process -f - --local \
   -p POSTGRESQL_DATABASE=job_history_db \
@@ -63,11 +67,13 @@ echo "$template" | oc process -f - --local \
   -p POSTGRESQL_PASSWORD=$(get_db_password job-history) \
   -p POSTGRESQL_USER=user \
   -p NAMESPACE=openshift \
-  -p VOLUME_CAPACITY=1Gi \
+  -p VOLUME_CAPACITY=100Mi \
   -p POSTGRESQL_VERSION=9.5 \
   | oc apply -f -
 
-wait_pvc_bound job-history-postgres
+if [ -z "$is_fast" ]; then
+  wait_pvc_bound job-history-postgres
+fi
 
 if [ -z "$is_fast" ]; then
   psql auth-postgres        auth_db        'alter system set synchronous_commit to off'
