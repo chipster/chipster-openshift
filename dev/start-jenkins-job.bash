@@ -6,3 +6,4 @@ curl -X POST https://jenkins-chipster-jenkins.rahtiapp.fi/job/$job/build --user 
 
 echo "console output available in"
 echo "curl https://jenkins-chipster-jenkins.rahtiapp.fi/job/$job/lastBuild/consoleText --user $JENKINS_USER:$JENKINS_TOKEN"
+echo "https://jenkins-chipster-jenkins.rahtiapp.fi/job/deploy-chipster/lastBuild/console"

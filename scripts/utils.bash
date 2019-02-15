@@ -145,3 +145,17 @@ function patch_index {
 	# apply the script to the file
 	echo "$script2" | yq w -i $file items[$i] --script -
 }
+
+function wait_dc {
+  service="$1"
+  is_printed="false"
+  while [ $(oc get dc $service -o json | jq .status.availableReplicas) != 1 ]; do
+    if [ $is_printed == "false" ]; then
+      echo "waiting $service to start"
+      is_printed="true"
+    else
+      echo -n "."
+    fi 
+    sleep 2
+  done
+}

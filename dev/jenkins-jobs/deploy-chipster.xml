@@ -65,6 +65,7 @@ mkdir -p chipster-private/confs/chipster-all
 mkdir -p chipster-private/confs/rahti-int
 
 echo "$DEPLOY_CONF" &gt; chipster-private/confs/chipster-all/deploy.yaml
+echo "$USERS_CONF" &gt; chipster-private/confs/chipster-all/users
 
 # ldap won't work, but the script wants this
 touch chipster-private/confs/rahti-int/jaas.config 
@@ -87,7 +88,7 @@ bash deploy-servers.bash
 
 #bash rollout-services.bash
 
-#bash setup.bash</command>
+bash setup.bash</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
@@ -105,6 +106,10 @@ bash deploy-servers.bash
         <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
           <credentialsId>DEPLOY_CONF</credentialsId>
           <variable>DEPLOY_CONF</variable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+          <credentialsId>USERS_CONF</credentialsId>
+          <variable>USERS_CONF</variable>
         </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
       </bindings>
     </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>

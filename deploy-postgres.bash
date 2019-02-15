@@ -21,10 +21,8 @@ function psql {
   db="$2"
   sql="$3"
   
-  while [ $(oc get dc $service -o json | jq .status.availableReplicas) != 1 ]; do
-    echo "waiting $service to start" 
-    sleep 1
-  done
+  wait_dc "$service"
+  
   oc rsh dc/$service bash -c "psql -c \"$sql\""
 }
 

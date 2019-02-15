@@ -7,6 +7,8 @@ source scripts/utils.bash
 PROJECT=$(oc project -q)
 DOMAIN=$(get_domain)
 
+wait_dc auth
+
 # check connection first, otherwise connection errors cause the users file to be overwritten
 if oc rsh dc/auth hostname && oc rsh dc/auth ls /opt/chipster-web-server/security/users > /dev/null ; then
   echo "Using old accounts"
