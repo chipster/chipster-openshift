@@ -37,7 +37,10 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>if [ -d chipster-web-server ]; then
+      <command>#!/bin/bash
+set +x
+      
+if [ -d chipster-web-server ]; then
   pushd chipster-web-server; git pull; popd
 else
   git clone --depth=1 https://github.com/chipster/chipster-web-server.git
@@ -48,8 +51,6 @@ if [ -d chipster-web ]; then
 else
   git clone --depth=1 https://github.com/chipster/chipster-web.git
 fi
-
-ls -lah
 
 oc login https://rahti.csc.fi:8443 --token=$OPENSHIFT_TOKEN
 
@@ -78,17 +79,27 @@ oc delete service --all
 
 pushd chipster-openshift
 
-bash generate-passwords.bash
+source scripts/utils.bash
 
-bash create-secrets.bash
+bash generate-passwords.bash
 
 bash deploy-postgres.bash fast
 
+bash create-secrets.bash
+
 bash deploy-servers.bash
 
-#bash rollout-services.bash
+# OpenShift would get it running on its own eventually, but let's help little bit
+wait_dc auth-postgres
+wait_dc session-db-postgres
+bash rollout-services.bash
 
-bash setup.bash</command>
+bash setup.bash
+
+wait_dc web-server
+
+echo "The application is available in"
+echo https://$(oc get route web-server -o json | jq .spec.host -r)</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

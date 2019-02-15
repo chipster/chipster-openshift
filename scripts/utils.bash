@@ -158,4 +158,5 @@ function wait_dc {
     fi 
     sleep 2
   done
+  echo ""
 }
