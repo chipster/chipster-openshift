@@ -73,11 +73,11 @@ touch chipster-private/confs/rahti-int/jaas.config
 
 source scripts/utils.bash
 
-oc delete secret passwords || true
-oc delete dc --all
-oc delete route --all
-oc delete service --all
-delete_all_pvcs
+delete secret passwods || true
+delete_all dc
+delete_all route
+delete_all service
+delete_all pvc 
 
 pushd chipster-openshift
 
