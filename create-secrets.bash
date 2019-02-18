@@ -6,7 +6,7 @@
 # maintaining a large number of deployments (i.e. OpenShift projects)
 #  
 # 1. chipstser-web-server/src/main/resources/chipster-defaults.yaml
-#    - Chipster defaults, ready to run on laptop for development
+#    - Chipster defaults, ready to run on a laptop for development
 # 2. this script (create-secrets.bash)
 #    - Generic OpenShift deployment
 # 3. chipster-private/confs/chipster-all/

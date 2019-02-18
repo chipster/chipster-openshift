@@ -71,15 +71,15 @@ echo "$USERS_CONF" &gt; chipster-private/confs/chipster-all/users
 # ldap won't work, but the script wants this
 touch chipster-private/confs/rahti-int/jaas.config 
 
+source scripts/utils.bash
+
 oc delete secret passwords || true
-oc delete pvc --all
 oc delete dc --all
 oc delete route --all
 oc delete service --all
+delete_all_pvcs
 
 pushd chipster-openshift
-
-source scripts/utils.bash
 
 bash generate-passwords.bash
 
@@ -90,9 +90,9 @@ bash create-secrets.bash
 bash deploy-servers.bash
 
 # OpenShift would get it running on its own eventually, but let's help little bit
-wait_dc auth-postgres
-wait_dc session-db-postgres
-bash rollout-services.bash
+#wait_dc auth-postgres
+#wait_dc session-db-postgres
+#bash rollout-services.bash
 
 bash setup.bash
 

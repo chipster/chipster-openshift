@@ -146,6 +146,23 @@ function patch_index {
 	echo "$script2" | yq w -i $file items[$i] --script -
 }
 
+function delete_all_pvcs {
+
+  oc delete pvc --all
+
+  is_printed="false"
+  while [ $(oc get pvc -o json | jq '.items | length') != 0 ]; do
+    if [ $is_printed == "false" ]; then
+      echo "waiting all pvcs to get deleted"
+      is_printed="true"
+    else
+      echo -n "."
+    fi 
+    sleep 2
+  done
+  echo ""
+}
+
 function wait_dc {
   service="$1"
   is_printed="false"
