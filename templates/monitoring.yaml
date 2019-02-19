@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: monitoring
+  name: monitoring${SUBPROJECT_POSTFIX}
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
     generation: 1
     labels:
-      app: grafana
-    name: influxdb
+      app: grafana${SUBPROJECT_POSTFIX}
+    name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
     selector:
-      app: influxdb
+      app: influxdb${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -27,7 +27,7 @@ objects:
     template:
       metadata:
         labels:
-          app: influxdb
+          app: influxdb${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - image: influxdb
@@ -51,7 +51,7 @@ objects:
         volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: influxdb
+            claimName: influxdb${SUBPROJECT_POSTFIX}
     test: false
     triggers:
     - type: ConfigChange
@@ -61,12 +61,12 @@ objects:
   metadata:
     generation: 1
     labels:
-      app: grafana
-    name: grafana
+      app: grafana${SUBPROJECT_POSTFIX}
+    name: grafana${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
     selector:
-      app: grafana
+      app: grafana${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -80,7 +80,7 @@ objects:
     template:
       metadata:
         labels:
-          app: grafana
+          app: grafana${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - image: docker-registry.default.svc:5000/${PROJECT}/grafana
@@ -104,7 +104,7 @@ objects:
         volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: grafana
+            claimName: grafana${SUBPROJECT_POSTFIX}
     test: false
     triggers:
     - type: ConfigChange
@@ -112,46 +112,47 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: grafana
+    name: grafana${SUBPROJECT_POSTFIX}
   spec:
-    host: grafana-${PROJECT}.${DOMAIN}
+    host: grafana${SUBPROJECT_POSTFIX}-${PROJECT}.${DOMAIN}
     tls:
       insecureEdgeTerminationPolicy: Redirect
       termination: edge
     to:
       kind: Service
-      name: grafana
+      name: grafana${SUBPROJECT_POSTFIX}
       weight: 100
     wildcardPolicy: None
       
 - apiVersion: v1
   kind: Service
   metadata:
-    name: influxdb
+    name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     ports:
     - port: 8086
       protocol: TCP
       targetPort: api
     selector:
-      app: influxdb
+      app: influxdb${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
     
 - apiVersion: v1
   kind: Service
   metadata:
-    name: grafana
+    name: grafana${SUBPROJECT_POSTFIX}
   spec:
     ports:
     - port: 80
       protocol: TCP
       targetPort: api
     selector:
-      app: grafana
+      app: grafana${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
 
 parameters:
 - name: PROJECT
 - name: DOMAIN
+- name: SUBPROJECT_POSTFIX

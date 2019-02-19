@@ -3,6 +3,14 @@
 source scripts/utils.bash
 set -e
 
+subproject="$1"
+
+if [ -z $subproject ]; then
+  secret_name="passwords"
+else
+  secret_name="passwords-$subproject"
+fi
+
 echo "Generate passwords"
 echo
 
@@ -15,7 +23,7 @@ password_secret='{
             "kind": "Secret",
             "apiVersion": "v1",
             "metadata": {
-                "name": "passwords"
+                "name": "'$secret_name'"
             },
             "data": {
             },

@@ -2,18 +2,21 @@
 
 source scripts/utils.bash
 
-patch_kind_and_name $1/backup.yaml DeploymentConfig backup "
+template_dir="$1"
+subproject_postfix="$2"
+
+patch_kind_and_name $template_dir/backup.yaml DeploymentConfig backup$subproject_postfix "
   spec.replicas: 0
 " false
 
-patch_kind_and_name $1/job-history.yaml DeploymentConfig job-history "
+patch_kind_and_name $template_dir/job-history.yaml DeploymentConfig job-history$subproject_postfix "
   spec.replicas: 0
 " false
 
-patch_kind_and_name $1/monitoring.yaml DeploymentConfig influxdb "
+patch_kind_and_name $template_dir/monitoring.yaml DeploymentConfig influxdb$subproject_postfix "
   spec.replicas: 0
 " false
 
-patch_kind_and_name $1/monitoring.yaml DeploymentConfig grafana "
+patch_kind_and_name $template_dir/monitoring.yaml DeploymentConfig grafana$subproject_postfix "
   spec.replicas: 0
 " false

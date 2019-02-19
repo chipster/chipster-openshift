@@ -31,7 +31,7 @@ function write_password {
   service=$1
   config_key=service-password-${service}
   
-  echo $config_key: $(get_service_password $service) | tee conf/$service.yaml >> conf/auth.yaml
+  echo $config_key: $(get_service_password passwords$subproject_postfix $service) | tee conf/$service.yaml >> conf/auth.yaml
 }
 
 function create_sso_password {
@@ -66,7 +66,8 @@ function merge_custom_confs {
 
 function create_secret {
   service=$1
-  secret_name=${service}-conf
+  subproject_postfix="$2"
+  secret_name=${service}-conf$subproject_postfix
   
   # apply custom configurations
   merge_custom_confs $service.yaml
@@ -84,6 +85,13 @@ function create_secret {
   	--from-file=jaas.config=../chipster-private/confs/rahti-int/jaas.config
 }
 
+subproject="$1"
+
+if [ -z $subproject ]; then
+  subproject_postfix=""
+else
+  subproject_postfix="-$subproject"
+fi
 
 # generate configs and save them as openshift secrets
 
@@ -116,14 +124,14 @@ done
 echo "{}" >  conf/backup.yaml
 merge_custom_confs backup.yaml
 
-auth_db_pass=$(get_db_password auth)
-session_db_db_pass=$(get_db_password session-db)
-job_history_db_pass=$(get_db_password job-history)
+auth_db_pass=$(get_db_password passwords$subproject_postfix auth)
+session_db_db_pass=$(get_db_password passwords$subproject_postfix session-db)
+job_history_db_pass=$(get_db_password passwords$subproject_postfix job-history)
 
-echo db-url-auth: jdbc:postgresql://auth-postgres:5432/auth_db | tee -a conf/backup.yaml >> conf/auth.yaml
+echo db-url-auth: jdbc:postgresql://auth-postgres$subproject_postfix:5432/auth_db | tee -a conf/backup.yaml >> conf/auth.yaml
 echo db-pass-auth: $auth_db_pass | tee -a conf/backup.yaml >> conf/auth.yaml
 
-echo db-url-job-history: jdbc:postgresql://job-history-postgres:5432/job_history_db | tee -a conf/backup.yaml >> conf/job-history.yaml
+echo db-url-job-history: jdbc:postgresql://job-history-postgres$subproject_postfix:5432/job_history_db | tee -a conf/backup.yaml >> conf/job-history.yaml
 echo db-pass-job-history: $job_history_db_pass | tee -a conf/backup.yaml >> conf/job-history.yaml
 
 # DB restore from backup
@@ -143,43 +151,42 @@ echo db-pass-job-history: $job_history_db_pass | tee -a conf/backup.yaml >> conf
 # monitoring password
 monitoring_password=$(generate_password)
 echo auth-monitoring-password:  $monitoring_password >> conf/auth.yaml
-if oc get secret monitoring-conf > /dev/null 2>&1; then
-  oc delete secret monitoring-conf
+if oc get secret monitoring-conf$subproject_postfix  > /dev/null 2>&1; then
+  oc delete secret monitoring-conf$subproject_postfix
 fi
-oc create secret generic monitoring-conf --from-literal=password=$monitoring_password
+oc create secret generic monitoring-conf$subproject_postfix --from-literal=password=$monitoring_password
 
-echo 'db-url-session-db: jdbc:postgresql://session-db-postgres:5432/session_db_db' | tee -a conf/backup.yaml >> conf/session-db.yaml
+echo db-url-session-db: jdbc:postgresql://session-db-postgres$subproject_postfix:5432/session_db_db | tee -a conf/backup.yaml >> conf/session-db.yaml
 echo db-pass-session-db: $session_db_db_pass | tee -a conf/backup.yaml >> conf/session-db.yaml
 
-bash scripts/generate-urls.bash $PROJECT $DOMAIN >> conf/service-locator.yaml
+bash scripts/generate-urls.bash $PROJECT $DOMAIN $subproject >> conf/service-locator.yaml
 
 # Haka Single sign-on
 # this should be in the project specific configuration, but it doesn't support variables yet 
 create_sso_password haka
 echo url-ext-haka: https://$PROJECT.$DOMAIN/sso/haka >> conf/service-locator.yaml
 
-for service in $services; do
-	# deployment assumes that there is a configuration secret for each service	
-	echo "url-int-service-locator: http://service-locator" >> conf/$service.yaml
+for service in $services; do	
+	echo "url-int-service-locator: http://service-locator$subproject_postfix" >> conf/$service.yaml
 		
-	create_secret $service
+	create_secret $service $subproject_postfix
 done
 
 # Mylly
 # this should be in the project specific configuration, but it doesn't support custom scripts yet
 cp conf/comp.yaml conf/comp-mylly.yaml
-create_secret comp-mylly
+create_secret comp-mylly $subproject_postfix
 
 
 # Configuration for the Angular app
-if oc get secret web-server-app-conf > /dev/null 2>&1; then
-  oc delete secret web-server-app-conf  
+if oc get secret web-server-app-conf$subproject_postfix > /dev/null 2>&1; then
+  oc delete secret web-server-app-conf$subproject_postfix
 fi
 
 mkdir -p conf/web-server-app-conf
 
 cat ../chipster-web/src/assets/conf/chipster.yaml \
-  | yq w - service-locator https://service-locator-$PROJECT.$DOMAIN \
+  | yq w - service-locator https://service-locator${subproject_postfix}-$PROJECT.$DOMAIN \
   > conf/web-server-app-conf/chipster.yaml
   
 merge_custom_confs web-server-app-conf/chipster.yaml
@@ -196,7 +203,7 @@ yq n modules [] \
   | yq w - contact-path assets/manual/kielipankki/manual/app-contact.html \
    > conf/web-server-app-conf/mylly.yaml
 
-oc create secret generic web-server-app-conf \
+oc create secret generic web-server-app-conf$subproject_postfix \
   --from-file=chipster.yaml=conf/web-server-app-conf/chipster.yaml \
   --from-file=mylly.yaml=conf/web-server-app-conf/mylly.yaml
 

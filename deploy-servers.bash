@@ -14,21 +14,23 @@ function apply_firewall {
 }
 
 function configure_java_service {
-  service=$1
-  java_class=$2  
+  subproject_postfix=$1
+  service=$2
+  java_class=$3  
   image="chipster-web-server"
   work_dir="/opt/chipster-web-server"
   role=$service
-  configure_service "$service" "$image" "$role" "$work_dir" "$java_class"
+  configure_service "$subproject_postfix" "$service" "$image" "$role" "$work_dir" "$java_class"
 }
 
 # configure a service to path /opt/chipster-web-server
 function configure_service {
-  service=$1
-  image=$2
-  role=$3
-  work_dir=$4
-  java_class=$5
+  subproject_postfix=$1
+  service=$2
+  image=$3
+  role=$4
+  work_dir=$5
+  java_class=$6
     
   api_port=$(yq r $chipster_defaults_path url-bind-$role | cut -d : -f 3) || true
   admin_port=$(yq r $chipster_defaults_path url-admin-bind-$role | cut -d : -f 3) || true
@@ -49,6 +51,7 @@ function configure_service {
   -p PROJECT=$PROJECT \
   -p IMAGE=$image \
   -p IMAGE_PROJECT=$image_project \
+  -p SUBPROJECT_POSTFIX=$subproject_postfix \
   > $template_dir/$service/dc.yaml
   
   # configure ports for services that have them
@@ -57,7 +60,7 @@ function configure_service {
   if [ "$create_api_service" != "null" ]; then
   	
     admin_port_index=1
-    patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service "
+    patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service$subproject_postfix "
       spec.template.spec.containers[0].ports[0].containerPort: $api_port
       spec.template.spec.containers[0].ports[0].name: api
       spec.template.spec.containers[0].ports[0].protocol: TCP
@@ -65,7 +68,7 @@ function configure_service {
     
     # create OpenShift service
     oc process -f templates/java-server/java-server-api-service.yaml --local \
-    -p NAME=$service \
+    -p NAME=$service$subproject_postfix \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
     > $template_dir/$service/api-service.yaml
@@ -75,7 +78,7 @@ function configure_service {
   
     # create OpenShift service
     oc process -f templates/java-server/java-server-api-route.yaml --local \
-    -p NAME=$service \
+    -p NAME=$service$subproject_postfix \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
     > $template_dir/$service/api-route.yaml  
@@ -91,7 +94,7 @@ function configure_service {
   
   if [ "$create_admin_service_and_route" != "null" ]; then
   
-    patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service "
+    patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service$subproject_postfix "
       spec.template.spec.containers[0].ports[$admin_port_index].containerPort: $admin_port
       spec.template.spec.containers[0].ports[$admin_port_index].name: admin
       spec.template.spec.containers[0].ports[$admin_port_index].protocol: TCP
@@ -99,7 +102,7 @@ function configure_service {
   
     # create service and route
     oc process -f templates/java-server/java-server-admin.yaml --local \
-    -p NAME=$service \
+    -p NAME=$service$subproject_postfix \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
     > $template_dir/$service/admin.yaml
@@ -156,6 +159,15 @@ if [[ $(oc get dc) ]] || [[ $(oc get service -o name | grep -v glusterfs-dynamic
   echo ""
 fi
 
+subproject="$1"
+
+if [ -z $subproject ]; then
+  subproject_postfix=""
+else
+  subproject_postfix="-$subproject"
+  echo subproject: $subproject
+fi
+
 PROJECT=$(oc project -q)
 DOMAIN=$(get_domain)
 
@@ -192,24 +204,24 @@ mkdir -p $template_dir
 
 echo "generate server templates"
 
-configure_java_service auth fi.csc.chipster.auth.AuthenticationService &
-configure_java_service service-locator fi.csc.chipster.servicelocator.ServiceLocator &
-configure_java_service session-db fi.csc.chipster.sessiondb.SessionDb &
-configure_java_service file-broker fi.csc.chipster.filebroker.FileBroker &
-configure_java_service scheduler fi.csc.chipster.scheduler.Scheduler &
-configure_java_service session-worker fi.csc.chipster.sessionworker.SessionWorker &
-configure_java_service backup fi.csc.chipster.backup.Backup &
-configure_java_service job-history fi.csc.chipster.jobhistory.JobHistoryService &
+configure_java_service $subproject_postfix auth fi.csc.chipster.auth.AuthenticationService &
+configure_java_service $subproject_postfix service-locator fi.csc.chipster.servicelocator.ServiceLocator &
+configure_java_service $subproject_postfix session-db fi.csc.chipster.sessiondb.SessionDb &
+configure_java_service $subproject_postfix file-broker fi.csc.chipster.filebroker.FileBroker &
+configure_java_service $subproject_postfix scheduler fi.csc.chipster.scheduler.Scheduler &
+configure_java_service $subproject_postfix session-worker fi.csc.chipster.sessionworker.SessionWorker &
+configure_java_service $subproject_postfix backup fi.csc.chipster.backup.Backup &
+configure_java_service $subproject_postfix job-history fi.csc.chipster.jobhistory.JobHistoryService &
 
 # shared templates and custom image 
 
-configure_service toolbox toolbox toolbox /opt/chipster-web-server &
-configure_service type-service chipster-web-server-js type-service /opt/chipster-web-server &
-configure_service web-server web-server web-server /opt/chipster-web-server &
-configure_service comp comp comp /opt/chipster/comp &
+configure_service $subproject_postfix toolbox toolbox toolbox /opt/chipster-web-server &
+configure_service $subproject_postfix type-service chipster-web-server-js type-service /opt/chipster-web-server &
+configure_service $subproject_postfix web-server web-server web-server /opt/chipster-web-server &
+configure_service $subproject_postfix comp comp comp /opt/chipster/comp &
 
 if [ "$mylly" = true ]; then
-  configure_service comp-mylly comp-mylly comp /opt/chipster/comp &
+  configure_service $subproject_postfix comp-mylly comp-mylly comp /opt/chipster/comp &
 else
   echo "skipping mylly"
 fi
@@ -235,7 +247,7 @@ if [ -n "$shibboleth" ]; then
 	  
 	m2m_port=$(yq r $chipster_defaults_path url-m2m-int-auth | cut -d : -f 3) || true  
 	
-	patch_kind_and_name $template_dir/auth.yaml DeploymentConfig auth "
+	patch_kind_and_name $template_dir/auth.yaml DeploymentConfig auth$subproject_postfix "
       spec.template.spec.containers[0].ports[2].containerPort: $m2m_port
       spec.template.spec.containers[0].ports[2].name: m2m
       spec.template.spec.containers[0].ports[2].protocol: TCP
@@ -249,35 +261,38 @@ fi
 
 wait
 
-
 oc process -f templates/custom-objects.yaml --local \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/custom-objects.yaml
 
-oc process -f templates/pvcs.yaml --local > $template_dir/pvcs.yaml
+oc process -f templates/pvcs.yaml --local \
+	-p SUBPROJECT_POSTFIX=$subproject_postfix \
+	> $template_dir/pvcs.yaml
 
 oc process -f templates/monitoring.yaml --local \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/monitoring.yaml
     
-    apply_firewall $template_dir/monitoring.yaml $ip_whitelist_admin_path
+apply_firewall $template_dir/monitoring.yaml $ip_whitelist_admin_path
 
 # it would be cleaner to patch after the merge, but patching the large file takes about 20 seconds, when
 # patching these small files takes less than a second
 echo "customize individual servers"
-bash templates/java-server/patch.bash $template_dir $PROJECT $DOMAIN
+bash templates/java-server/patch.bash $template_dir $PROJECT $DOMAIN $subproject
 
 max_pods=$(oc get quota -o json | jq .items[].spec.hard.pods -r | grep -v null)
 
 if [ "$max_pods" -lt 40 ]; then
-  echo "disabled non-critical services because of low pod quota"
-  bash templates/patch-low-pod-quota.bash $template_dir
+  echo "disable non-critical services because of low pod quota"
+  bash templates/patch-low-pod-quota.bash $template_dir $subproject_postfix
   
-  oc get dc job-history-postgres -o yaml | yq w - spec.replicas 0 | oc apply -f -
+  oc get dc job-history-postgres$subproject_postfix -o yaml | yq w - spec.replicas 0 | oc apply -f -
 else
-  oc get dc job-history-postgres -o yaml | yq w - spec.replicas 1 | oc apply -f -
+  oc get dc job-history-postgres$subproject_postfix -o yaml | yq w - spec.replicas 1 | oc apply -f -
 fi
 
 sharedScriptPath="$private_config_path/chipster-all/chipster-template-patch.bash"

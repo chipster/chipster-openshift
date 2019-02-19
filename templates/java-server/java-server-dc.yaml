@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: ${NAME}-dc
+  name: ${NAME}${SUBPROJECT_POSTFIX}-dc
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
-      app: ${{NAME}}
-    name: ${{NAME}}
+      app: ${NAME}${SUBPROJECT_POSTFIX}
+    name: ${NAME}${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
     selector:
-      app: ${{NAME}}
+      app: ${NAME}${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -26,7 +26,7 @@ objects:
     template:
       metadata:
         labels:
-          app: ${{NAME}}
+          app: ${NAME}${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - env:
@@ -67,7 +67,7 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: password
-                name: monitoring-conf
+                name: monitoring-conf${SUBPROJECT_POSTFIX}
           image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/monitoring
           imagePullPolicy: Always
           name: status
@@ -100,7 +100,7 @@ objects:
         - name: conf
           secret:
             defaultMode: 420
-            secretName: ${NAME}-conf
+            secretName: ${NAME}-conf${SUBPROJECT_POSTFIX}
     test: false
     triggers:
     - type: ConfigChange
@@ -122,3 +122,4 @@ parameters:
 - name: PROJECT
 - name: IMAGE
 - name: IMAGE_PROJECT
+- name: SUBPROJECT_POSTFIX

@@ -32,18 +32,21 @@ function generate_password {
 }
 
 function get_db_password {
-  role="$1"
-  get_password "$role-db-password"
+  secret="$1"
+  role="$2"
+  get_password $secret "$role-db-password"
 }
 
 function get_service_password {
-  role="$1"
-  get_password "service-password-$role"
+  secret="$1"
+  role="$2"
+  get_password $secret "service-password-$role"
 }
 
 function get_password {
-  key="$1"
-  oc get secret passwords -o json | jq -r .data[\"$key\"] | base64 --decode
+  secret="$1"
+  key="$2"
+  oc get secret $secret -o json | jq -r .data[\"$key\"] | base64 --decode
 }
 
 # Find the object in the given file with given type (i.e. "kind") and name. 

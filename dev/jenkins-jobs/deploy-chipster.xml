@@ -38,6 +38,8 @@
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
+      
+set -e
 set +x
       
 if [ -d chipster-web-server ]; then
@@ -71,6 +73,8 @@ echo "$USERS_CONF" &gt; chipster-private/confs/chipster-all/users
 # ldap won't work, but the script wants this
 touch chipster-private/confs/rahti-int/jaas.config 
 
+pushd chipster-openshift
+
 source scripts/utils.bash
 
 delete secret passwods || true
@@ -79,22 +83,17 @@ delete_all route
 delete_all service
 delete_all pvc 
 
-pushd chipster-openshift
+subproject="abc"
 
-bash generate-passwords.bash
+bash generate-passwords.bash subproject
 
-bash deploy-postgres.bash fast
+bash deploy-postgres.bash fast subproject
 
-bash create-secrets.bash
+bash create-secrets.bash subproject
 
-bash deploy-servers.bash
+bash deploy-servers.bash subproject
 
-# OpenShift would get it running on its own eventually, but let's help little bit
-#wait_dc auth-postgres
-#wait_dc session-db-postgres
-#bash rollout-services.bash
-
-bash setup.bash
+bash setup.bash subproject
 
 wait_dc web-server
 

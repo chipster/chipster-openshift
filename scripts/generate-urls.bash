@@ -2,6 +2,13 @@
 
 PROJECT=$1
 DOMAIN=$2
+subproject=$3
+
+if [ -z $subproject ]; then
+  subproject_postfix=""
+else
+  subproject_postfix="-$subproject"
+fi
 
 # external route urls
 while read line; do
@@ -19,9 +26,13 @@ while read line; do
 		fi
 		
 		if [[ $service == web-server ]]; then
-			echo url-ext-$service: $proto$PROJECT.$DOMAIN
+			if [ -z $subproject ]; then
+				echo url-ext-$service: $proto$PROJECT.$DOMAIN
+			else
+				echo url-ext-$service: $proto$subproject-$PROJECT.$DOMAIN
+			fi
 		else			
-			echo url-ext-$service: $proto$service-$PROJECT.$DOMAIN
+			echo url-ext-$service: $proto$service$subproject_postfix-$PROJECT.$DOMAIN
 		fi
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
@@ -37,7 +48,7 @@ while read line; do
 			proto="https://"
 		fi
 		
-		echo url-admin-ext-$service: $proto$service-admin-$PROJECT.$DOMAIN		
+		echo url-admin-ext-$service: $proto$service$subproject_postfix-admin-$PROJECT.$DOMAIN		
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
@@ -48,7 +59,7 @@ while read line; do
 		default_url=$(echo $line | cut -d " " -f 2)
 		proto=$(echo $default_url | cut -d { -f 1)
 		
-		echo url-m2m-int-$service: $proto$service-m2m
+		echo url-m2m-int-$service: $proto$service$subproject_postfix-m2m
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
@@ -59,6 +70,6 @@ while read line; do
 		default_url=$(echo $line | cut -d " " -f 2)
 		proto=$(echo $default_url | cut -d { -f 1)
 		
-		echo url-int-$service: $proto$service
+		echo url-int-$service: $proto$service$subproject_postfix
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml

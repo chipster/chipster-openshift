@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: chipster-pvcs
+  name: chipster-pvcs${SUBPROJECT_POSTFIX}
 objects:
 
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: auth-security
+    name: auth-security${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -18,7 +18,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: comp-jobs-data
+    name: comp-jobs-data${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -29,7 +29,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: comp-jobs-data-mylly
+    name: comp-jobs-data-mylly${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -40,7 +40,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: db-backups
+    name: db-backups${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -51,7 +51,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: file-broker-storage
+    name: file-broker-storage${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -62,7 +62,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: grafana
+    name: grafana${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -73,7 +73,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: influxdb
+    name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -84,7 +84,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: tools-bin
+    name: tools-bin${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
@@ -95,10 +95,13 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: tools-bin-mylly
+    name: tools-bin-mylly${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
     - ReadWriteMany
     resources:
       requests:
         storage: 1Gi
+        
+parameters:
+- name: SUBPROJECT_POSTFIX
