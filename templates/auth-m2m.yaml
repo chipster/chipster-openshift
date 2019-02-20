@@ -6,7 +6,7 @@ items:
   kind: Service
   metadata:
     labels:
-      app: auth
+      app: chipster
     name: auth-m2m
   spec:
     ports:

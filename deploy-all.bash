@@ -9,7 +9,7 @@ bash generate-passwords.bash $subproject
 bash create-secrets.bash $subproject
 
 # deploy databases
-bash deploy-postgres.bash fast $subproject
+bash deploy-postgres.bash $subproject
 
 # optional
 #bash deploy-shibboleth.bash

@@ -69,7 +69,7 @@ function create_secret_for_service {
 	
 	secret_file="$configured_objects_dir/${service}.json"
 		
-	get_secret $secret_name $subproject $service > $secret_file
+	get_secret $secret_name $subproject > $secret_file
 	add_file_to_secret $secret_file chipster.yaml $build_dir/${service}.yaml
 }
 
@@ -158,7 +158,7 @@ echo "create monitoring password"
 monitoring_password=$(generate_password)
 echo auth-monitoring-password:  $monitoring_password >> $build_dir/auth.yaml
 secret_file="$configured_objects_dir/monitoring.json"
-get_secret monitoring$subproject_postfix $subproject monitoring > $secret_file
+get_secret monitoring$subproject_postfix $subproject > $secret_file
 add_literal_to_secret $secret_file password $monitoring_password
 
 
@@ -219,7 +219,7 @@ yq n modules [] \
    	
 secret_file="$configured_objects_dir/web-server-app.json"
 	
-get_secret web-server-app$subproject_postfix $subproject web-server > $secret_file
+get_secret web-server-app$subproject_postfix $subproject > $secret_file
 add_file_to_secret $secret_file chipster.yaml $build_dir/web-server-app/chipster.yaml
 add_file_to_secret $secret_file mylly.yaml $build_dir/web-server-app/mylly.yaml
 

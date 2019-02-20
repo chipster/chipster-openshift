@@ -9,12 +9,12 @@ objects:
     generation: 1
     labels:      
       subproject: ${{SUBPROJECT}}
-      app: grafana${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
     selector:
-      app: influxdb${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -29,7 +29,7 @@ objects:
       metadata:
         labels:
           subproject: ${{SUBPROJECT}}
-          app: influxdb${SUBPROJECT_POSTFIX}
+          app: chipster${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - image: influxdb
@@ -64,12 +64,12 @@ objects:
     generation: 1
     labels:
       subproject: ${{SUBPROJECT}}
-      app: grafana${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
     selector:
-      app: grafana${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -84,7 +84,7 @@ objects:
       metadata:
         labels:
           subproject: ${{SUBPROJECT}}
-          app: grafana${SUBPROJECT_POSTFIX}
+          app: chipster${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - image: docker-registry.default.svc:5000/${PROJECT}/grafana
@@ -118,7 +118,7 @@ objects:
   metadata:
     labels:
       subproject: ${{SUBPROJECT}}
-      app: grafana${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
     host: grafana${SUBPROJECT_POSTFIX}-${PROJECT}.${DOMAIN}
@@ -136,7 +136,7 @@ objects:
   metadata:
     labels:
       subproject: ${{SUBPROJECT}}
-      app: influxdb${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     ports:
@@ -144,7 +144,7 @@ objects:
       protocol: TCP
       targetPort: api
     selector:
-      app: influxdb${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
     
@@ -153,7 +153,7 @@ objects:
   metadata:
     labels:
       subproject: ${{SUBPROJECT}}
-      app: grafana${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
     ports:
@@ -161,7 +161,7 @@ objects:
       protocol: TCP
       targetPort: api
     selector:
-      app: grafana${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
 

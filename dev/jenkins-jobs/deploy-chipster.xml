@@ -84,7 +84,7 @@ oc delete pvc -l subproject=$subproject
 
 bash generate-passwords.bash $subproject
 
-bash deploy-postgres.bash fast $subproject
+bash deploy-postgres.bash $subproject
 
 bash create-secrets.bash $subproject
 

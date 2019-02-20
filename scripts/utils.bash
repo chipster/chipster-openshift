@@ -180,7 +180,12 @@ function wait_dc {
 function get_secret {
   secret_name="$1"
   subproject="$2"
-  app="$3"
+  
+  if [ -z $subproject ]; then
+    app="chipster"
+  else
+    app="chipster-$subproject"
+  fi
   
   secret_template='{
     "kind": "List",
@@ -228,4 +233,14 @@ function add_file_to_secret {
   file="$3"
   
   add_literal_to_secret "$secret_file" "$key" "$(cat "$file")"
+}
+
+function psql {
+  service="$1"
+  db="$2"
+  sql="$3"
+  
+  wait_dc "$service"
+  
+  oc rsh dc/$service bash -c "psql -c \"$sql\""
 }

@@ -34,6 +34,10 @@ else
   cat $users_path | oc rsh dc/auth$subproject_postfix bash -c "cat - > /opt/chipster-web-server/security/users"
 fi
 
+psql auth-postgres$subproject_postfix        auth_db        'alter system set synchronous_commit to off'
+psql session-db-postgres$subproject_postfix  session_db_db  'alter system set synchronous_commit to off'
+psql job-history-postgres$subproject_postfix job_history_db 'alter system set synchronous_commit to off'
+
 # create a db to influxdb
 if [ $(oc get dc influxdb$subproject_postfix -o json | jq .spec.replicas) == 1 ]; then
   oc rsh dc/influxdb$subproject_postfix curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE db" -X POST

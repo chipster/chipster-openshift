@@ -7,7 +7,7 @@ objects:
   kind: Route
   metadata:
     labels:
-      app: session-db${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
       subproject: ${{SUBPROJECT}}
     name: session-db-events${SUBPROJECT_POSTFIX}
   spec:
@@ -25,7 +25,7 @@ objects:
   kind: Service
   metadata:
     labels:
-      app: session-db${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
       subproject: ${{SUBPROJECT}}
     name: session-db-events${SUBPROJECT_POSTFIX}
   spec:
@@ -34,7 +34,7 @@ objects:
       protocol: TCP
       targetPort: events
     selector:
-      app: session-db${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
     

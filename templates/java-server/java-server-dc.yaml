@@ -7,13 +7,13 @@ objects:
   kind: DeploymentConfig
   metadata:
     labels:
-      app: ${NAME}${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
       subproject: ${{SUBPROJECT}}
     name: ${NAME}${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
     selector:
-      app: ${NAME}${SUBPROJECT_POSTFIX}
+      app: chipster${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -27,7 +27,7 @@ objects:
     template:
       metadata:
         labels:
-          app: ${NAME}${SUBPROJECT_POSTFIX}
+          app: chipster${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - env:
