@@ -6,6 +6,9 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
+    labels:
+      app: session-db${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: session-db-events${SUBPROJECT_POSTFIX}
   spec:
     host: session-db-events${SUBPROJECT_POSTFIX}-${PROJECT}.${DOMAIN}
@@ -21,6 +24,9 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
+    labels:
+      app: session-db${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: session-db-events${SUBPROJECT_POSTFIX}
   spec:
     ports:
@@ -35,4 +41,5 @@ objects:
 parameters:
 - name: PROJECT
 - name: DOMAIN
+- name: SUBPROJECT
 - name: SUBPROJECT_POSTFIX

@@ -7,6 +7,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: auth${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: auth-security${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -18,6 +21,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: comp${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: comp-jobs-data${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -29,6 +35,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: comp-mylly${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: comp-jobs-data-mylly${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -40,6 +49,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: backup${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: db-backups${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -51,6 +63,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: file-broker${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: file-broker-storage${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -62,6 +77,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: grafana${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -73,6 +91,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: influxdb${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -84,6 +105,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: comp${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: tools-bin${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -95,6 +119,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    labels:
+      app: comp-mylly${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: tools-bin-mylly${SUBPROJECT_POSTFIX}
   spec:
     accessModes:
@@ -104,4 +131,5 @@ objects:
         storage: 1Gi
         
 parameters:
+- name: SUBPROJECT
 - name: SUBPROJECT_POSTFIX

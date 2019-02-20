@@ -6,15 +6,18 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: ${NAME}
+    labels:
+      app: ${NAME}${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
+    name: ${NAME}${SUBPROJECT_POSTFIX}
   spec:
-    host: ${NAME}-${PROJECT}.${DOMAIN}
+    host: ${NAME}${SUBPROJECT_POSTFIX}-${PROJECT}.${DOMAIN}
     tls:
       insecureEdgeTerminationPolicy: Redirect
       termination: edge
     to:
       kind: Service
-      name: ${{NAME}}
+      name: ${NAME}${SUBPROJECT_POSTFIX}
       weight: 100
     wildcardPolicy: None
     
@@ -22,3 +25,5 @@ parameters:
 - name: NAME
 - name: PROJECT
 - name: DOMAIN
+- name: SUBPROJECT
+- name: SUBPROJECT_POSTFIX

@@ -87,7 +87,7 @@ patch_kind_and_name $template_dir/web-server.yaml DeploymentConfig web-server$su
   spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster-web/src/assets/conf
   spec.template.spec.containers[0].volumeMounts[2].name: app-conf
   spec.template.spec.volumes[2].name: app-conf
-  spec.template.spec.volumes[2].secret.secretName: web-server-app-conf$subproject_postfix
+  spec.template.spec.volumes[2].secret.secretName: web-server-app$subproject_postfix
 " false
 
 if [ -z $subproject ]; then

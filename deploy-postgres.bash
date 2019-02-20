@@ -26,6 +26,34 @@ function psql {
   oc rsh dc/$service bash -c "psql -c \"$sql\""
 }
 
+function deploy_postgres {
+
+  template="$1"
+  subproject="$2"
+  is_fast="$3"
+  name="$4"
+  
+  db_name="$(echo $name | tr "-" "_")_db"
+
+  echo "$template" \
+  | jq ".labels.subproject=\"$subproject\"" \
+  | jq ".labels.app=\"${name}-postgres\"" \
+  | oc process -f - --local \
+  -p POSTGRESQL_DATABASE=$db_name \
+  -p DATABASE_SERVICE_NAME=$name-postgres$postfix \
+  -p POSTGRESQL_PASSWORD=$(get_db_password passwords$postfix $name) \
+  -p POSTGRESQL_USER=user \
+  -p NAMESPACE=openshift \
+  -p VOLUME_CAPACITY=100Mi \
+  -p POSTGRESQL_VERSION=9.5 \
+  | oc apply -f - 
+
+  # for some reason glusterfs services won't get created, if we create pvcs too fast
+  if [ -z "$is_fast" ]; then  
+    wait_pvc_bound $name-postgres$postfix
+  fi
+}
+
 is_fast="$1"
 subproject="$2"
 
@@ -37,48 +65,9 @@ fi
 
 template="$(oc get template -n openshift postgresql-persistent -o json)" 
 
-echo "$template" | oc process -f - --local \
-  -p POSTGRESQL_DATABASE=auth_db \
-  -p DATABASE_SERVICE_NAME=auth-postgres$postfix \
-  -p POSTGRESQL_PASSWORD=$(get_db_password passwords$postfix auth) \
-  -p POSTGRESQL_USER=user \
-  -p NAMESPACE=openshift \
-  -p VOLUME_CAPACITY=100Mi \
-  -p POSTGRESQL_VERSION=9.5 \
-  | oc apply -f - 
-
-# for some reason glusterfs services won't get created, if we create pvcs too fast
-if [ -z "$is_fast" ]; then  
-  wait_pvc_bound auth-postgres$postfix
-fi
-  
-echo "$template" | oc process -f - --local \
-  -p POSTGRESQL_DATABASE=session_db_db \
-  -p DATABASE_SERVICE_NAME=session-db-postgres$postfix \
-  -p POSTGRESQL_PASSWORD=$(get_db_password passwords$postfix session-db) \
-  -p POSTGRESQL_USER=user \
-  -p NAMESPACE=openshift \
-  -p VOLUME_CAPACITY=1Gi \
-  -p POSTGRESQL_VERSION=9.5 \
-  | oc apply -f -
-
-if [ -z "$is_fast" ]; then  
-  wait_pvc_bound session-db-postgres$postfix
-fi
-  
-echo "$template" | oc process -f - --local \
-  -p POSTGRESQL_DATABASE=job_history_db \
-  -p DATABASE_SERVICE_NAME=job-history-postgres$postfix \
-  -p POSTGRESQL_PASSWORD=$(get_db_password passwords$postfix job-history) \
-  -p POSTGRESQL_USER=user \
-  -p NAMESPACE=openshift \
-  -p VOLUME_CAPACITY=100Mi \
-  -p POSTGRESQL_VERSION=9.5 \
-  | oc apply -f -
-
-if [ -z "$is_fast" ]; then
-  wait_pvc_bound job-history-postgres$postfix
-fi
+deploy_postgres "$template" "$subproject" "$is_fast" auth
+deploy_postgres "$template" "$subproject" "$is_fast" session-db
+deploy_postgres "$template" "$subproject" "$is_fast" job-history
 
 if [ -z "$is_fast" ]; then
   psql auth-postgres$postfix        auth_db        'alter system set synchronous_commit to off'

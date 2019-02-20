@@ -8,6 +8,7 @@ objects:
   metadata:
     labels:
       app: ${NAME}${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
     name: ${NAME}${SUBPROJECT_POSTFIX}
   spec:
     replicas: 1
@@ -67,7 +68,7 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: password
-                name: monitoring-conf${SUBPROJECT_POSTFIX}
+                name: monitoring${SUBPROJECT_POSTFIX}
           image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/monitoring
           imagePullPolicy: Always
           name: status
@@ -100,7 +101,7 @@ objects:
         - name: conf
           secret:
             defaultMode: 420
-            secretName: ${NAME}-conf${SUBPROJECT_POSTFIX}
+            secretName: ${NAME}${SUBPROJECT_POSTFIX}
     test: false
     triggers:
     - type: ConfigChange
@@ -122,4 +123,5 @@ parameters:
 - name: PROJECT
 - name: IMAGE
 - name: IMAGE_PROJECT
+- name: SUBPROJECT
 - name: SUBPROJECT_POSTFIX

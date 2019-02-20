@@ -77,28 +77,25 @@ pushd chipster-openshift
 
 source scripts/utils.bash
 
-delete secret passwods || true
-delete_all dc
-delete_all route
-delete_all service
-delete_all pvc 
-
 subproject="abc"
 
-bash generate-passwords.bash subproject
+bash remove-servers.bash $subproject
+oc delete pvc -l subproject=$subproject
 
-bash deploy-postgres.bash fast subproject
+bash generate-passwords.bash $subproject
 
-bash create-secrets.bash subproject
+bash deploy-postgres.bash fast $subproject
 
-bash deploy-servers.bash subproject
+bash create-secrets.bash $subproject
 
-bash setup.bash subproject
+bash deploy-servers.bash $subproject
 
-wait_dc web-server
+bash setup.bash $subproject
+
+wait_dc web-server-$subproject
 
 echo "The application is available in"
-echo https://$(oc get route web-server -o json | jq .spec.host -r)</command>
+echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

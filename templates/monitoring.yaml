@@ -7,7 +7,8 @@ objects:
   kind: DeploymentConfig
   metadata:
     generation: 1
-    labels:
+    labels:      
+      subproject: ${{SUBPROJECT}}
       app: grafana${SUBPROJECT_POSTFIX}
     name: influxdb${SUBPROJECT_POSTFIX}
   spec:
@@ -27,6 +28,7 @@ objects:
     template:
       metadata:
         labels:
+          subproject: ${{SUBPROJECT}}
           app: influxdb${SUBPROJECT_POSTFIX}
       spec:
         containers:
@@ -61,6 +63,7 @@ objects:
   metadata:
     generation: 1
     labels:
+      subproject: ${{SUBPROJECT}}
       app: grafana${SUBPROJECT_POSTFIX}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
@@ -80,6 +83,7 @@ objects:
     template:
       metadata:
         labels:
+          subproject: ${{SUBPROJECT}}
           app: grafana${SUBPROJECT_POSTFIX}
       spec:
         containers:
@@ -112,6 +116,9 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
+    labels:
+      subproject: ${{SUBPROJECT}}
+      app: grafana${SUBPROJECT_POSTFIX}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
     host: grafana${SUBPROJECT_POSTFIX}-${PROJECT}.${DOMAIN}
@@ -127,6 +134,9 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
+    labels:
+      subproject: ${{SUBPROJECT}}
+      app: influxdb${SUBPROJECT_POSTFIX}
     name: influxdb${SUBPROJECT_POSTFIX}
   spec:
     ports:
@@ -141,6 +151,9 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
+    labels:
+      subproject: ${{SUBPROJECT}}
+      app: grafana${SUBPROJECT_POSTFIX}
     name: grafana${SUBPROJECT_POSTFIX}
   spec:
     ports:
@@ -155,4 +168,5 @@ objects:
 parameters:
 - name: PROJECT
 - name: DOMAIN
+- name: SUBPROJECT
 - name: SUBPROJECT_POSTFIX

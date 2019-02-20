@@ -51,6 +51,7 @@ function configure_service {
   -p PROJECT=$PROJECT \
   -p IMAGE=$image \
   -p IMAGE_PROJECT=$image_project \
+  -p SUBPROJECT=$subproject \
   -p SUBPROJECT_POSTFIX=$subproject_postfix \
   > $template_dir/$service/dc.yaml
   
@@ -68,9 +69,11 @@ function configure_service {
     
     # create OpenShift service
     oc process -f templates/java-server/java-server-api-service.yaml --local \
-    -p NAME=$service$subproject_postfix \
+    -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT=$subproject \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/api-service.yaml
   fi
     
@@ -78,9 +81,11 @@ function configure_service {
   
     # create OpenShift service
     oc process -f templates/java-server/java-server-api-route.yaml --local \
-    -p NAME=$service$subproject_postfix \
+    -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT=$subproject \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/api-route.yaml  
         
     ip_whitelist="$(get_deploy_config ip-whitelist-api)"
@@ -102,9 +107,10 @@ function configure_service {
   
     # create service and route
     oc process -f templates/java-server/java-server-admin.yaml --local \
-    -p NAME=$service$subproject_postfix \
+    -p NAME=$service \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT=$subproject \
     > $template_dir/$service/admin.yaml
     
     ip_whitelist="$(get_deploy_config ip-whitelist-admin)"
@@ -264,16 +270,19 @@ wait
 oc process -f templates/custom-objects.yaml --local \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/custom-objects.yaml
 
 oc process -f templates/pvcs.yaml --local \
+    -p SUBPROJECT=$subproject \
 	-p SUBPROJECT_POSTFIX=$subproject_postfix \
 	> $template_dir/pvcs.yaml
 
 oc process -f templates/monitoring.yaml --local \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/monitoring.yaml
     

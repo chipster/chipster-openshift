@@ -37,12 +37,6 @@ function get_db_password {
   get_password $secret "$role-db-password"
 }
 
-function get_service_password {
-  secret="$1"
-  role="$2"
-  get_password $secret "service-password-$role"
-}
-
 function get_password {
   secret="$1"
   key="$2"
@@ -181,4 +175,57 @@ function wait_dc {
     sleep 2
   done
   echo ""
+}
+
+function get_secret {
+  secret_name="$1"
+  subproject="$2"
+  app="$3"
+  
+  secret_template='{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {},
+    "items": [
+        {
+            "kind": "Secret",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "'$secret_name'",
+                "labels": {
+		    		"subproject": "'$subproject'",
+		    		"app": "'$app'"
+		    	}
+            },
+            "data": {
+            },
+            "type": "Opaque"
+        }
+    ]
+}'
+
+  echo "$secret_template"
+}
+
+function add_literal_to_secret {
+  secret_file=$1
+  key="$2"
+  value="$3"
+ 
+  tmp_file=${secret_file}_add_to_secret_temp
+  encoded_value="$(echo "$value" | base64)"
+  
+  cat $secret_file \
+  | jq ".items[0].data.\"$key\"=\"$encoded_value\"" \
+  > $tmp_file
+  
+  mv $tmp_file $secret_file
+}
+
+function add_file_to_secret {
+  secret_file=$1
+  key="$2"
+  file="$3"
+  
+  add_literal_to_secret "$secret_file" "$key" "$(cat "$file")"
 }
