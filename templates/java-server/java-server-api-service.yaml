@@ -16,7 +16,7 @@ objects:
       protocol: TCP
       targetPort: api
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: ${NAME}${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
     

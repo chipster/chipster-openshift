@@ -14,7 +14,7 @@ objects:
   spec:
     replicas: 1
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: influxdb${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -30,6 +30,7 @@ objects:
         labels:
           subproject: ${{SUBPROJECT}}
           app: chipster${SUBPROJECT_POSTFIX}
+          name: influxdb${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - image: influxdb
@@ -69,7 +70,7 @@ objects:
   spec:
     replicas: 1
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: grafana${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -85,6 +86,7 @@ objects:
         labels:
           subproject: ${{SUBPROJECT}}
           app: chipster${SUBPROJECT_POSTFIX}
+          name: grafana${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - image: docker-registry.default.svc:5000/${PROJECT}/grafana
@@ -144,7 +146,7 @@ objects:
       protocol: TCP
       targetPort: api
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: influxdb${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
     
@@ -161,7 +163,7 @@ objects:
       protocol: TCP
       targetPort: api
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: grafana${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
 

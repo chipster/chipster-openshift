@@ -13,7 +13,7 @@ objects:
   spec:
     replicas: 1
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: ${NAME}${SUBPROJECT_POSTFIX}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -28,6 +28,7 @@ objects:
       metadata:
         labels:
           app: chipster${SUBPROJECT_POSTFIX}
+          name: ${NAME}${SUBPROJECT_POSTFIX}
       spec:
         containers:
         - env:

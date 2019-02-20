@@ -14,6 +14,6 @@ items:
       protocol: TCP
       targetPort: 8013
     selector:
-      app: auth
+      name: auth
     sessionAffinity: None
     type: ClusterIP

@@ -111,6 +111,7 @@ function configure_service {
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
     -p SUBPROJECT=$subproject \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/admin.yaml
     
     ip_whitelist="$(get_deploy_config ip-whitelist-admin)"
@@ -150,20 +151,6 @@ function get_deploy_config {
     fi
   fi
 }
-
-if [[ $(oc get dc) ]] || [[ $(oc get service -o name | grep -v glusterfs-dynamic-) ]] || [[ $(oc get routes) ]] ; then
-  echo "The project is not empty"
-  echo ""
-  echo "The scirpt will continue, but it won't delete any extra deployments you possibly have."
-  echo "Run the following command to remove all deployments:"
-  echo ""
-  echo "    bash delete-all-services.bash"
-  echo ""
-  echo "and if your want to remove volumes too:"
-  echo ""
-  echo "    oc delete pvc --all"
-  echo ""
-fi
 
 subproject="$1"
 

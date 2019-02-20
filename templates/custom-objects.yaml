@@ -34,7 +34,7 @@ objects:
       protocol: TCP
       targetPort: events
     selector:
-      app: chipster${SUBPROJECT_POSTFIX}
+      name: session-db${SUBPROJECT_POSTFIX}
     sessionAffinity: None
     type: ClusterIP
     

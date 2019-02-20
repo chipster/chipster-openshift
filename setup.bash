@@ -36,7 +36,9 @@ fi
 
 psql auth-postgres$subproject_postfix        auth_db        'alter system set synchronous_commit to off'
 psql session-db-postgres$subproject_postfix  session_db_db  'alter system set synchronous_commit to off'
-psql job-history-postgres$subproject_postfix job_history_db 'alter system set synchronous_commit to off'
+if [ $(oc get dc job-history-postgres$subproject_postfix -o json | jq .spec.replicas) == 1 ]; then
+  psql job-history-postgres$subproject_postfix job_history_db 'alter system set synchronous_commit to off'
+fi
 
 # create a db to influxdb
 if [ $(oc get dc influxdb$subproject_postfix -o json | jq .spec.replicas) == 1 ]; then
