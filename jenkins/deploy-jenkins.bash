@@ -20,15 +20,20 @@ oc volume dc/jenkins --add --name jenkins-data --type=pvc --claim-name jenkins-d
  
  oc get -o json route jenkins | jq ".metadata.annotations.\"haproxy.router.openshift.io/ip_whitelist\" = \"$firewall\"" | oc apply -f -
  
+ export JENKINS_HOST="https://$(oc get -o json route jenkins | jq .spec.host -r)"
+ 
  # go to jenkins and click your username on the top right corner
  # store your Jenkins User ID to env "JENKINS_USER" 
- # click "Configure" and click "Add new token" and "Genereate". Save the token to env "JENKINS_TOKEN"
+ # click "Configure" and click "Add new token" and "Generate". Save the token to env "JENKINS_TOKEN"
  
 curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="rebuild@latest" /></jenkins>' --header 'Content-Type: text/xml' https://jenkins-chipster-jenkins.rahtiapp.fi/pluginManager/installNecessaryPlugins
 
-# not really a secret, but doesn't belong to the public repo either. Should be a parameter
-bash dev/add_jenkins_credential.bash DEPLOY_CONF "$deploy_conf"
-bash dev/add_jenkins_credential.bash USERS_CONF "$(cat ../chipster-private/confs/chipster-all/users)"
+# store private confs as Jenkins managed files
+bash jenkins/add-jenkins-file.bash DEPLOY_CONF --string "$deploy_conf"
+bash jenkins/add-jenkins-file.bash OPENSHIFT_PROJECT --string "$(cat ../chipster-private/confs/jenkins/openshift_project)"
+
+# store secrets as Jenkins credentials 
+bash jenkins/add-jenkins-credential.bash USERS_CONF "$(cat ../chipster-private/confs/chipster-all/users)"
 
 # use create-namespaces.bash to create a project where the Chipster is deployed
   

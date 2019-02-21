@@ -8,6 +8,24 @@
       <autoRebuild>false</autoRebuild>
       <rebuildDisabled>false</rebuildDisabled>
     </com.sonyericsson.rebuild.RebuildSettings>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.BooleanParameterDefinition>
+          <name>DELETE_VOLUMES</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>SUBPROJECT</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              {{SUBPROJECT_OPTIONS}}
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
     <configVersion>2</configVersion>
@@ -41,6 +59,9 @@
       
 set -e
 set +x
+
+OPENSHIFT_PROJECT=&quot;$(cat $OPENSHIFT_PROJECT_PATH)&quot;
+DEPLOY_CONF=&quot;$(cat $DEPLOY_CONF_PATH)&quot;
       
 if [ -d chipster-web-server ]; then
   pushd chipster-web-server; git pull; popd
@@ -58,7 +79,7 @@ oc login https://rahti.csc.fi:8443 --token=$OPENSHIFT_TOKEN
 
 oc project $OPENSHIFT_PROJECT
 
-project="$(oc project -q)"
+project=&quot;$(oc project -q)&quot;
 if [ &quot;$project&quot; != $OPENSHIFT_PROJECT ]; then
   echo &quot;project change failed, stop here&quot;
   exit 1
@@ -67,20 +88,28 @@ fi
 mkdir -p chipster-private/confs/chipster-all
 mkdir -p chipster-private/confs/rahti-int
 
-echo "$DEPLOY_CONF" &gt; chipster-private/confs/chipster-all/deploy.yaml
-echo "$USERS_CONF" &gt; chipster-private/confs/chipster-all/users
+echo &quot;$DEPLOY_CONF&quot; &gt; chipster-private/confs/chipster-all/deploy.yaml
+echo &quot;$USERS_CONF&quot; &gt; chipster-private/confs/chipster-all/users
 
-# ldap won't work, but the script wants this
+# ldap won&apos;t work, but the script wants this
 touch chipster-private/confs/rahti-int/jaas.config 
 
 pushd chipster-openshift
 
 source scripts/utils.bash
 
-subproject="abc"
+subproject=&quot;$SUBPROJECT&quot;
 
 bash remove-servers.bash $subproject
-oc delete pvc -l subproject=$subproject
+
+echo DELETE_VOLUMES &quot;$DELETE_VOLUMES&quot;
+
+if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
+  oc delete pvc -l subproject=$subproject
+  t=5
+  echo &quot;Waiting $t minutes to make sure OpenShift has garbage collected PVC services&quot;
+  sleep $(($t * 60))
+fi
 
 bash generate-passwords.bash $subproject
 
@@ -94,8 +123,9 @@ bash setup.bash $subproject
 
 wait_dc web-server-$subproject
 
-echo "The application is available in"
-echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)</command>
+echo &quot;The application is available in&quot;
+echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
@@ -103,16 +133,8 @@ echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)</
     <org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper plugin="credentials-binding@1.15">
       <bindings>
         <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
-          <credentialsId>OPENSHIFT_PROJECT</credentialsId>
-          <variable>OPENSHIFT_PROJECT</variable>
-        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
-        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
           <credentialsId>OPENSHIFT_TOKEN</credentialsId>
           <variable>OPENSHIFT_TOKEN</variable>
-        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
-        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
-          <credentialsId>DEPLOY_CONF</credentialsId>
-          <variable>DEPLOY_CONF</variable>
         </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
         <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
           <credentialsId>USERS_CONF</credentialsId>
@@ -120,5 +142,19 @@ echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)</
         </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
       </bindings>
     </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
+    <org.jenkinsci.plugins.configfiles.buildwrapper.ConfigFileBuildWrapper plugin="config-file-provider@3.2">
+      <managedFiles>
+        <org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+          <fileId>DEPLOY_CONF</fileId>
+          <replaceTokens>false</replaceTokens>
+          <variable>DEPLOY_CONF_PATH</variable>
+        </org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+        <org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+          <fileId>OPENSHIFT_PROJECT</fileId>
+          <replaceTokens>false</replaceTokens>
+          <variable>OPENSHIFT_PROJECT_PATH</variable>
+        </org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+      </managedFiles>
+    </org.jenkinsci.plugins.configfiles.buildwrapper.ConfigFileBuildWrapper>
   </buildWrappers>
 </project>

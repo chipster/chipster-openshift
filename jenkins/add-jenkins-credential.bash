@@ -19,5 +19,5 @@
     | jq .credentials.id=\"$key\" \
     | jq .credentials.secret="$json_encoded_value")"
    
-  curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN 'https://jenkins-chipster-jenkins.rahtiapp.fi/credentials/store/system/domain/_/createCredentials' \
+  curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN "$JENKINS_HOST/credentials/store/system/domain/_/createCredentials" \
   --data-urlencode json="$json"
