@@ -197,21 +197,21 @@ mkdir -p $template_dir
 
 echo "generate server templates"
 
-configure_java_service $subproject_postfix auth fi.csc.chipster.auth.AuthenticationService &
-configure_java_service $subproject_postfix service-locator fi.csc.chipster.servicelocator.ServiceLocator &
-configure_java_service $subproject_postfix session-db fi.csc.chipster.sessiondb.SessionDb &
-configure_java_service $subproject_postfix file-broker fi.csc.chipster.filebroker.FileBroker &
-configure_java_service $subproject_postfix scheduler fi.csc.chipster.scheduler.Scheduler &
-configure_java_service $subproject_postfix session-worker fi.csc.chipster.sessionworker.SessionWorker &
-configure_java_service $subproject_postfix backup fi.csc.chipster.backup.Backup &
-configure_java_service $subproject_postfix job-history fi.csc.chipster.jobhistory.JobHistoryService &
+configure_java_service "$subproject_postfix" auth fi.csc.chipster.auth.AuthenticationService &
+configure_java_service "$subproject_postfix" service-locator fi.csc.chipster.servicelocator.ServiceLocator &
+configure_java_service "$subproject_postfix" session-db fi.csc.chipster.sessiondb.SessionDb &
+configure_java_service "$subproject_postfix" file-broker fi.csc.chipster.filebroker.FileBroker &
+configure_java_service "$subproject_postfix" scheduler fi.csc.chipster.scheduler.Scheduler &
+configure_java_service "$subproject_postfix" session-worker fi.csc.chipster.sessionworker.SessionWorker &
+configure_java_service "$subproject_postfix" backup fi.csc.chipster.backup.Backup &
+configure_java_service "$subproject_postfix" job-history fi.csc.chipster.jobhistory.JobHistoryService &
 
 # shared templates and custom image 
 
-configure_service $subproject_postfix toolbox toolbox toolbox /opt/chipster-web-server &
-configure_service $subproject_postfix type-service chipster-web-server-js type-service /opt/chipster-web-server &
-configure_service $subproject_postfix web-server web-server web-server /opt/chipster-web-server &
-configure_service $subproject_postfix comp comp comp /opt/chipster/comp &
+configure_service "$subproject_postfix" toolbox toolbox toolbox /opt/chipster-web-server &
+configure_service "$subproject_postfix" type-service chipster-web-server-js type-service /opt/chipster-web-server &
+configure_service "$subproject_postfix" web-server web-server web-server /opt/chipster-web-server &
+configure_service "$subproject_postfix" comp comp comp /opt/chipster/comp &
 
 if [ "$mylly" = true ]; then
   configure_service $subproject_postfix comp-mylly comp-mylly comp /opt/chipster/comp &
@@ -305,6 +305,7 @@ if [ -f $projectScriptPath ]; then
 fi
  
 template="$build_dir/chipster_template.yaml"
+
 yq merge --append $template_dir/*.yaml > $template
 
 echo "apply the template to the server"
@@ -312,4 +313,4 @@ apply_out="$build_dir/apply.out"
 oc apply -f $template | tee $apply_out | grep -v unchanged
 echo $(cat $apply_out | grep unchanged | wc -l) objects unchanged 
 
-rm -rf $build_dir
+#rm -rf $build_dir

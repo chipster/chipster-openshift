@@ -13,8 +13,9 @@ function deploy_postgres {
   
   db_name="$(echo $name | tr "-" "_")_db"
 
+  # add different subproject label for databases, so that those can be kept or removed separately 
   echo "$template" \
-  | jq ".labels.subproject=\"$subproject\"" \
+  | jq ".labels.subproject=\"${subproject}-db\"" \
   | jq ".labels.app=\"chipster$subproject_postfix\"" \
   | oc process -f - --local \
   -p POSTGRESQL_DATABASE=$db_name \

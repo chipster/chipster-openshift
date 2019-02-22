@@ -24,6 +24,45 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>COMP_RAM</name>
+          <description>How many gigabytes of RAM memory is a comp allowed to use.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>1</string>
+              <string>2</string>
+              <string>4</string>
+              <string>8</string>
+              <string>16</string>
+              <string>32</string>
+              <string>40</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>COMP_SLOTS</name>
+          <description>How many job slots is one comp allowed to run at the same time. In production this is COMP_RAM / 8.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>2</string>
+              <string>1</string>
+              <string>3</string>
+              <string>4</string>
+              <string>5</string>
+              <string>10</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>COMP_CPU</name>
+          <description>How many CPU cores is comp allowed to use. Use 2 by default or 8 if the tool can use that many.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>2</string>
+              <string>8</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -90,6 +129,27 @@ mkdir -p chipster-private/confs/rahti-int
 
 echo &quot;$DEPLOY_CONF&quot; &gt; chipster-private/confs/chipster-all/deploy.yaml
 echo &quot;$USERS_CONF&quot; &gt; chipster-private/confs/chipster-all/users
+
+# chipster-all is actually a place for organization wide configs, but we can use it to configure individual installations
+# as long as these jobs are not run in parallel in Jenkins  
+echo &quot;comp-max-jobs: $COMP_SLOTS&quot; &gt; chipster-private/confs/chipster-all/comp.yaml
+
+COMP_RAM_MB=$(($COMP_RAM * 1000 - 100))
+COMP_CPU_MILLIS=$(($COMP_CPU * 1000 - 100))
+COMP_RAM_MB_REQUEST=$(($COMP_RAM_MB / 2))
+COMP_CPU_MILLIS_REQUEST=$(($COMP_CPU_MILLIS / 2))
+
+echo &quot;
+source scripts/utils.bash
+
+patch_kind_and_name \$1/comp.yaml DeploymentConfig comp-$SUBPROJECT \&quot;
+  spec.template.spec.containers[0].resources.limits.cpu: ${COMP_CPU_MILLIS}m
+  spec.template.spec.containers[0].resources.limits.memory: ${COMP_RAM_MB}Mi
+  spec.template.spec.containers[0].resources.requests.cpu: ${COMP_CPU_MILLIS_REQUEST}m
+  spec.template.spec.containers[0].resources.requests.memory: ${COMP_RAM_MB_REQUEST}Mi
+\&quot; true
+
+&quot; &gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
 
 # ldap won&apos;t work, but the script wants this
 touch chipster-private/confs/rahti-int/jaas.config 

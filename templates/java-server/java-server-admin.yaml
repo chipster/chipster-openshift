@@ -26,7 +26,7 @@ objects:
     labels:
       app: chipster${SUBPROJECT_POSTFIX}
       subproject: ${{SUBPROJECT}}
-    name: ${NAME}-admin
+    name: ${NAME}-admin${SUBPROJECT_POSTFIX}
   spec:
     host: ${NAME}-admin${SUBPROJECT_POSTFIX}-${PROJECT}.${DOMAIN}
     tls:
