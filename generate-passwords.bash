@@ -31,7 +31,8 @@ rm -rf $build_dir
 mkdir -p $build_dir
 
 secret_file="$build_dir/passwords.json"
-get_secret passwords$subproject_postfix $subproject > $secret_file
+get_secret passwords$subproject_postfix $subproject \
+	| jq ".items[0].metadata.labels.subproject=\"chipster-$subproject-passowrds\"" > $secret_file
 		
 for key in $keys; do
   add_literal_to_secret $secret_file "$key" "$(generate_password)"

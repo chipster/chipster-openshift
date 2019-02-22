@@ -165,15 +165,19 @@ bash remove-servers.bash $subproject
 echo DELETE_VOLUMES &quot;$DELETE_VOLUMES&quot;
 
 if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
+  oc delete all -l subproject=${subproject}-db
+  oc delete secret -l subproject=${subproject}-db
   oc delete pvc -l subproject=$subproject
   t=5
   echo &quot;Waiting $t minutes to make sure OpenShift has garbage collected PVC services&quot;
   sleep $(($t * 60))
 fi
 
-bash generate-passwords.bash $subproject
 
-bash deploy-postgres.bash $subproject
+if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
+  bash generate-passwords.bash $subproject
+  bash deploy-postgres.bash $subproject
+fi
 
 bash create-secrets.bash $subproject
 
