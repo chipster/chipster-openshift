@@ -13,7 +13,7 @@ USER 1000
 # remove the symlink becasue ng build doesn't tolerate it
 # the source image already has to manual in place 
 RUN cd /home/user/build/chipster-web \	
-	&& npm install \
+	&& npm ci \
 	&& rm src/assets/manual \
 	&& ng build --prod --no-progress || true \
 	&& cp -r dist/* /opt/chipster-web/src/ \
