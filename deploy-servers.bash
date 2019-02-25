@@ -313,4 +313,4 @@ apply_out="$build_dir/apply.out"
 oc apply -f $template | tee $apply_out | grep -v unchanged
 echo $(cat $apply_out | grep unchanged | wc -l) objects unchanged 
 
-#rm -rf $build_dir
+rm -rf $build_dir
