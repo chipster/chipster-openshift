@@ -1,23 +1,31 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Template
 metadata:
   name: download-tools-bin
-spec:
-  parallelism: 1    
-  completions: 1    
-  template:         
-    metadata:
-      name: download-tools-bin
-    spec:
-      containers:
-      - name: download-tools-bin
-        image: docker-registry.default.svc:5000/{{project}}/base
-        command: ["bash", "-c", "set -x; set -e; cd /mnt/tools; mkdir -p current; cd current; url='https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/229/parts'; curl -s $url/files.txt | grep lz4$ | parallel -j 8 \"curl $url/{} | lz4 -d | tar -x\""]
-        volumeMounts:        
-        - mountPath: /mnt/tools
-          name: tools-bin
-      volumes:
-      - name: tools-bin
-        persistentVolumeClaim:
-          claimName: tools-bin
-      restartPolicy: OnFailure
+objects:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: download-tools-bin
+  spec:
+    parallelism: 1    
+    completions: 1    
+    template:         
+      metadata:
+        name: download-tools-bin
+      spec:
+        containers:
+        - name: download-tools-bin
+          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/base
+          command: ["bash", "-c", "set -x; set -e; cd /mnt/tools; mkdir -p ${TOOLS_BIN_VERSION}; cd ${TOOLS_BIN_VERSION}; url='https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts'; curl -s $url/files.txt | grep lz4$ | parallel -j 8 \"curl $url/{} | lz4 -d | tar -x\""]
+          volumeMounts:        
+          - mountPath: /mnt/tools
+            name: tools-bin
+        volumes:
+        - name: tools-bin
+          persistentVolumeClaim:
+            claimName: tools-bin
+        restartPolicy: OnFailure
+parameters:
+- name: IMAGE_PROJECT
+- name: TOOLS_BIN_VERSION

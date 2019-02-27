@@ -40,6 +40,7 @@ if [ -f $template_dir/comp-mylly.yaml ]; then
 	  spec.template.spec.containers[0].volumeMounts[2].name: jobs-data
 	  spec.template.spec.containers[0].volumeMounts[3].mountPath: /appl
 	  spec.template.spec.containers[0].volumeMounts[3].name: tools-bin 
+	  spec.template.spec.containers[0].volumeMounts[3].readOnly: true
 	  spec.template.spec.volumes[2].name: jobs-data
 	  spec.template.spec.volumes[2].persistentVolumeClaim.claimName: comp-jobs-data-mylly$subproject_postfix
 	  spec.template.spec.volumes[3].name: tools-bin
@@ -58,6 +59,7 @@ patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp$subproject_pos
   spec.template.spec.containers[0].volumeMounts[2].name: jobs-data
   spec.template.spec.containers[0].volumeMounts[3].mountPath: /mnt/tools
   spec.template.spec.containers[0].volumeMounts[3].name: tools-bin
+  spec.template.spec.containers[0].volumeMounts[3].readOnly: true
   spec.template.spec.volumes[2].name: jobs-data
   spec.template.spec.volumes[2].persistentVolumeClaim.claimName: comp-jobs-data$subproject_postfix
   spec.template.spec.volumes[3].name: tools-bin
@@ -79,6 +81,7 @@ patch_kind_and_name $template_dir/session-db.yaml DeploymentConfig session-db$su
 patch_kind_and_name $template_dir/toolbox.yaml DeploymentConfig toolbox$subproject_postfix "
   spec.template.spec.containers[0].volumeMounts[2].mountPath: /mnt/tools
   spec.template.spec.containers[0].volumeMounts[2].name: tools-bin
+  spec.template.spec.containers[0].volumeMounts[2].readOnly: true
   spec.template.spec.volumes[2].name: tools-bin
   spec.template.spec.volumes[2].persistentVolumeClaim.claimName: tools-bin$subproject_postfix
 " false

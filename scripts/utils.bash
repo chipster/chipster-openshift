@@ -244,3 +244,31 @@ function psql {
   
   oc rsh dc/$service bash -c "psql -c \"$sql\""
 }
+
+function get_deploy_config {
+
+  private_config_path="$1"
+  key="$2"
+
+  deploy_config_path_shared="$private_config_path/chipster-all/deploy.yaml"
+  deploy_config_path_project="$private_config_path/$PROJECT.$DOMAIN/deploy.yaml"
+
+  # if project specific file exists
+  if [ -f $deploy_config_path_project ]; then
+    value="$(yq r $deploy_config_path_project "$key")"
+    # if the key was found    
+    if [ "$value" != "null" ]; then
+      echo "$value"
+      return
+    fi
+  fi
+  
+  # not found from project specific, try shared
+  if [ -f $deploy_config_path_shared ]; then
+    value="$(yq r $deploy_config_path_shared "$key")"
+    if [ "$value" != "null" ]; then
+      echo "$value"
+      return
+    fi
+  fi
+}

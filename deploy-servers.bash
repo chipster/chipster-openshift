@@ -88,7 +88,7 @@ function configure_service {
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/api-route.yaml  
         
-    ip_whitelist="$(get_deploy_config ip-whitelist-api)"
+    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-api)"
     
     if [ -n "$ip_whitelist" ]; then
       apply_firewall $template_dir/$service/api-route.yaml "$ip_whitelist"
@@ -114,7 +114,7 @@ function configure_service {
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/admin.yaml
     
-    ip_whitelist="$(get_deploy_config ip-whitelist-admin)"
+    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-admin)"
     if [ -n "$ip_whitelist" ]; then
       apply_firewall $template_dir/$service/admin.yaml "$ip_whitelist"
     else
@@ -126,30 +126,6 @@ function configure_service {
   yq merge --append $template_dir/$service/*.yaml > $template_dir/$service.yaml
   rm $template_dir/$service/*.yaml
   rmdir $template_dir/$service
-}
-
-function get_deploy_config {
-
-  key="$1"
-
-  # if project specific file exists
-  if [ -f $deploy_config_path_project ]; then
-    value="$(yq r $deploy_config_path_project "$key")"
-    # if the key was found    
-    if [ "$value" != "null" ]; then
-      echo "$value"
-      return
-    fi
-  fi
-  
-  # not found from project specific, try shared
-  if [ -f $deploy_config_path_shared ]; then
-    value="$(yq r $deploy_config_path_shared "$key")"
-    if [ "$value" != "null" ]; then
-      echo "$value"
-      return
-    fi
-  fi
 }
 
 subproject="$1"
@@ -167,21 +143,17 @@ DOMAIN=$(get_domain)
 echo project: $PROJECT domain: $DOMAIN
 
 private_config_path="../chipster-private/confs"
-
-deploy_config_path_shared="$private_config_path/chipster-all/deploy.yaml"
-deploy_config_path_project="$private_config_path/$PROJECT.$DOMAIN/deploy.yaml"
-
 chipster_defaults_path="../chipster-web-server/src/main/resources/chipster-defaults.yaml"
 
-mylly=$(get_deploy_config mylly)
+mylly=$(get_deploy_config $private_config_path mylly)
 if [ -z "$mylly" ]; then  
   mylly=false
 fi
 
-shibboleth=$(get_deploy_config shibboleth)
+shibboleth=$(get_deploy_config $private_config_path shibboleth)
 
 
-image_project=$(get_deploy_config image_project)
+image_project=$(get_deploy_config $private_config_path image_project)
 if [ -z "$image_project" ]; then
   echo "image_project is not configure, assuming all images are found from the current project"
   image_project=$PROJECT
@@ -296,12 +268,12 @@ projectScriptPath="$private_config_path/$PROJECT.$DOMAIN/chipster-template-patch
 
 if [ -f $sharedScriptPath ]; then
   echo "apply shared customizations in $sharedScriptPath"
-  bash $sharedScriptPath $template_dir
+  bash $sharedScriptPath $template_dir $subproject_postfix
 fi
 
 if [ -f $projectScriptPath ]; then
   echo "apply project specific customizations in $projectScriptPath"
-  bash $projectScriptPath $template_dir
+  bash $projectScriptPath $template_dir $subproject_postfix
 fi
  
 template="$build_dir/chipster_template.yaml"
