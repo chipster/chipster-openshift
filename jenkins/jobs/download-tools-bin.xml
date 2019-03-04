@@ -10,16 +10,43 @@
     </com.sonyericsson.rebuild.RebuildSettings>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
-        <hudson.model.ChoiceParameterDefinition>
+        <org.biouno.unochoice.ChoiceParameter plugin="uno-choice@2.1">
           <name>TOOLS_BIN_VERSION</name>
           <description></description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>chipster-3.14.2</string>
-              <string>233</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
+          <randomName>choice-parameter-3542969651890309</randomName>
+          <visibleItemCount>1</visibleItemCount>
+          <script class="org.biouno.unochoice.model.GroovyScript">
+            <secureScript plugin="script-security@1.48">
+              <script>// Set the URL we want to read from, it is MySQL from official Library for this example, limited to 20 results only.
+url = &quot;https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/&quot;
+try {
+    def http_client = new URL(url).openConnection() as HttpURLConnection
+    http_client.setRequestMethod(&apos;GET&apos;)
+    http_client.connect()
+    def response = &quot;&quot;
+    if (http_client.responseCode == 200) {
+        response = http_client.inputStream.getText(&apos;UTF-8&apos;)
+    } else {
+        println(&quot;HTTP response error&quot;)
+        System.exit(0)
+    }
+    def list = response.readLines().collect { it.split(&quot;/&quot;)[0] }
+    return list.sort()
+} catch (Exception e) {
+         println(e)
+}</script>
+              <sandbox>false</sandbox>
+            </secureScript>
+            <secureFallbackScript plugin="script-security@1.48">
+              <script></script>
+              <sandbox>false</sandbox>
+            </secureFallbackScript>
+          </script>
+          <projectName>download-tools-bin</projectName>
+          <choiceType>PT_SINGLE_SELECT</choiceType>
+          <filterable>false</filterable>
+          <filterLength>1</filterLength>
+        </org.biouno.unochoice.ChoiceParameter>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -57,6 +84,7 @@ set -e
 set +x
 
 OPENSHIFT_PROJECT=&quot;$(cat $OPENSHIFT_PROJECT_PATH)&quot;
+DEPLOY_CONF=&quot;$(cat $DEPLOY_CONF_PATH)&quot;
       
 oc login https://rahti.csc.fi:8443 --token=$OPENSHIFT_TOKEN
 
@@ -67,6 +95,10 @@ if [ &quot;$project&quot; != $OPENSHIFT_PROJECT ]; then
   echo &quot;project change failed, stop here&quot;
   exit 1
 fi
+
+mkdir -p chipster-private/confs/chipster-all
+
+echo &quot;$DEPLOY_CONF&quot; &gt; chipster-private/confs/chipster-all/deploy.yaml
 
 pushd chipster-openshift
 
@@ -88,6 +120,11 @@ bash download-tools-bin.bash $TOOLS_BIN_VERSION
     </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
     <org.jenkinsci.plugins.configfiles.buildwrapper.ConfigFileBuildWrapper plugin="config-file-provider@3.2">
       <managedFiles>
+        <org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+          <fileId>DEPLOY_CONF</fileId>
+          <replaceTokens>false</replaceTokens>
+          <variable>DEPLOY_CONF_PATH</variable>
+        </org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
         <org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
           <fileId>OPENSHIFT_PROJECT</fileId>
           <replaceTokens>false</replaceTokens>

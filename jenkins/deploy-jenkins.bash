@@ -26,11 +26,19 @@ oc volume dc/jenkins --add --name jenkins-data --type=pvc --claim-name jenkins-d
  # store your Jenkins User ID to env "JENKINS_USER" 
  # click "Configure" and click "Add new token" and "Generate". Save the token to env "JENKINS_TOKEN"
  
-curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="rebuild@latest" /></jenkins>' --header 'Content-Type: text/xml' https://jenkins-chipster-jenkins.rahtiapp.fi/pluginManager/installNecessaryPlugins
+curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="rebuild@latest" /></jenkins>' \
+  --header 'Content-Type: text/xml' \
+  https://jenkins-chipster-jenkins.rahtiapp.fi/pluginManager/installNecessaryPlugins
+  
+curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="uno-choice@latest" /></jenkins>' \
+  --header 'Content-Type: text/xml' \
+  https://jenkins-chipster-jenkins.rahtiapp.fi/pluginManager/installNecessaryPlugins
+  
 
 # store private confs as Jenkins managed files
 bash jenkins/add-jenkins-file.bash DEPLOY_CONF --string "$deploy_conf"
 bash jenkins/add-jenkins-file.bash OPENSHIFT_PROJECT --string "$(cat ../chipster-private/confs/jenkins/openshift_project)"
+bash jenkins/add-jenkins-file.bash CHIPSTER_DEV_PATCH --string "$(cat ../chipster-private/confs/chipster-dev.rahtiapp.fi/chipster-template-patch.bash)"
 
 # store secrets as Jenkins credentials 
 bash jenkins/add-jenkins-credential.bash USERS_CONF "$(cat ../chipster-private/confs/chipster-all/users)"

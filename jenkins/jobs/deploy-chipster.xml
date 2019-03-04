@@ -63,6 +63,43 @@
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
+        <org.biouno.unochoice.ChoiceParameter plugin="uno-choice@2.1">
+          <name>TOOLS_BIN_VERSION</name>
+          <description>The options are taken from the object storage and may contain choices that haven&apos;t been downloaded to OpenShift yet. Use the Jenkins job download-tools-bin-from-object-storage to see if the version is downloaded already or to download it.</description>
+          <randomName>choice-parameter-3543489150877066</randomName>
+          <visibleItemCount>1</visibleItemCount>
+          <script class="org.biouno.unochoice.model.GroovyScript">
+            <secureScript plugin="script-security@1.48">
+              <script>// Set the URL we want to read from, it is MySQL from official Library for this example, limited to 20 results only.
+url = &quot;https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/&quot;
+try {
+    def http_client = new URL(url).openConnection() as HttpURLConnection
+    http_client.setRequestMethod(&apos;GET&apos;)
+    http_client.connect()
+    def response = &quot;&quot;
+    if (http_client.responseCode == 200) {
+        response = http_client.inputStream.getText(&apos;UTF-8&apos;)
+    } else {
+        println(&quot;HTTP response error&quot;)
+        System.exit(0)
+    }
+    def list = response.readLines().collect { it.split(&quot;/&quot;)[0] }
+    return list.sort()
+} catch (Exception e) {
+         println(e)
+}</script>
+              <sandbox>false</sandbox>
+            </secureScript>
+            <secureFallbackScript plugin="script-security@1.48">
+              <script></script>
+              <sandbox>false</sandbox>
+            </secureFallbackScript>
+          </script>
+          <projectName>deploy-chipster</projectName>
+          <choiceType>PT_SINGLE_SELECT</choiceType>
+          <filterable>false</filterable>
+          <filterLength>1</filterLength>
+        </org.biouno.unochoice.ChoiceParameter>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -101,6 +138,7 @@ set +x
 
 OPENSHIFT_PROJECT=&quot;$(cat $OPENSHIFT_PROJECT_PATH)&quot;
 DEPLOY_CONF=&quot;$(cat $DEPLOY_CONF_PATH)&quot;
+CHIPSTER_DEV_PATCH=&quot;$(cat $CHIPSTER_DEV_PATCH_PATH)&quot;
       
 if [ -d chipster-web-server ]; then
   pushd chipster-web-server; git pull; popd
@@ -129,6 +167,7 @@ mkdir -p chipster-private/confs/rahti-int
 
 echo &quot;$DEPLOY_CONF&quot; &gt; chipster-private/confs/chipster-all/deploy.yaml
 echo &quot;$USERS_CONF&quot; &gt; chipster-private/confs/chipster-all/users
+echo &quot;$CHIPSTER_DEV_PATCH&quot; &gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
 
 # chipster-all is actually a place for organization wide configs, but we can use it to configure individual installations
 # as long as these jobs are not run in parallel in Jenkins  
@@ -142,14 +181,26 @@ COMP_CPU_MILLIS_REQUEST=$(($COMP_CPU_MILLIS / 2))
 echo &quot;
 source scripts/utils.bash
 
-patch_kind_and_name \$1/comp.yaml DeploymentConfig comp-$SUBPROJECT \&quot;
+template_dir=&quot;\$1&quot;
+subproject_postfix=&quot;\$2&quot;
+
+patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp-$SUBPROJECT \&quot;
   spec.template.spec.containers[0].resources.limits.cpu: ${COMP_CPU_MILLIS}m
   spec.template.spec.containers[0].resources.limits.memory: ${COMP_RAM_MB}Mi
   spec.template.spec.containers[0].resources.requests.cpu: ${COMP_CPU_MILLIS_REQUEST}m
   spec.template.spec.containers[0].resources.requests.memory: ${COMP_RAM_MB_REQUEST}Mi
 \&quot; true
 
-&quot; &gt; chipster-private/confs/chipster-all/chipster-template-patch.bash 
+patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp\$subproject_postfix \&quot;
+  spec.template.spec.containers[0].volumeMounts[3].subPath: $TOOLS_BIN_VERSION
+\&quot; true
+
+patch_kind_and_name \$template_dir/toolbox.yaml DeploymentConfig toolbox\$subproject_postfix \&quot;
+  spec.template.spec.containers[0].volumeMounts[2].subPath: $TOOLS_BIN_VERSION
+\&quot; true
+
+&quot; &gt;&gt; chipster-private/confs/chipster-all/chipster-template-patch.bash 
+
 
 pushd chipster-openshift
 
@@ -216,6 +267,11 @@ echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)
           <fileId>OPENSHIFT_PROJECT</fileId>
           <replaceTokens>false</replaceTokens>
           <variable>OPENSHIFT_PROJECT_PATH</variable>
+        </org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+        <org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
+          <fileId>CHIPSTER_DEV_PATCH</fileId>
+          <targetLocation>CHIPSTER_DEV_PATCH_PATH</targetLocation>
+          <replaceTokens>false</replaceTokens>
         </org.jenkinsci.plugins.configfiles.buildwrapper.ManagedFile>
       </managedFiles>
     </org.jenkinsci.plugins.configfiles.buildwrapper.ConfigFileBuildWrapper>

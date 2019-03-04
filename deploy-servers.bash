@@ -88,7 +88,7 @@ function configure_service {
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/api-route.yaml  
         
-    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-api)"
+    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-api $PROJECT $DOMAIN)"
     
     if [ -n "$ip_whitelist" ]; then
       apply_firewall $template_dir/$service/api-route.yaml "$ip_whitelist"
@@ -114,7 +114,7 @@ function configure_service {
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/admin.yaml
     
-    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-admin)"
+    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-admin $PROJECT $DOMAIN)"
     if [ -n "$ip_whitelist" ]; then
       apply_firewall $template_dir/$service/admin.yaml "$ip_whitelist"
     else
@@ -145,19 +145,14 @@ echo project: $PROJECT domain: $DOMAIN
 private_config_path="../chipster-private/confs"
 chipster_defaults_path="../chipster-web-server/src/main/resources/chipster-defaults.yaml"
 
-mylly=$(get_deploy_config $private_config_path mylly)
+mylly=$(get_deploy_config $private_config_path mylly $PROJECT $DOMAIN)
 if [ -z "$mylly" ]; then  
   mylly=false
 fi
 
-shibboleth=$(get_deploy_config $private_config_path shibboleth)
+shibboleth=$(get_deploy_config $private_config_path shibboleth $PROJECT $DOMAIN)
 
-
-image_project=$(get_deploy_config $private_config_path image_project)
-if [ -z "$image_project" ]; then
-  echo "image_project is not configure, assuming all images are found from the current project"
-  image_project=$PROJECT
-fi
+image_project=$(get_image_project $private_config_path $PROJECT $DOMAIN)
 
 build_dir="build"
 template_dir="$build_dir/parts"
@@ -186,7 +181,7 @@ configure_service "$subproject_postfix" web-server web-server web-server /opt/ch
 configure_service "$subproject_postfix" comp comp comp /opt/chipster/comp &
 
 if [ "$mylly" = true ]; then
-  configure_service $subproject_postfix comp-mylly comp-mylly comp /opt/chipster/comp &
+  configure_service "$subproject_postfix" comp-mylly comp-mylly comp /opt/chipster/comp &
 else
   echo "skipping mylly"
 fi

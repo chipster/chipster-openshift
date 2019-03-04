@@ -6,7 +6,7 @@ RUN mkdir -p /opt/chipster/comp \
   && chmod -R ugo+rwx /opt/chipster-web-server \
   && mv /opt/chipster-web-server/lib /opt/chipster \
   && cd /opt/chipster \
-  && ln -s /mnt/tools/current tools \
+  && ln -s /mnt/tools tools \
   && mkdir -p /opt/chipster/comp/security
 
 # Legacy DirectoryLayout assumes it's running here

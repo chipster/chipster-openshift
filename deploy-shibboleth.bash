@@ -11,6 +11,8 @@ bash ../shibboleth-openshift/deploy-shibboleth.bash \
   --hostname $PROJECT.$DOMAIN \
   --cert_dir "~/shibboleth_keys/$PROJECT.$DOMAIN-haka"
   
+oc get dc haka -o json | sed "s/haka-conf/haka/g" | oc apply -f -
+  
 oc delete bc shibboleth-java; oc delete is shibboleth-java
 oc new-build --name shibboleth-java --source-image=chipster-web-server --source-image-path=/opt/chipster-web-server:chipster-web-server -D - < dockerfiles/shibboleth-java/Dockerfile  && sleep 1 && oc logs -f bc/shibboleth-java
 

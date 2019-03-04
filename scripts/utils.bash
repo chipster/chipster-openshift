@@ -249,6 +249,8 @@ function get_deploy_config {
 
   private_config_path="$1"
   key="$2"
+  PROJECT="$3"
+  DOMAIN="$4"
 
   deploy_config_path_shared="$private_config_path/chipster-all/deploy.yaml"
   deploy_config_path_project="$private_config_path/$PROJECT.$DOMAIN/deploy.yaml"
@@ -271,4 +273,54 @@ function get_deploy_config {
       return
     fi
   fi
+}
+
+function wait_job {
+  job="$1"
+  phase="$2"
+  
+  
+  
+  is_printed="false"
+  while true; do
+    pod="$(oc get pod  | grep $job | grep $phase | cut -d " " -f 1)"
+    if [ -n "$pod" ]; then
+      break
+    fi
+    
+    if [ $is_printed == "false" ]; then
+      echo "waiting $job to be in phase $phase"
+      is_printed="true"
+    else
+      echo -n "."
+    fi    
+    sleep 2
+  done
+  echo ""
+}
+
+function get_image_project {
+      
+  private_config_path="$1"
+  PROJECT="$2"
+  DOMAIN="$3"
+  
+  image_project=$(get_deploy_config $private_config_path image-project $PROJECT $DOMAIN)
+  
+  if [ -z "$image_project" ]; then
+    echo "image_project is not configure, assuming all images are found from the current project"
+    image_project="$(oc project -q)"
+  fi
+  
+  echo "$image_project"
+}
+
+function follow_job {
+
+  job="$1"
+  
+  wait_job $job Running
+
+  pod="$(oc get pod  | grep $job | grep "Running" | cut -d " " -f 1)"
+  oc logs --follow $pod
 }
