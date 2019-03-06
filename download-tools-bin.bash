@@ -14,4 +14,4 @@ if [ -z $tools_bin_version ]; then
   exit 1
 fi
 
-bash run-job-with-tools-bin.bash $TOOLS_BIN_VERSION
+bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version"
