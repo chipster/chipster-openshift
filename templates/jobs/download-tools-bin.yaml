@@ -31,7 +31,7 @@ objects:
           # sholud further improved to make sure there are no both large and small files 
           # in the same package, because the current logic will fail in that case.
           #
-          command: ["bash", "-c", "set -e; cd /mnt/tools; mkdir -p ${TOOLS_BIN_VERSION}; cd ${TOOLS_BIN_VERSION}; export url='https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts'; curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 8 --halt 2 'set -o pipefail; size=$(curl -sI $url/{} | grep -i Content-Length | cut -d \" \" -f 2 | tr -d \"\r\"); echo $url/{} $size; if [ $size -lt $((5 * 1024 * 1024 * 1024)) ]; then wget --non-verbose --tries 5 $url/{} -O {}_tmp && cat {}_tmp | lz4 -d | tar -x; rm {}_tmp; else curl --silent --show-error --fail $url/{} | lz4 -d | tar -x; fi'"]          
+          command: ["bash", "-c", "set -e; cd /mnt/tools; mkdir -p ${TOOLS_BIN_VERSION}; cd ${TOOLS_BIN_VERSION}; export url='https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts'; curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 8 --halt 2 'set -o pipefail; size=$(curl -sI $url/{} | grep -i Content-Length | cut -d \" \" -f 2 | tr -d \"\r\"); echo $url/{} $size; if [ $size -lt $((5 * 1024 * 1024 * 1024)) ]; then wget --no-verbose --tries 5 $url/{} -O {}_tmp && cat {}_tmp | lz4 -d | tar -x; rm {}_tmp; else curl --silent --show-error --fail $url/{} | lz4 -d | tar -x; fi'"]          
           volumeMounts:        
           - mountPath: /mnt/tools
             name: tools-bin
