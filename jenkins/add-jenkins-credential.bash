@@ -1,7 +1,11 @@
 #!/bin/bash
 
+source jenkins/jenkins-utils.bash
+
   key="$1"
   value="$2"
+  
+check_jenkins_login
   
   json_template='{
     "": "0",

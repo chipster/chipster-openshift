@@ -1,6 +1,15 @@
 #!/bin/bash
 
+source jenkins/jenkins-utils.bash
+
 job="$1"
+
+check_jenkins_login
+
+if [ -z "$job" ]; then
+  echo "Usage: bash download-jenkins-job.bash JOB_NAME"
+  exit 1
+fi
 
 out_file="jenkins/jobs/$job.xml"
 

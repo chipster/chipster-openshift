@@ -2,9 +2,13 @@
 
 set -e
 
+source jenkins/jenkins-utils.bash
+
 name="$1"
 type="$2"
 file_or_value="$3"
+
+check_jenkins_login
 	
 json_template='{
 	"config": {

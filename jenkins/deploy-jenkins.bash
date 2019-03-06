@@ -28,11 +28,11 @@ oc volume dc/jenkins --add --name jenkins-data --type=pvc --claim-name jenkins-d
  
 curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="rebuild@latest" /></jenkins>' \
   --header 'Content-Type: text/xml' \
-  https://jenkins-chipster-jenkins.rahtiapp.fi/pluginManager/installNecessaryPlugins
+  $JENKINS_HOST/pluginManager/installNecessaryPlugins
   
 curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="uno-choice@latest" /></jenkins>' \
   --header 'Content-Type: text/xml' \
-  https://jenkins-chipster-jenkins.rahtiapp.fi/pluginManager/installNecessaryPlugins
+  $JENKINS_HOST/pluginManager/installNecessaryPlugins
   
 
 # store private confs as Jenkins managed files

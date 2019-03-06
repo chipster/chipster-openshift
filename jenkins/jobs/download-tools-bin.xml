@@ -102,8 +102,6 @@ echo &quot;$DEPLOY_CONF&quot; &gt; chipster-private/confs/chipster-all/deploy.ya
 
 pushd chipster-openshift
 
-#source scripts/utils.bash
-
 bash download-tools-bin.bash $TOOLS_BIN_VERSION
 </command>
     </hudson.tasks.Shell>
