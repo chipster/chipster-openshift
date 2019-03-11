@@ -48,5 +48,8 @@ function download_file {
 }
 
 export -f download_file
+
+# delete old download temp files
+rm -f *_tmp
           
 curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 8 --halt 2 "download_file {}"

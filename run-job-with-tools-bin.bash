@@ -21,7 +21,8 @@ image_project=$(get_image_project $private_config_path $PROJECT $DOMAIN)
 name=$(basename $job .bash)-bash-job
 
 if oc get job $name > /dev/null 2>&1; then
-  oc delete job $name
+  oc delete job $name  
+  #TODO wait until the job isn't Running anymore
 fi
 
 oc process -f templates/jobs/bash-job-template-with-tools-bin.yaml --local \
@@ -31,4 +32,5 @@ oc process -f templates/jobs/bash-job-template-with-tools-bin.yaml --local \
 	| yq r -j - | jq .items[0].spec.template.spec.containers[0].command[2]="$(cat $job | jq -s -R .)" \
 	| oc create -f - --validate 
 	
+#TODO show logs even if the job completed already
 follow_job download-tools-bin

@@ -34,14 +34,20 @@ curl -X POST --user $JENKINS_USER:$JENKINS_TOKEN -d '<jenkins><install plugin="u
   --header 'Content-Type: text/xml' \
   $JENKINS_HOST/pluginManager/installNecessaryPlugins
   
+project="chipster-dev"
 
 # store private confs as Jenkins managed files
 bash jenkins/add-jenkins-file.bash DEPLOY_CONF --string "$deploy_conf"
 bash jenkins/add-jenkins-file.bash OPENSHIFT_PROJECT --string "$(cat ../chipster-private/confs/jenkins/openshift_project)"
-bash jenkins/add-jenkins-file.bash CHIPSTER_DEV_PATCH --string "$(cat ../chipster-private/confs/chipster-dev.rahtiapp.fi/chipster-template-patch.bash)"
+bash jenkins/add-jenkins-file.bash CHIPSTER_DEV_PATCH --string "$(cat ../chipster-private/confs/$project.rahtiapp.fi/chipster-template-patch.bash)"
 
 # store secrets as Jenkins credentials 
 bash jenkins/add-jenkins-credential.bash USERS_CONF "$(cat ../chipster-private/confs/chipster-all/users)"
 
-# use create-namespaces.bash to create a project where the Chipster is deployed
-  
+oc create project $project
+
+# create a serviceccount that jenkins uses to manage the project
+token=$(bash create-serviceaccount.bash jenkins)
+
+bash dev/add_jenkins_credential.bash OPENSHIFT_PROJECT $project
+bash dev/add_jenkins_credential.bash OPENSHIFT_TOKEN $token
