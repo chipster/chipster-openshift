@@ -49,5 +49,8 @@ oc create project $project
 # create a serviceccount that jenkins uses to manage the project
 token=$(bash create-serviceaccount.bash jenkins)
 
+# change the jenkins role in OKD console -> Resources -> Membership -> Edit Membership 
+# from Edit to Admin to allow it to create serviceaccounts for tool developers
+
 bash dev/add_jenkins_credential.bash OPENSHIFT_PROJECT $project
 bash dev/add_jenkins_credential.bash OPENSHIFT_TOKEN $token
