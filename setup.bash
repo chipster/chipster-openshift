@@ -36,8 +36,11 @@ fi
 
 psql auth-postgres$subproject_postfix        auth_db        'alter system set synchronous_commit to off'
 psql session-db-postgres$subproject_postfix  session_db_db  'alter system set synchronous_commit to off'
+oc rsh dc/auth-postgres$subproject_postfix pg_ctl reload -D /var/lib/pgsql/data/userdata
+oc rsh dc/session-db-postgres$subproject_postfix pg_ctl reload -D /var/lib/pgsql/data/userdata
 if [ $(oc get dc job-history-postgres$subproject_postfix -o json | jq .spec.replicas) == 1 ]; then
   psql job-history-postgres$subproject_postfix job_history_db 'alter system set synchronous_commit to off'
+  oc rsh dc/job-history-postgres$subproject_postfix pg_ctl reload -D /var/lib/pgsql/data/userdata
 fi
 
 # create a db to influxdb
