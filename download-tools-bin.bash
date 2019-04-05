@@ -2,6 +2,8 @@
 
 set -e
 
+command -v yq >/dev/null 2>&1 || { echo >&2 "I require yq but it's not installed.  Aborting."; exit 1; }
+
 source scripts/utils.bash
 
 tools_bin_version="$1"
