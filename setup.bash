@@ -49,13 +49,15 @@ if [ $(oc get dc influxdb$subproject_postfix -o json | jq .spec.replicas) == 1 ]
 fi
 
 if [ $(oc get dc grafana$subproject_postfix -o json | jq .spec.replicas) == 1 ]; then
-  oc rsh dc/grafana$subproject_postfix grafana-cli admin reset-admin-password --homepath "/usr/share/grafana" "$(cat ../chipster-private/confs/chipster-all/grafana-admin-password)"
+  if [ -z ../chipster-private/confs/rahti-int/grafana-admin-password ]; then
+	  grafana_password="$(cat ../chipster-private/confs/rahti-int/grafana-admin-password)"
+	  oc rsh dc/grafana$subproject_postfix grafana-cli admin reset-admin-password --homepath "/usr/share/grafana" "$grafana_password"
 
-  grafana_password="$(cat ../chipster-private/confs/rahti-int/grafana-admin-password)"
-  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/datasources -u admin:$grafana_password -X POST --data-binary '{ "name": "InfluxDB", "type": "influxdb", "url": "http://influxdb:8086", "access": "proxy", "basicAuth": false, "database": "db" }' -H Content-Type:application/json
-  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-summary.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-websocket.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-load.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-rest.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-benchmark.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/datasources -u admin:$grafana_password -X POST --data-binary '{ "name": "InfluxDB", "type": "influxdb", "url": "http://influxdb:8086", "access": "proxy", "basicAuth": false, "database": "db" }' -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-summary.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-websocket.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-load.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-rest.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-benchmark.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+  fi
 fi 
