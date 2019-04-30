@@ -3,9 +3,8 @@ FROM base
 COPY . /home/user/chipster-web-server/
 
 RUN cd /home/user/chipster-web-server/js/cli-client \
-    && chmod -R ugo+rwx .
+    && chmod -R ug+rwx .
     
-USER 1000
 RUN cd /home/user/chipster-web-server/js/cli-client \
 	&& npm install; tsc
 
