@@ -7,8 +7,6 @@ COPY . /home/user/build/chipster-web
 # /opt/chipster-web is created by the manual copy in the toolbox build and /home/user/build is created by the copy above  
 RUN mkdir -p /opt/chipster-web/src \
 	&& chmod ugo+rwx -R /home/user/build /opt/chipster-web
-	
-USER 1000
 
 # remove the symlink becasue ng build doesn't tolerate it
 # the source image already has to manual in place 

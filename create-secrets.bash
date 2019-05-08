@@ -120,12 +120,8 @@ for service in $authenticated_services; do
   echo $config_key: $service_password | tee $build_dir/$service.yaml >> $build_dir/auth.yaml
 done
 
+# variable isn't needed anymore, clear it
 passwords=""
-
-echo "{}" >  $build_dir/backup.yaml
-merge_custom_confs backup.yaml
-# file-broker needs the backup configs too
-cat $build_dir/backup.yaml | grep "^backup-" >> $build_dir/file-broker.yaml
 
 echo "get db passwords"
 
