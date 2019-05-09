@@ -4,7 +4,7 @@ FROM ubuntu:16.04
 
 RUN apt-get update -y \ 
 	&& apt-get upgrade -y \
-	&& apt-get install -y openjdk-8-jdk ant gradle nano dstat pv curl build-essential liblz4-tool parallel jq postgresql-client postgresql-contrib gnupg2 \
+	&& apt-get install -y openjdk-8-jdk ant gradle nano dstat pv curl build-essential liblz4-tool parallel jq postgresql-client postgresql-contrib gnupg2 awscli \
 	&& curl -sL https://deb.nodesource.com/setup_8.x | bash - \
 	&& apt-get install -y nodejs \
 	&& apt-get clean
