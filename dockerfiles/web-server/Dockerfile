@@ -13,7 +13,7 @@ RUN mkdir -p /opt/chipster-web/src \
 RUN cd /home/user/build/chipster-web \	
 	&& npm ci \
 	&& rm src/assets/manual \
-	&& ng build --prod --no-progress || true \
+	&& npm run build -- --no-progress || true \
 	&& cp -r dist/* /opt/chipster-web/src/ \
 	&& ls -lah /opt/chipster-web/src/ \
 	&& rm -rf /home/user/build
