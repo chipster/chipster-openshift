@@ -156,8 +156,8 @@ echo "generate haka password"
 
 # Haka Single sign-on
 # this should be in the project specific configuration, but it doesn't support variables yet 
-create_sso_password haka
-echo url-ext-haka: https://$PROJECT.$DOMAIN/sso/haka >> $build_dir/service-locator.yaml
+# create_sso_password haka
+# echo url-ext-haka: https://$PROJECT.$DOMAIN/sso/haka >> $build_dir/service-locator.yaml
 
 echo "generate secret for each service"
 
