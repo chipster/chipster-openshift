@@ -11,12 +11,13 @@ bash create-secrets.bash $subproject
 # deploy databases
 bash deploy-postgres.bash $subproject
 
-# optional
-#bash deploy-shibboleth.bash
 
 # run if the templates have changed or there are new services
 # - remove all: bash remove-all-services.bash
 bash deploy-servers.bash $subproject
+
+# optional
+#bash deploy-mylly-app.bash
 
 # run always after create-secrets.bash
 #bash rollout-services.bash

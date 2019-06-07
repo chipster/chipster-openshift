@@ -52,17 +52,6 @@ while read line; do
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
-# m2m urls
-while read line; do
-	if [[ $line == url-m2m-int-* ]]; then
-		service=$(echo $line | cut -d : -f 1 | sed s/url-m2m-int-//)
-		default_url=$(echo $line | cut -d " " -f 2)
-		proto=$(echo $default_url | cut -d { -f 1)
-		
-		echo url-m2m-int-$service: $proto$service$subproject_postfix-m2m
-	fi
-done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
-
 # internal service urls
 while read line; do
 	if [[ $line == url-int-* ]]; then

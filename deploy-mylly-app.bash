@@ -30,6 +30,7 @@ secret_web_server_app="$(oc get secret web-server-app -n chipster -o json | jq "
 | yq w - manual-path assets/manual/kielipankki/manual/ \
 | yq w - manual-tool-postfix .en.src.html \
 | yq w - app-name Mylly \
+| yq w - app-id mylly \
 | yq w - custom-css assets/manual/kielipankki/manual/app-mylly-styles.css \
 | yq w - favicon assets/manual/kielipankki/manual/app-mylly-favicon.png \
 | yq w - home-path assets/manual/kielipankki/manual/app-home.html \

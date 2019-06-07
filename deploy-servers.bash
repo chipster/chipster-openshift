@@ -150,8 +150,6 @@ if [ -z "$mylly" ]; then
   mylly=false
 fi
 
-shibboleth=$(get_deploy_config $private_config_path shibboleth $PROJECT $DOMAIN)
-
 image_project=$(get_image_project $private_config_path $PROJECT $DOMAIN)
 
 build_dir="build"
@@ -184,39 +182,6 @@ if [ "$mylly" = true ]; then
   configure_service "$subproject_postfix" comp-mylly comp-mylly comp /opt/chipster/comp &
 else
   echo "skipping mylly"
-fi
-
-if [ -n "$shibboleth" ]; then
-  
-  if oc get dc haka -o json | jq '.spec.template.spec.containers[0].volumeMounts[0].mountPath' | grep logs; then
-    echo "dc haka was patched with earlier version of this script. Move "logs" and "confs" to be the last in the volumes and volumeMounts arrays."
-    exit 1
-  else
-  
-    # it would be nicer if the shibboleth script would only create the template locally and we could patch before it's 
-    # applied to the server. Unfortunately it has created the object already on the server, so we have to patch it there for now   
-    echo "configure $shibboleth"
-    
-    json="$(oc get dc haka -o json)"
-    echo "$json" \
-      | jq '.spec.template.spec.containers[0].volumeMounts[3]={"mountPath": "/opt/chipster-web-server/logs", "name": "logs"}' \
-      | jq '.spec.template.spec.containers[0].volumeMounts[4]={"mountPath": "/opt/chipster-web-server/conf", "name": "conf"}' \
-      | jq '.spec.template.spec.volumes[3]={"emptyDir": {}, "name": "logs"}' \
-	  | jq '.spec.template.spec.volumes[4]={"name": "conf", "secret": {"defaultMode": 420, "secretName": "haka-conf"}}' \
-	  | oc apply -f -
-	  
-	m2m_port=$(yq r $chipster_defaults_path url-m2m-int-auth | cut -d : -f 3) || true  
-	
-	patch_kind_and_name $template_dir/auth.yaml DeploymentConfig auth$subproject_postfix "
-      spec.template.spec.containers[0].ports[2].containerPort: $m2m_port
-      spec.template.spec.containers[0].ports[2].name: m2m
-      spec.template.spec.containers[0].ports[2].protocol: TCP
-    " false
-    
-    oc apply -f templates/auth-m2m.yaml
-  fi
-else
-  echo "skipping shibboleth"
 fi
 
 wait
