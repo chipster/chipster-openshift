@@ -11,7 +11,7 @@
       <parameterDefinitions>
         <hudson.model.BooleanParameterDefinition>
           <name>DELETE_VOLUMES</name>
-          <description/>
+          <description>Must be selected on the first run of each subproject</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
@@ -215,11 +215,15 @@ if [ $DELETE_VOLUMES == "true" ]; then
   
   oc delete all -l subproject=${subproject}-db
   oc delete secret -l subproject=${subproject}-db
-  oc delete secret passwords-${subproject}
+  
+  if oc get secret passwords-${subproject} > /dev/null; then
+  	oc delete secret passwords-${subproject}
+  fi
+  
   oc delete pvc -l subproject=$subproject
-  t=5
-  echo "Waiting $t minutes to make sure OpenShift has garbage collected PVC services"
-  sleep $(($t * 60))
+  t=30
+  echo "Waiting $t seconds to make sure OpenShift has removed everything"
+  sleep $t
 fi
 
 
