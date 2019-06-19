@@ -18,6 +18,9 @@ if [ -z "$branch" ]; then
   exit 1
 fi
 
+# filebeat and logstash
+oc new-build --name logstash https://github.com/chipster/chipster-openshift.git -D - < dockerfiles/logstash/Dockerfile && retry oc logs -f bc/logstash &
+
 # from ubuntu
 oc new-build --name base -D - < dockerfiles/base/Dockerfile && retry oc logs -f bc/base &
 oc new-build --name=grafana -D - < dockerfiles/grafana/Dockerfile --to grafana && retry oc logs -f bc/grafana &
