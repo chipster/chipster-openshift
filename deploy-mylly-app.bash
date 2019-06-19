@@ -37,6 +37,7 @@ secret_web_server_app="$(oc get secret web-server-app -n chipster -o json | jq "
 | yq w - home-header-path assets/manual/kielipankki/manual/app-home-header.html \
 | yq w - contact-path assets/manual/kielipankki/manual/app-contact.html \
 | yq w - visualization-blacklist '["phenodata"]' \
+| yq w - example-session-owner-user-id jaas/mylly_example_session_owner \
 | base64)"
 
 oc get secret web-server-app -n chipster -o json \

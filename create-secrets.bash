@@ -161,14 +161,6 @@ create_secret_for_service comp-mylly $subproject $subproject_postfix
 add_file_to_secret $configured_objects_dir/comp.json 		comp-chipster-config.xml ../chipster-web-server/conf/comp-chipster-config.xml
 add_file_to_secret $configured_objects_dir/comp-mylly.json 	comp-chipster-config.xml ../chipster-web-server/conf/comp-chipster-config.xml
 
-private_jaas_path="../chipster-private/confs/chipster-all/jaas.config"
-
-if [ -f $private_jaas_path ]; then
-  jaas_path="$private_jaas_path"
-else
-  jaas_path="../chipster-web-server/conf/jaas.config"
-fi
-add_file_to_secret $configured_objects_dir/auth.json jaas.config "$jaas_path"
 
 echo "configure app"
 
