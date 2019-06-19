@@ -9,4 +9,4 @@ RUN mkdir -p /opt/chipster \
   && chown -R 1000 /opt/chipster-web-server/tools \
   && chmod -R ugo+rwx /opt/chipster-web-server/tools
 
-CMD ["java", "-XX:+UseSerialGC", "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1", "-XX:MinHeapFreeRatio=20", "-XX:MaxHeapFreeRatio=40", "-XX:GCTimeRatio=4", "-XX:AdaptiveSizePolicyWeight=90", "-Xss228k", "-Xms32m", "-Xmx128m", "-cp", "lib/*:", "fi.csc.chipster.toolbox.ToolboxService"]
+CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.toolbox.ToolboxService"]

@@ -18,4 +18,4 @@ RUN cd /home/user/build/chipster-web \
 	&& ls -lah /opt/chipster-web/src/ \
 	&& rm -rf /home/user/build
 
-CMD ["java", "-XX:+UseSerialGC", "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1", "-XX:MinHeapFreeRatio=20", "-XX:MaxHeapFreeRatio=40", "-XX:GCTimeRatio=4", "-XX:AdaptiveSizePolicyWeight=90", "-Xss228k", "-Xms32m", "-Xmx128m","-cp", "lib/*:", "fi.csc.chipster.web.WebServer"]
+CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.web.WebServer"]
