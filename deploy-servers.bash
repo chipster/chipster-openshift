@@ -242,6 +242,7 @@ oc process -f templates/monitoring.yaml --local \
 
 oc process -f templates/logging.yaml --local \
     -p PROJECT=$PROJECT \
+    -p IMAGE_PROJECT=$image_project \
     -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/logging.yaml
