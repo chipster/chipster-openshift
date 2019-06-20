@@ -173,24 +173,11 @@ cat ../chipster-web/src/assets/conf/chipster.yaml \
   > $build_dir/web-server-app/chipster.yaml
   
 merge_custom_confs web-server-app/chipster.yaml
-  
-yq n modules [] \
-  | yq w - modules[0] Kielipankki \
-  | yq w - manual-path assets/manual/kielipankki/manual/ \
-  | yq w - manual-tool-postfix .en.src.html \
-  | yq w - app-name Mylly \
-  | yq w - custom-css assets/manual/kielipankki/manual/app-mylly-styles.css \
-  | yq w - favicon assets/manual/kielipankki/manual/app-mylly-favicon.png \
-  | yq w - home-path assets/manual/kielipankki/manual/app-home.html \
-  | yq w - home-header-path assets/manual/kielipankki/manual/app-home-header.html \
-  | yq w - contact-path assets/manual/kielipankki/manual/app-contact.html \
-   > $build_dir/web-server-app/mylly.yaml
    	
 secret_file="$configured_objects_dir/web-server-app.json"
 	
 get_secret web-server-app$subproject_postfix $subproject > $secret_file
 add_file_to_secret $secret_file chipster.yaml $build_dir/web-server-app/chipster.yaml
-add_file_to_secret $secret_file mylly.yaml $build_dir/web-server-app/mylly.yaml
 
 echo "apply to server"
 
