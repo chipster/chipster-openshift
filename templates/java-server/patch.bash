@@ -30,7 +30,7 @@ patch_kind_and_name $template_dir/backup.yaml DeploymentConfig backup$subproject
 # only if mylly was enabled
 if [ -f $template_dir/comp-mylly.yaml ]; then
 	patch_kind_and_name $template_dir/comp-mylly.yaml DeploymentConfig comp-mylly$subproject_postfix "
-	  spec.template.spec.containers[0].resources.limits.cpu: 1900m
+	  spec.template.spec.containers[0].resources.limits.cpu: 1600m
 	  spec.template.spec.containers[0].resources.limits.memory: 7900Mi
 	  spec.template.spec.containers[0].resources.requests.cpu: 1000m
 	  spec.template.spec.containers[0].resources.requests.memory: 4000Mi
@@ -49,7 +49,7 @@ if [ -f $template_dir/comp-mylly.yaml ]; then
 fi
 
 patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp$subproject_postfix "
-  spec.template.spec.containers[0].resources.limits.cpu: 1900m
+  spec.template.spec.containers[0].resources.limits.cpu: 1600m
   spec.template.spec.containers[0].resources.limits.memory: 7900Mi
   spec.template.spec.containers[0].resources.requests.cpu: 1000m
   spec.template.spec.containers[0].resources.requests.memory: 4000Mi
