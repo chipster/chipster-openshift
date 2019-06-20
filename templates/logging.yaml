@@ -29,7 +29,7 @@ objects:
             name: logstash${SUBPROJECT_POSTFIX}
         spec:
           containers:
-            - image: docker-registry.default.svc:5000/${PROJECT}/logstash
+            - image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/logstash
               imagePullPolicy: Always
               name: logstash
               ports:
@@ -66,6 +66,15 @@ objects:
       test: false
       triggers:
         - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - logstash
+            from:
+              kind: ImageStreamTag
+              name: logstash:latest
+              namespace: ${{IMAGE_PROJECT}}
+          type: ImageChange
 
   - apiVersion: v1
     kind: Service
@@ -86,5 +95,6 @@ objects:
 
 parameters:
   - name: PROJECT
+  - name: IMAGE_PROJECT
   - name: SUBPROJECT
   - name: SUBPROJECT_POSTFIX
