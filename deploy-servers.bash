@@ -204,7 +204,14 @@ oc process -f templates/monitoring.yaml --local \
     -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/monitoring.yaml
-    
+
+oc process -f templates/logging.yaml --local \
+    -p PROJECT=$PROJECT \
+    -p SUBPROJECT=$subproject \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
+    > $template_dir/logging.yaml
+
+
 apply_firewall $template_dir/monitoring.yaml $ip_whitelist_admin_path
 
 # it would be cleaner to patch after the merge, but patching the large file takes about 20 seconds, when

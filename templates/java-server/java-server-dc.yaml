@@ -3,126 +3,150 @@ kind: Template
 metadata:
   name: ${NAME}${SUBPROJECT_POSTFIX}-dc
 objects:
-- apiVersion: v1
-  kind: DeploymentConfig
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: ${NAME}${SUBPROJECT_POSTFIX}
-  spec:
-    replicas: 1
-    selector:
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
       name: ${NAME}${SUBPROJECT_POSTFIX}
-    strategy:
-      activeDeadlineSeconds: 21600
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
-    template:
-      metadata:
-        labels:
-          app: chipster${SUBPROJECT_POSTFIX}
-          name: ${NAME}${SUBPROJECT_POSTFIX}
-      spec:
-        containers:
-        - env:
-          - name: JAVA_CLASS
-            value: ${{JAVA_CLASS}}
-          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/${IMAGE}
-          imagePullPolicy: Always
-          name: ${{NAME}}
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /admin/alive
-              port: ${{ADMIN_PORT}}
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources:
-            limits:
-              cpu: 1900m
-              memory: 512Mi
-            requests:
-              cpu: 1900m
-              memory: 512Mi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /opt/chipster-web-server/logs
-            name: logs
-          - mountPath: /opt/chipster-web-server/conf
-            name: conf
-        - env:
-          - name: admin_port
-            value: "${ADMIN_PORT}"
-          - name: role
-            value: ${{NAME}}
-          - name: password
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: monitoring${SUBPROJECT_POSTFIX}
-          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/monitoring
-          imagePullPolicy: Always
-          name: status
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /admin/alive
-              port: ${{ADMIN_PORT}}
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
-          resources:
-            limits:
-              cpu: 100m
-              memory: 100Mi
-            requests:
-              cpu: 100m
-              memory: 10Mi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: logs
-        - name: conf
-          secret:
-            defaultMode: 420
-            secretName: ${NAME}${SUBPROJECT_POSTFIX}
-    test: false
-    triggers:
-    - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - ${{NAME}}
-        from:
-          kind: ImageStreamTag
-          name: ${IMAGE}:latest
-          namespace: ${{IMAGE_PROJECT}}
-      type: ImageChange
-      
+    spec:
+      replicas: 1
+      selector:
+        name: ${NAME}${SUBPROJECT_POSTFIX}
+      strategy:
+        activeDeadlineSeconds: 21600
+        resources: {}
+        rollingParams:
+          intervalSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
+          updatePeriodSeconds: 1
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: chipster${SUBPROJECT_POSTFIX}
+            name: ${NAME}${SUBPROJECT_POSTFIX}
+        spec:
+          containers:
+            - env:
+                - name: JAVA_CLASS
+                  value: ${{JAVA_CLASS}}
+              image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/${IMAGE}
+              imagePullPolicy: Always
+              name: ${{NAME}}
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /admin/alive
+                  port: ${{ADMIN_PORT}}
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 1600m
+                  memory: 512Mi
+                requests:
+                  cpu: 1600m
+                  memory: 512Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /opt/chipster-web-server/logs
+                  name: logs
+                - mountPath: /opt/chipster-web-server/conf
+                  name: conf
+            - env:
+                - name: admin_port
+                  value: "${ADMIN_PORT}"
+                - name: role
+                  value: ${{NAME}}
+                - name: password
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: monitoring${SUBPROJECT_POSTFIX}
+              image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/monitoring
+              imagePullPolicy: Always
+              name: status
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /admin/alive
+                  port: ${{ADMIN_PORT}}
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 100Mi
+                requests:
+                  cpu: 200m
+                  memory: 10Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+            - image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/filebeat
+              imagePullPolicy: Always
+              name: filebeat
+              volumeMounts:
+                - mountPath: /opt/chipster-web-server/logs
+                  name: logs
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /admin/alive
+                  port: ${{ADMIN_PORT}}
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 100Mi
+                requests:
+                  cpu: 200m
+                  memory: 10Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: logs
+            - name: conf
+              secret:
+                defaultMode: 420
+                secretName: ${NAME}${SUBPROJECT_POSTFIX}
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - ${{NAME}}
+            from:
+              kind: ImageStreamTag
+              name: ${IMAGE}:latest
+              namespace: ${{IMAGE_PROJECT}}
+          type: ImageChange
+
 parameters:
-- name: NAME
-- name: API_PORT 
-- name: ADMIN_PORT
-- name: JAVA_CLASS
-- name: PROJECT
-- name: IMAGE
-- name: IMAGE_PROJECT
-- name: SUBPROJECT
-- name: SUBPROJECT_POSTFIX
+  - name: NAME
+  - name: API_PORT
+  - name: ADMIN_PORT
+  - name: JAVA_CLASS
+  - name: PROJECT
+  - name: IMAGE
+  - name: IMAGE_PROJECT
+  - name: SUBPROJECT
+  - name: SUBPROJECT_POSTFIX

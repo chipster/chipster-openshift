@@ -3,133 +3,146 @@ kind: Template
 metadata:
   name: chipster-pvcs${SUBPROJECT_POSTFIX}
 objects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: auth-security${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 100Mi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: auth-security${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 100Mi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: comp-jobs-data${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 10Gi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: comp-jobs-data${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 10Gi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: comp-jobs-data-mylly${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: comp-jobs-data-mylly${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 1Gi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: db-backups${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 100Mi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: db-backups${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 100Mi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: file-broker-storage${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 10Gi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: file-broker-storage${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 10Gi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: grafana${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 100Mi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: grafana${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 100Mi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: influxdb${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: influxdb${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 1Gi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: logstash${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: tools-bin${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 20Gi
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: tools-bin${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 20Gi
 
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    labels:
-      app: chipster${SUBPROJECT_POSTFIX}
-      subproject: ${{SUBPROJECT}}
-    name: tools-bin-mylly${SUBPROJECT_POSTFIX}
-  spec:
-    accessModes:
-    - ReadWriteMany
-    resources:
-      requests:
-        storage: 1Gi
-        
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: chipster${SUBPROJECT_POSTFIX}
+        subproject: ${{SUBPROJECT}}
+      name: tools-bin-mylly${SUBPROJECT_POSTFIX}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi
+
 parameters:
-- name: SUBPROJECT
-- name: SUBPROJECT_POSTFIX
+  - name: SUBPROJECT
+  - name: SUBPROJECT_POSTFIX
