@@ -8,9 +8,9 @@ filebeat.inputs:
     enabled: true
     paths:
       - /opt/chipster-web-server/logs/chipster.log
-# output.logstash:
-#   hosts: ["127.0.0.1:5044"]
 
+output.logstash:
+  hosts: ["logstash:5044"]
 # output.console:
 #   pretty: true
 

@@ -20,6 +20,7 @@ fi
 
 # filebeat and logstash
 oc new-build --name logstash https://github.com/chipster/chipster-openshift.git -D - < dockerfiles/logstash/Dockerfile && retry oc logs -f bc/logstash &
+oc new-build --name filebeat https://github.com/chipster/chipster-openshift.git -D - < dockerfiles/filebeat/Dockerfile && retry oc logs -f bc/filebeat &
 
 # from ubuntu
 oc new-build --name base -D - < dockerfiles/base/Dockerfile && retry oc logs -f bc/base &

@@ -20,3 +20,7 @@ patch_kind_and_name $template_dir/monitoring.yaml DeploymentConfig influxdb$subp
 patch_kind_and_name $template_dir/monitoring.yaml DeploymentConfig grafana$subproject_postfix "
   spec.replicas: 0
 " false
+
+patch_kind_and_name $template_dir/logging.yaml DeploymentConfig logstash$subproject_postfix "
+  spec.replicas: 0
+" false
