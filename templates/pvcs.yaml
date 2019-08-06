@@ -23,34 +23,6 @@ objects:
       labels:
         app: chipster${SUBPROJECT_POSTFIX}
         subproject: ${{SUBPROJECT}}
-      name: comp-jobs-data${SUBPROJECT_POSTFIX}
-    spec:
-      accessModes:
-        - ReadWriteMany
-      resources:
-        requests:
-          storage: 10Gi
-
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      labels:
-        app: chipster${SUBPROJECT_POSTFIX}
-        subproject: ${{SUBPROJECT}}
-      name: comp-jobs-data-mylly${SUBPROJECT_POSTFIX}
-    spec:
-      accessModes:
-        - ReadWriteMany
-      resources:
-        requests:
-          storage: 1Gi
-
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      labels:
-        app: chipster${SUBPROJECT_POSTFIX}
-        subproject: ${{SUBPROJECT}}
       name: db-backups${SUBPROJECT_POSTFIX}
     spec:
       accessModes:
