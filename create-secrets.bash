@@ -113,6 +113,13 @@ for service in $authenticated_services; do
   echo $config_key: $service_password | tee $build_dir/$service.yaml >> $build_dir/auth.yaml
 done
 
+# get the (multiline) private key from the passwords, and prefix each line with a space character to make it a yaml block 
+jws_private_key_auth="$(      echo "$passwords" | jq -r .data[\"jws-private-key-auth\"]       | base64 --decode | sed -e 's/^/ /')"
+jws_private_key_session_db="$(echo "$passwords" | jq -r .data[\"jws-private-key-session-db\"] | base64 --decode | sed -e 's/^/ /')"
+
+echo -e "jws-private-key-auth: |\n$jws_private_key_auth"             >> $build_dir/auth.yaml
+echo -e "jws-private-key-session-db: |\n$jws_private_key_session_db" >> $build_dir/session-db.yaml
+
 # variable isn't needed anymore, clear it
 passwords=""
 

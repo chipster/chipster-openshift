@@ -38,6 +38,9 @@ for key in $keys; do
   add_literal_to_secret $secret_file "$key" "$(generate_password)"
 done
 
+add_literal_to_secret $secret_file "jws-private-key-auth" "$(openssl ecparam -genkey -name secp521r1 -noout)"
+add_literal_to_secret $secret_file "jws-private-key-session-db" "$(openssl ecparam -genkey -name secp521r1 -noout)"
+
 oc apply -f $secret_file
 
 rm -rf $build_dir
