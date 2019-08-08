@@ -45,17 +45,7 @@ if [ -f $token_file ]; then
   rm $token_file;
 else
   echo "authenticate" 
-  auth_resp=$(http_request POST http://auth/tokens?pretty monitoring:$password) 
-    
-  if ! token=$(echo "$auth_resp" | jq .tokenKey -r ); then
-    echo token parsing failed: $token
-  fi
-  
-  # if var uninitialized
-  if [[ ! -v token ]]; then  
-    echo token not set
-    exit 1
-  fi
+  token=$(http_request POST http://auth/tokens?pretty monitoring:$password) 
 fi
 
 #echo token $token
