@@ -45,7 +45,7 @@ objects:
                   scheme: HTTP
                 periodSeconds: 10
                 successThreshold: 1
-                timeoutSeconds: 1
+                timeoutSeconds: 5
               resources:
                 limits:
                   cpu: 1600m
@@ -81,7 +81,7 @@ objects:
                   scheme: HTTP
                 periodSeconds: 10
                 successThreshold: 1
-                timeoutSeconds: 1
+                timeoutSeconds: 5
               resources:
                 limits:
                   cpu: 200m
@@ -105,7 +105,7 @@ objects:
                   scheme: HTTP
                 periodSeconds: 10
                 successThreshold: 1
-                timeoutSeconds: 1
+                timeoutSeconds: 5
               resources:
                 limits:
                   cpu: 200m
