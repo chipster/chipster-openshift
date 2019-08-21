@@ -212,8 +212,16 @@ oc process -f templates/logging.yaml --local \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/logging.yaml
 
+oc process -f templates/replay.yaml --local \
+    -p PROJECT=$PROJECT \
+    -p DOMAIN=$DOMAIN \
+    -p SUBPROJECT=$subproject \
+    -p SUBPROJECT_POSTFIX=$subproject_postfix \
+    -p PASSWORD=$(cat ../chipster-private/confs/chipster-all/users | grep replay_test | cut -d ":" -f 2) \
+    > $template_dir/replay.yaml
 
 apply_firewall $template_dir/monitoring.yaml $ip_whitelist_admin_path
+apply_firewall $template_dir/replay.yaml $ip_whitelist_admin_path
 
 # it would be cleaner to patch after the merge, but patching the large file takes about 20 seconds, when
 # patching these small files takes less than a second

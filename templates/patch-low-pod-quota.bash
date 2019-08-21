@@ -24,3 +24,7 @@ patch_kind_and_name $template_dir/monitoring.yaml DeploymentConfig grafana$subpr
 patch_kind_and_name $template_dir/logging.yaml DeploymentConfig logstash$subproject_postfix "
   spec.replicas: 0
 " false
+
+patch_kind_and_name $template_dir/replay.yaml DeploymentConfig replay$subproject_postfix "
+  spec.replicas: 0
+" false
