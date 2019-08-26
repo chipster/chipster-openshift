@@ -49,15 +49,15 @@ objects:
           - --schedule
           - '35 * * * *:tools-hourly2'
           - --schedule
-          - '03 8 * * *:tools-hourly2 tools-daily2'
+          - '16 12 * * *:tools-hourly2 tools-daily2'
           - --schedule
-          - '03 9 * * *:tools-hourly2 tools-daily2 example-sessions'
+          - '3 3 * * *:tools-hourly2 tools-daily2 example-sessions'
           image: docker-registry.default.svc:5000/${PROJECT}/cli-client
           imagePullPolicy: Always
           name: replay
           ports:
           - containerPort: 9000
-            name: api
+            name: admin
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
@@ -81,10 +81,10 @@ objects:
           resources:
             limits:
               cpu: 1600m
-              memory: 512Mi
+              memory: 1500Mi
             requests:
               cpu: 1600m
-              memory: 512Mi
+              memory: 1500Mi
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -164,7 +164,7 @@ objects:
     ports:
     - port: 80
       protocol: TCP
-      targetPort: api
+      targetPort: admin
     selector:
       name: replay${SUBPROJECT_POSTFIX}
     sessionAffinity: None

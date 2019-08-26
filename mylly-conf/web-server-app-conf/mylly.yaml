@@ -3,8 +3,11 @@ modules:
 manual-path: assets/manual/kielipankki/manual/
 manual-tool-postfix: .en.src.html
 app-name: Mylly
+app-id: mylly
 custom-css: assets/manual/kielipankki/manual/app-mylly-styles.css
 favicon: assets/manual/kielipankki/manual/app-mylly-favicon.png
 home-path: assets/manual/kielipankki/manual/app-home.html
 home-header-path: assets/manual/kielipankki/manual/app-home-header.html
 contact-path: assets/manual/kielipankki/manual/app-contact.html
+visualization-blacklist: ["phenodata"]
+example-session-owner-user-id: jaas/mylly_example_session_owner
