@@ -1,12 +1,39 @@
-oc project mylly
+set -e
+
 # make images web-server and monitoring "shared" in Rahti registry
 
-oc get dc web-server -n chipster -o json
+backend="$1"
+
+if [ -z $backend ]; then
+	echo "Usage:     bash deploy-mylly-app.bash BACKEND"
+	echo "  Example: bash deploy-mylly-app.bash chipster.rahtiapp.fi"
+	exit 1
+fi
+
+oc project mylly
+
+# "oc apply" refuses change the existing objects, because object version in the chipster project is different
+delete_list=(
+	dc/web-server
+	secret/monitoring
+	secret/web-server
+	route/web-server
+	service/web-server
+	secret/web-server-app
+)
+
+echo "delete old objects"
+for obj in ${delete_list[*]}; do
+	if oc get $obj > /dev/null 2>&1; then
+	  oc delete $obj
+	fi
+done
+
 oc get dc web-server -n chipster -o json | jq '.metadata.namespace="mylly"' | oc apply -f -
 
 oc get secret monitoring -n chipster -o json | jq '.metadata.namespace="mylly"' | oc apply -f -
 
-service_locator_uri="$(curl -s https://service-locator-chipster.rahti-int-app.csc.fi/services?pretty | grep service-locator | grep publicUri | cut -d '"' -f 4)"
+service_locator_uri="$(curl -s https://service-locator-${backend}/services?pretty | grep service-locator | grep publicUri | cut -d '"' -f 4)"
 secret_web_server="$(oc get secret web-server -n chipster -o json | jq '.data["chipster.yaml"]' -r | base64 --decode | yq w - url-int-service-locator $service_locator_uri | base64)"
 
 oc get secret web-server -n chipster -o json \
@@ -16,7 +43,7 @@ oc get secret web-server -n chipster -o json \
 	
 oc get route web-server -n chipster -o json \
 | jq '.metadata.namespace="mylly"' \
-| jq ".spec.host=\"mylly.rahti-int-app.csc.fi\"" \
+| jq ".spec.host=\"mylly.rahtiapp.fi\"" \
 | oc apply -f -
 
 oc get service web-server -n chipster -o json \
@@ -24,21 +51,9 @@ oc get service web-server -n chipster -o json \
 | jq '.spec.clusterIP=""' \
 | oc apply -f -
 
-secret_web_server_app="$(oc get secret web-server-app -n chipster -o json | jq ".data[\"chipster.yaml\"]" -r | base64 --decode \
-| yq w - modules [] \
-| yq w - modules[0] Kielipankki \
-| yq w - manual-path assets/manual/kielipankki/manual/ \
-| yq w - manual-tool-postfix .en.src.html \
-| yq w - app-name Mylly \
-| yq w - app-id mylly \
-| yq w - custom-css assets/manual/kielipankki/manual/app-mylly-styles.css \
-| yq w - favicon assets/manual/kielipankki/manual/app-mylly-favicon.png \
-| yq w - home-path assets/manual/kielipankki/manual/app-home.html \
-| yq w - home-header-path assets/manual/kielipankki/manual/app-home-header.html \
-| yq w - contact-path assets/manual/kielipankki/manual/app-contact.html \
-| yq w - visualization-blacklist '["phenodata"]' \
-| yq w - example-session-owner-user-id jaas/mylly_example_session_owner \
-| base64)"
+chipster_app="$(oc get secret web-server-app -n chipster -o json | jq ".data[\"chipster.yaml\"]" -r | base64 --decode)"
+mylly_app="$(cat mylly-conf/web-server-app-conf/mylly.yaml)"
+secret_web_server_app="$(yq merge <(echo "$mylly_app") <(echo "$chipster_app") | base64)"
 
 oc get secret web-server-app -n chipster -o json \
 | jq '.metadata.namespace="mylly"' \

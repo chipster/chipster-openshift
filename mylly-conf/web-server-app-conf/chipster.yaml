@@ -1,16 +1,13 @@
-terms-of-use-auths: ['haka']
-terms-of-use-path: assets/csc-terms-of-use-v1.html
-terms-of-use-version: 1
-service-locator: https://service-locator-chipster.rahtiapp.fi
-#service-locator: https://service-locator-chipster.rahti-int-app.csc.fi
-
-home-path: assets/manual/app-home.html
-home-header-path: assets/manual/app-home-header.html
-contact-path: assets/manual/app-contact.html
-
-# Bio modules and manual
-modules: ['NGS', 'Microarray', 'Misc']
-manual-path: assets/manual/
-manual-tool-postfix: .html
-app-name: Chipster
-favicon: assets/manual/app-chipster-icon.png
+modules:
+- Kielipankki
+manual-path: assets/manual/kielipankki/manual/
+manual-tool-postfix: .en.src.html
+app-name: Mylly
+app-id: mylly
+custom-css: assets/manual/kielipankki/manual/app-mylly-styles.css
+favicon: assets/manual/kielipankki/manual/app-mylly-favicon.png
+home-path: assets/manual/kielipankki/manual/app-home.html
+home-header-path: assets/manual/kielipankki/manual/app-home-header.html
+contact-path: assets/manual/kielipankki/manual/app-contact.html
+visualization-blacklist: ["phenodata"]
+example-session-owner-user-id: jaas/mylly_example_session_owner
