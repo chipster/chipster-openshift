@@ -5,7 +5,8 @@ source scripts/utils.bash
 template_dir="$1"
 PROJECT="$2"
 DOMAIN="$3"
-subproject="$4"
+tools_bin="$4"
+subproject="$5"
 
 if [ -z $subproject ]; then
   subproject_postfix=""
@@ -39,7 +40,7 @@ if [ -f $template_dir/comp-mylly.yaml ]; then
 	  spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/comp/jobs-data
 	  spec.template.spec.containers[0].volumeMounts[2].name: jobs-data
 	  spec.template.spec.containers[0].volumeMounts[3].mountPath: /appl
-	  spec.template.spec.containers[0].volumeMounts[3].name: tools-bin 
+	  spec.template.spec.containers[0].volumeMounts[3].name: tools-bin
 	  spec.template.spec.containers[0].volumeMounts[3].readOnly: true
 	  spec.template.spec.volumes[2].name: jobs-data
 	  spec.template.spec.volumes[2].emptyDir: {}
@@ -63,7 +64,7 @@ patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp$subproject_pos
   spec.template.spec.volumes[2].name: jobs-data
   spec.template.spec.volumes[2].emptyDir: {}
   spec.template.spec.volumes[3].name: tools-bin
-  spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin$subproject_postfix
+  spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin-$tools_bin$subproject_postfix
 " false
 
 patch_kind_and_name $template_dir/file-broker.yaml DeploymentConfig file-broker$subproject_postfix "
@@ -83,7 +84,7 @@ patch_kind_and_name $template_dir/toolbox.yaml DeploymentConfig toolbox$subproje
   spec.template.spec.containers[0].volumeMounts[2].name: tools-bin
   spec.template.spec.containers[0].volumeMounts[2].readOnly: true
   spec.template.spec.volumes[2].name: tools-bin
-  spec.template.spec.volumes[2].persistentVolumeClaim.claimName: tools-bin$subproject_postfix
+  spec.template.spec.volumes[2].persistentVolumeClaim.claimName: tools-bin-$tools_bin$subproject_postfix
 " false
 
 patch_kind_and_name $template_dir/web-server.yaml DeploymentConfig web-server$subproject_postfix "

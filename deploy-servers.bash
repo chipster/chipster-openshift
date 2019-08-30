@@ -150,6 +150,15 @@ if [ -z "$mylly" ]; then
   mylly=false
 fi
 
+tools_bin=$(get_deploy_config $private_config_path tools-bin $PROJECT $DOMAIN)
+if [ -z "$tools_bin" ]; then  
+  echo "Tools-bin version is not configured in deploy.yaml"
+  echo "- Run 'bash download-tools-bin.bash'"
+  echo "- Configure the version in deploy.yaml"
+  echo "- Run 'bash this script again"
+  tools_bin="empty"   
+fi
+
 image_project=$(get_image_project $private_config_path $PROJECT $DOMAIN)
 
 build_dir="build"
@@ -226,7 +235,7 @@ apply_firewall $template_dir/replay.yaml $ip_whitelist_admin_path
 # it would be cleaner to patch after the merge, but patching the large file takes about 20 seconds, when
 # patching these small files takes less than a second
 echo "customize individual servers"
-bash templates/java-server/patch.bash $template_dir $PROJECT $DOMAIN $subproject
+bash templates/java-server/patch.bash $template_dir $PROJECT $DOMAIN $tools_bin $subproject 
 
 max_pods=$(oc get quota -o json | jq .items[].spec.hard.pods -r | grep -v null)
 
