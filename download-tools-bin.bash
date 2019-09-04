@@ -30,5 +30,19 @@ oc process -f templates/jobs/pvc.yaml --local \
 	-p NAME=$pvc_name \
 	-p SIZE=$tools_bin_size \
 	| oc create -f - --validate
+	
+temp_pvc="${pvc_name}-temp"
+while oc get pvc $temp_pvc; do
+  oc delete pvc $temp_pvc
+  sleep 1
+done
 
-bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version"
+oc process -f templates/jobs/pvc.yaml --local \
+	-p NAME=$temp_pvc \
+	-p SIZE=400Gi \
+	| oc create -f - --validate
+
+bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version" "$temp_pvc"
+
+#TODO how to run this after the job has finished?
+#oc delete pvc $temp_pvc

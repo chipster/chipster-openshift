@@ -23,10 +23,10 @@ objects:
           command: ["bash", "-c", ""]
           resources:
             limits:
-              cpu: '4'
+              cpu: ${{CPU}}
               memory: 8Gi
             requests:
-              cpu: '4'
+              cpu: ${{CPU}}
               memory: 8Gi          
           volumeMounts:        
           - mountPath: /mnt/tools
@@ -38,9 +38,13 @@ objects:
           persistentVolumeClaim:
             claimName: tools-bin-${TOOLS_BIN_VERSION}
         - name: temp
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: ${{TEMP_PVC}}
+          #emptyDir: {}
         restartPolicy: OnFailure
 parameters:
 - name: IMAGE_PROJECT
 - name: TOOLS_BIN_VERSION
 - name: NAME
+- name: CPU
+- name: TEMP_PVC

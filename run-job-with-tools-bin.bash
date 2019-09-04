@@ -6,6 +6,7 @@ source scripts/utils.bash
 
 job="$1"
 tools_bin_version="$2"
+temp_pvc="$3"
 
 if [ -z $tools_bin_version ]; then
   echo "Usage: bash run-job-with-tools-bin.bash BASH_JOB TOOLS_BIN_VERSION"
@@ -25,10 +26,18 @@ if oc get job $name > /dev/null 2>&1; then
   #TODO wait until the job isn't Running anymore
 fi
 
+max_cpu=$(oc get limits -o json | jq .items[].spec.limits[0].max.cpu -r)
+cpu="4"
+if [ "$cpu" -gt "$max_cpu" ]; then
+  cpu="$max_cpu"  
+fi
+
 oc process -f templates/jobs/bash-job-template-with-tools-bin.yaml --local \
 	-p IMAGE_PROJECT=$image_project \
 	-p TOOLS_BIN_VERSION=$tools_bin_version \
 	-p NAME=$name \
+	-p CPU=$cpu \
+	-p TEMP_PVC=$temp_pvc \
 	| yq r -j - | jq .items[0].spec.template.spec.containers[0].command[2]="$(cat $job | jq -s -R .)" \
 	| oc create -f - --validate 
 	
