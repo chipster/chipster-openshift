@@ -131,8 +131,9 @@ function configure_service {
 subproject="$1"
 is_debug="$2"
 
-if [ $is_debug != "" ]; then
-	set -x
+if [ -n "$is_debug" ]; then
+  echo enable debug
+  set -x
 fi
 
 if [ -z $subproject ]; then
