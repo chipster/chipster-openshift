@@ -9,6 +9,7 @@ objects:
       labels:
         app: chipster${SUBPROJECT_POSTFIX}
         subproject: ${{SUBPROJECT}}
+        server: ${{NAME}}
       name: ${NAME}${SUBPROJECT_POSTFIX}
     spec:
       replicas: 1
@@ -29,6 +30,7 @@ objects:
           labels:
             app: chipster${SUBPROJECT_POSTFIX}
             name: ${NAME}${SUBPROJECT_POSTFIX}
+            server: ${{NAME}}
         spec:
           containers:
             - env:

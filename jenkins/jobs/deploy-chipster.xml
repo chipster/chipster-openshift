@@ -171,6 +171,7 @@ echo "$CHIPSTER_DEV_PATCH" &gt; chipster-private/confs/chipster-all/chipster-tem
 # chipster-all is actually a place for organization wide configs, but we can use it to configure individual installations
 # as long as these jobs are not run in parallel in Jenkins  
 echo "comp-max-jobs: $COMP_SLOTS" &gt; chipster-private/confs/chipster-all/comp.yaml
+echo "tools-bin: $TOOLS_BIN_VERSION" &gt; chipster-private/confs/chipster-all/deploy.yaml
 
 COMP_RAM_MB=$(($COMP_RAM * 1000 - 100))
 COMP_CPU_MILLIS=$(($COMP_CPU * 1000 - 100))
@@ -189,15 +190,6 @@ patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp-$SUBPROJECT \
   spec.template.spec.containers[0].resources.requests.cpu: ${COMP_CPU_MILLIS_REQUEST}m
   spec.template.spec.containers[0].resources.requests.memory: ${COMP_RAM_MB_REQUEST}Mi
 \" true
-
-patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp\$subproject_postfix \"
-  spec.template.spec.containers[0].volumeMounts[3].subPath: $TOOLS_BIN_VERSION
-\" true
-
-patch_kind_and_name \$template_dir/toolbox.yaml DeploymentConfig toolbox\$subproject_postfix \"
-  spec.template.spec.containers[0].volumeMounts[2].subPath: $TOOLS_BIN_VERSION
-\" true
-
 " &gt;&gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
 
 

@@ -129,6 +129,11 @@ function configure_service {
 }
 
 subproject="$1"
+is_debug="$2"
+
+if [ $is_debug != "" ]; then
+	set -x
+fi
 
 if [ -z $subproject ]; then
   subproject_postfix=""

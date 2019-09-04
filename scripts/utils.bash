@@ -308,7 +308,7 @@ function get_image_project {
   image_project=$(get_deploy_config $private_config_path image-project $PROJECT $DOMAIN)
   
   if [ -z "$image_project" ]; then
-    echo "image_project is not configure, assuming all images are found from the current project"
+    echo "image_project is not configured, assuming all images are found from the current project"
     image_project="$(oc project -q)"
   fi
   
