@@ -64,7 +64,7 @@ patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp$subproject_pos
   spec.template.spec.volumes[2].name: jobs-data
   spec.template.spec.volumes[2].emptyDir: {}
   spec.template.spec.volumes[3].name: tools-bin
-  spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin-$tools_bin$subproject_postfix
+  spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin-$tools_bin
 " false
 
 patch_kind_and_name $template_dir/file-broker.yaml DeploymentConfig file-broker$subproject_postfix "
@@ -84,7 +84,7 @@ patch_kind_and_name $template_dir/toolbox.yaml DeploymentConfig toolbox$subproje
   spec.template.spec.containers[0].volumeMounts[2].name: tools-bin
   spec.template.spec.containers[0].volumeMounts[2].readOnly: true
   spec.template.spec.volumes[2].name: tools-bin
-  spec.template.spec.volumes[2].persistentVolumeClaim.claimName: tools-bin-$tools_bin$subproject_postfix
+  spec.template.spec.volumes[2].persistentVolumeClaim.claimName: tools-bin-$tools_bin
 " false
 
 patch_kind_and_name $template_dir/web-server.yaml DeploymentConfig web-server$subproject_postfix "

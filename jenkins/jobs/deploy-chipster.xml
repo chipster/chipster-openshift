@@ -190,6 +190,7 @@ patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp-$SUBPROJECT \
   spec.template.spec.containers[0].resources.requests.cpu: ${COMP_CPU_MILLIS_REQUEST}m
   spec.template.spec.containers[0].resources.requests.memory: ${COMP_RAM_MB_REQUEST}Mi
 \" true
+
 " &gt;&gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
 
 
