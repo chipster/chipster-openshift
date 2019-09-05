@@ -34,6 +34,7 @@ oc new-build --name h2 . -D - < dockerfiles/h2/Dockerfile  && retry oc logs -f b
 oc new-build . --name=monitoring -D - < dockerfiles/monitoring/Dockerfile && retry oc logs -f bc/monitoring &
 oc new-build --name chipster-web-server-js https://github.com/chipster/chipster-web-server.git#$branch -D - < dockerfiles/chipster-web-server-js/Dockerfile && retry oc logs -f bc/chipster-web-server-js &
 oc new-build --name chipster https://github.com/chipster/chipster.git#$branch -D - < dockerfiles/chipster/Dockerfile && retry oc logs -f bc/chipster &
+oc new-build --name cli-client https://github.com/chipster/chipster-web-server.git#$branch -D - < dockerfiles/cli-client/Dockerfile && retry oc logs -f bc/chipster &
 wait
 sleep 1
 

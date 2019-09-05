@@ -87,11 +87,9 @@ function configure_service {
     -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/api-route.yaml  
-        
-    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-api $PROJECT $DOMAIN)"
     
-    if [ -n "$ip_whitelist" ]; then
-      apply_firewall $template_dir/$service/api-route.yaml "$ip_whitelist"
+    if [ -n "$ip_whitelist_api" ]; then
+      apply_firewall $template_dir/$service/api-route.yaml "$ip_whitelist_api"
     else
       echo "no firewall configured for route $service"  
     fi
@@ -113,10 +111,9 @@ function configure_service {
     -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/$service/admin.yaml
-    
-    ip_whitelist="$(get_deploy_config $private_config_path ip-whitelist-admin $PROJECT $DOMAIN)"
-    if [ -n "$ip_whitelist" ]; then
-      apply_firewall $template_dir/$service/admin.yaml "$ip_whitelist"
+
+    if [ -n "$ip_whitelist_admin" ]; then
+      apply_firewall $template_dir/$service/admin.yaml "$ip_whitelist_admin"
     else
       echo "no firewall configured for route $service-admin" 
     fi
@@ -150,6 +147,9 @@ echo project: $PROJECT domain: $DOMAIN
 
 private_config_path="../chipster-private/confs"
 chipster_defaults_path="../chipster-web-server/src/main/resources/chipster-defaults.yaml"
+
+ip_whitelist_api="$(get_deploy_config $private_config_path ip-whitelist-api $PROJECT $DOMAIN)"
+ip_whitelist_admin="$(get_deploy_config $private_config_path ip-whitelist-admin $PROJECT $DOMAIN)"
 
 mylly=$(get_deploy_config $private_config_path mylly $PROJECT $DOMAIN)
 if [ -z "$mylly" ]; then  
@@ -235,8 +235,8 @@ oc process -f templates/replay.yaml --local \
     -p PASSWORD=$(cat ../chipster-private/confs/chipster-all/users | grep replay_test | cut -d ":" -f 2) \
     > $template_dir/replay.yaml
 
-apply_firewall $template_dir/monitoring.yaml $ip_whitelist_admin_path
-apply_firewall $template_dir/replay.yaml $ip_whitelist_admin_path
+apply_firewall $template_dir/monitoring.yaml "$ip_whitelist_admin"
+apply_firewall $template_dir/replay.yaml     "$ip_whitelist_admin"
 
 # it would be cleaner to patch after the merge, but patching the large file takes about 20 seconds, when
 # patching these small files takes less than a second
