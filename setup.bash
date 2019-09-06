@@ -59,5 +59,6 @@ if [ $(oc get dc grafana$subproject_postfix -o json | jq .spec.replicas) == 1 ];
 	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-load.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
 	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-rest.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
 	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-benchmark.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana$subproject_postfix-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-replay-test.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
   fi
 fi 
