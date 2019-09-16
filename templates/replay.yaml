@@ -36,6 +36,7 @@ objects:
         - command:
           - node
           args:
+          - --max-old-space-size=8192
           - lib/replay-server
           - https://${PROJECT}.${DOMAIN}
           - --username
@@ -45,13 +46,32 @@ objects:
           - --influxdb
           - http://influxdb:8086/write?db=db
           - --schedule
-          - '* * * * *:availability'
+          - '*/5 * * * *:availability'
           - --schedule
-          - '35 * * * *:tools-hourly2'
+          - '3 * * * *:tools-hourly:8:60'          
+          - --schedule          
+          - '13 0-23/8 * * *:tools-daily:8:60'
+          - --schedule          
+          - '13 1-23/8 * * *:tools-daily:8:600'
+          - --schedule          
+          - '13 2-23/8 * * *:tools-daily:8:1800'
           - --schedule
-          - '16 12 * * *:tools-hourly2 tools-daily2'
+          - '13 3-23/8 * * *:example-sessions:8:1800'                                
           - --schedule
-          - '3 3 * * *:tools-hourly2 tools-daily2 example-sessions'
+          - '13 4-23/8 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:8:60'
+          - --schedule
+          - '13 5-23/8 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:8:1800'          
+          - --schedule
+          - '13 23 * * *:tools-unstable:1:1800'
+          - --schedule
+          - '23 23 * * *:tools-hourly-fix:1:1800'
+          - --schedule
+          - '33 23 * * *:tools-hourly-fix-java:1:1800'          
+          - --schedule
+          - '43 23 * * *:tools-daily-fix:8:1800'
+          - --schedule
+          - '53 23 * * *:tools-daily-fix-java:8:1800'          
+          
           image: docker-registry.default.svc:5000/${PROJECT}/cli-client
           imagePullPolicy: Always
           name: replay
@@ -69,31 +89,31 @@ objects:
             name: tmp
           - mountPath: /home/user/chipster-web-server/js/cli-client/logs
             name: logs
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /
-              port: 9000
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5
+#          readinessProbe:
+#            failureThreshold: 3
+#            httpGet:
+#              path: /
+#              port: 9000
+#              scheme: HTTP
+#            periodSeconds: 10
+#            successThreshold: 1
+#            timeoutSeconds: 5
           resources:
             limits:
-              cpu: 1600m
-              memory: 1500Mi
+              cpu: 1800m
+              memory: 7900Mi
             requests:
-              cpu: 1600m
-              memory: 1500Mi
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /
-              port: 9000
-              scheme: HTTP
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 5          
+              cpu: 1800m
+              memory: 7900Mi
+#          livenessProbe:
+#            failureThreshold: 3
+#            httpGet:
+#              path: /
+#              port: 9000
+#              scheme: HTTP
+#            periodSeconds: 10
+#            successThreshold: 1
+#            timeoutSeconds: 5          
         - image: docker-registry.default.svc:5000/${PROJECT}/filebeat
           imagePullPolicy: Always
           name: filebeat
@@ -106,7 +126,7 @@ objects:
               memory: 100Mi
             requests:
               cpu: 200m
-              memory: 10Mi
+              memory: 100Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
