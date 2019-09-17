@@ -46,13 +46,9 @@ objects:
           - --influxdb
           - http://influxdb:8086/write?db=db
           - --schedule
-          - '*/5 * * * *:availability'
+          - '*/5 * * * *:availability:1:30'
           - --schedule
           - '3 * * * *:tools-hourly:8:60'          
-          - --schedule          
-          - '13 0-23/8 * * *:tools-daily:8:60'
-          - --schedule          
-          - '13 1-23/8 * * *:tools-daily:8:600'
           - --schedule          
           - '13 2-23/8 * * *:tools-daily:8:1800'
           - --schedule
@@ -62,15 +58,15 @@ objects:
           - --schedule
           - '13 5-23/8 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:8:1800'          
           - --schedule
-          - '13 23 * * *:tools-unstable:1:1800'
+          - '13 0/8 * * *:tools-unstable:1:1800'
           - --schedule
-          - '23 23 * * *:tools-hourly-fix:1:1800'
+          - '23 0/8 * * *:tools-hourly-fix:1:1800'
           - --schedule
-          - '33 23 * * *:tools-hourly-fix-java:1:1800'          
+          - '33 0/8 * * *:tools-hourly-fix-java:1:1800'          
           - --schedule
-          - '43 23 * * *:tools-daily-fix:8:1800'
+          - '13 1/8 * * *:tools-daily-fix:8:1800'
           - --schedule
-          - '53 23 * * *:tools-daily-fix-java:8:1800'          
+          - '33 1/8 * * *:tools-daily-fix-java:8:1800'          
           
           image: docker-registry.default.svc:5000/${PROJECT}/cli-client
           imagePullPolicy: Always
