@@ -48,26 +48,23 @@ objects:
           - --schedule
           - '*/5 * * * *:availability:1:30'
           - --schedule
-          - '3 * * * *:tools-hourly:8:60'          
+          - '3 * * * *:tools-hourly:4:60'
+          - --schedule
+          - '13 14 * * *:tools-unstable:1:300'
+          - --schedule
+          - '18 14 * * *:tools-hourly-fix:1:60'
+          - --schedule
+          - '23 14 * * *:tools-hourly-fix-java:1:60'          
+          - --schedule
+          - '28 14 * * *:tools-daily-fix:4:1800'
+          - --schedule
+          - '53 14 * * *:tools-daily-fix-java:4:1800'          
           - --schedule          
-          - '13 2-23/8 * * *:tools-daily:8:1800'
+          - '13 15 * * *:tools-daily:4:1800'
           - --schedule
-          - '13 3-23/8 * * *:example-sessions:8:1800'                                
+          - '13 17 * * *:example-sessions:4:1800'                                
           - --schedule
-          - '13 4-23/8 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:8:60'
-          - --schedule
-          - '13 5-23/8 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:8:1800'          
-          - --schedule
-          - '13 0/8 * * *:tools-unstable:1:1800'
-          - --schedule
-          - '23 0/8 * * *:tools-hourly-fix:1:1800'
-          - --schedule
-          - '33 0/8 * * *:tools-hourly-fix-java:1:1800'          
-          - --schedule
-          - '13 1/8 * * *:tools-daily-fix:8:1800'
-          - --schedule
-          - '33 1/8 * * *:tools-daily-fix-java:8:1800'          
-          
+          - '13 20 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:4:1800'          
           image: docker-registry.default.svc:5000/${PROJECT}/cli-client
           imagePullPolicy: Always
           name: replay
@@ -85,31 +82,31 @@ objects:
             name: tmp
           - mountPath: /home/user/chipster-web-server/js/cli-client/logs
             name: logs
-#          readinessProbe:
-#            failureThreshold: 3
-#            httpGet:
-#              path: /
-#              port: 9000
-#              scheme: HTTP
-#            periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 9000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 1800m
-              memory: 7900Mi
+              memory: 1900Mi
             requests:
               cpu: 1800m
-              memory: 7900Mi
-#          livenessProbe:
-#            failureThreshold: 3
-#            httpGet:
-#              path: /
-#              port: 9000
-#              scheme: HTTP
-#            periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 5          
+              memory: 1900Mi
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /
+              port: 9000
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30          
         - image: docker-registry.default.svc:5000/${PROJECT}/filebeat
           imagePullPolicy: Always
           name: filebeat
