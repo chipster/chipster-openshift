@@ -36,7 +36,7 @@ objects:
         - command:
           - node
           args:
-          - --max-old-space-size=8192
+          - --max-old-space-size=2048
           - lib/replay-server
           - https://${PROJECT}.${DOMAIN}
           - --username
