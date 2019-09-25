@@ -232,7 +232,7 @@ oc process -f templates/replay.yaml --local \
     -p DOMAIN=$DOMAIN \
     -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
-    -p PASSWORD=$(cat ../chipster-private/confs/chipster-all/users | grep replay_test | cut -d ":" -f 2) \
+    -p PASSWORD=$(cat ../chipster-private/confs/$PROJECT.$DOMAIN/users | grep replay_test | cut -d ":" -f 2) \
     > $template_dir/replay.yaml
 
 apply_firewall $template_dir/monitoring.yaml "$ip_whitelist_admin"

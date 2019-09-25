@@ -46,25 +46,7 @@ objects:
           - --influxdb
           - http://influxdb:8086/write?db=db
           - --schedule
-          - '*/5 * * * *:availability:1:30'
-          - --schedule
-          - '3 * * * *:tools-hourly:4:60'
-          - --schedule
-          - '13 14 * * *:tools-unstable:1:300'
-          - --schedule
-          - '18 14 * * *:tools-hourly-fix:1:60'
-          - --schedule
-          - '23 14 * * *:tools-hourly-fix-java:1:60'          
-          - --schedule
-          - '28 14 * * *:tools-daily-fix:4:1800'
-          - --schedule
-          - '53 14 * * *:tools-daily-fix-java:4:1800'          
-          - --schedule          
-          - '13 15 * * *:tools-daily:4:1800'
-          - --schedule
-          - '13 17 * * *:example-sessions:4:1800'                                
-          - --schedule
-          - '13 20 * * *:tools-hourly tools-daily example-sessions tools-unstable tools-hourly-fix-java tools-daily-fix-java:4:1800'          
+          - '*/5 * * * *:availability:1:30'          
           image: docker-registry.default.svc:5000/${PROJECT}/cli-client
           imagePullPolicy: Always
           name: replay
