@@ -67,7 +67,7 @@ objects:
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /
+              path: /alive
               port: 9000
               scheme: HTTP
             periodSeconds: 10
@@ -83,7 +83,7 @@ objects:
           livenessProbe:
             failureThreshold: 10
             httpGet:
-              path: /
+              path: /alive
               port: 9000
               scheme: HTTP
             periodSeconds: 10
