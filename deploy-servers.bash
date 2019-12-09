@@ -18,9 +18,8 @@ function configure_java_service {
   service=$2
   java_class=$3  
   image="chipster-web-server"
-  work_dir="/opt/chipster-web-server"
   role=$service
-  configure_service "$subproject_postfix" "$service" "$image" "$role" "$work_dir" "$java_class"
+  configure_service "$subproject_postfix" "$service" "$image" "$role" "$java_class"
 }
 
 # configure a service to path /opt/chipster-web-server
@@ -29,8 +28,7 @@ function configure_service {
   service=$2
   image=$3
   role=$4
-  work_dir=$5
-  java_class=$6
+  java_class=$5
     
   api_port=$(yq r $chipster_defaults_path url-bind-$role | cut -d : -f 3) || true
   admin_port=$(yq r $chipster_defaults_path url-admin-bind-$role | cut -d : -f 3) || true
@@ -62,6 +60,7 @@ function configure_service {
   	
     admin_port_index=1
     patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service$subproject_postfix "
+      spec.template.spec.containers[0].ports[+]: "port-placeholder"
       spec.template.spec.containers[0].ports[0].containerPort: $api_port
       spec.template.spec.containers[0].ports[0].name: api
       spec.template.spec.containers[0].ports[0].protocol: TCP
@@ -91,13 +90,14 @@ function configure_service {
     if [ -n "$ip_whitelist_api" ]; then
       apply_firewall $template_dir/$service/api-route.yaml "$ip_whitelist_api"
     else
-      echo "no firewall configured for route $service"  
+      echo "no firewall configured for route $service"
     fi
   fi
   
   if [ "$create_admin_service_and_route" != "null" ]; then
   
     patch_kind_and_name $template_dir/$service/dc.yaml DeploymentConfig $service$subproject_postfix "
+      spec.template.spec.containers[0].ports[+]: "port-placeholder"
       spec.template.spec.containers[0].ports[$admin_port_index].containerPort: $admin_port
       spec.template.spec.containers[0].ports[$admin_port_index].name: admin
       spec.template.spec.containers[0].ports[$admin_port_index].protocol: TCP
@@ -188,13 +188,13 @@ configure_java_service "$subproject_postfix" job-history fi.csc.chipster.jobhist
 
 # shared templates and custom image 
 
-configure_service "$subproject_postfix" toolbox toolbox toolbox /opt/chipster-web-server &
-configure_service "$subproject_postfix" type-service chipster-web-server-js type-service /opt/chipster-web-server &
-configure_service "$subproject_postfix" web-server web-server web-server /opt/chipster-web-server &
-configure_service "$subproject_postfix" comp comp comp /opt/chipster/comp &
+configure_service "$subproject_postfix" toolbox toolbox toolbox &
+configure_service "$subproject_postfix" type-service chipster-web-server-js type-service &
+configure_service "$subproject_postfix" web-server web-server web-server &
+configure_service "$subproject_postfix" comp comp comp &
 
 if [ "$mylly" = true ]; then
-  configure_service "$subproject_postfix" comp-mylly comp-mylly comp /opt/chipster/comp &
+  configure_service "$subproject_postfix" comp-mylly comp-mylly comp &
 else
   echo "skipping mylly"
 fi
@@ -267,13 +267,27 @@ if [ -f $projectScriptPath ]; then
   bash $projectScriptPath $template_dir $subproject_postfix
 fi
  
-template="$build_dir/chipster_template.yaml"
-
-yq merge --append $template_dir/*.yaml > $template
 
 echo "apply the template to the server"
-apply_out="$build_dir/apply.out"
-oc apply -f $template | tee $apply_out | grep -v unchanged
-echo $(cat $apply_out | grep unchanged | wc -l) objects unchanged 
 
-rm -rf $build_dir
+# applying templates one by one (i.e. set do_merge to 0)
+# makes it easier to see errors
+do_merge=1
+
+if [[ $do_merge == 0 ]]; then 
+  for f in $template_dir/*.yaml; do
+    echo $f
+    oc apply -f $f
+  done
+else
+  template="$build_dir/chipster_template.yaml"
+
+  yq merge --append $template_dir/*.yaml > $template
+
+  apply_out="$build_dir/apply.out"
+  oc apply -f $template | tee $apply_out | grep -v unchanged
+  echo $(cat $apply_out | grep unchanged | wc -l) objects unchanged 
+
+  rm -rf $build_dir
+fi
+

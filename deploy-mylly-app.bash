@@ -1,6 +1,6 @@
 set -e
 
-# make images web-server and monitoring "shared" in Rahti registry
+# make images web-server-mylly and monitoring "shared" in Rahti registry
 
 backend="$1"
 
@@ -11,6 +11,8 @@ if [ -z $backend ]; then
 fi
 
 oc project mylly
+
+source scripts/utils.bash
 
 # "oc apply" refuses change the existing objects, because object version in the chipster project is different
 delete_list=(
@@ -29,7 +31,11 @@ for obj in ${delete_list[*]}; do
 	fi
 done
 
-oc get dc web-server -n chipster -o json | jq '.metadata.namespace="mylly"' | oc apply -f -
+oc get dc web-server -n chipster -o json \
+  | jq '.metadata.namespace="mylly"' \
+  | jq '.spec.template.spec.containers[0].image="docker-registry.default.svc:5000/'$PROJECT'/web-server-mylly"' \
+  | jq '.spec.triggers[1].imageChangeParams.from.name="web-server-mylly:latest"' \
+  | oc apply -f -
 
 oc get secret monitoring -n chipster -o json | jq '.metadata.namespace="mylly"' | oc apply -f -
 
@@ -43,7 +49,7 @@ oc get secret web-server -n chipster -o json \
 	
 oc get route web-server -n chipster -o json \
 | jq '.metadata.namespace="mylly"' \
-| jq ".spec.host=\"mylly.rahtiapp.fi\"" \
+| jq ".spec.host=\"mylly.$DOMAIN\"" \
 | oc apply -f -
 
 oc get service web-server -n chipster -o json \
@@ -52,7 +58,7 @@ oc get service web-server -n chipster -o json \
 | oc apply -f -
 
 chipster_app="$(oc get secret web-server-app -n chipster -o json | jq ".data[\"chipster.yaml\"]" -r | base64 --decode)"
-mylly_app="$(cat mylly-conf/web-server-app-conf/mylly.yaml)"
+mylly_app="$(cat mylly-conf/web-server-app-conf/chipster.yaml)"
 secret_web_server_app="$(yq merge <(echo "$mylly_app") <(echo "$chipster_app") | base64)"
 
 oc get secret web-server-app -n chipster -o json \

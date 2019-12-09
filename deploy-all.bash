@@ -11,6 +11,8 @@ bash create-secrets.bash $subproject
 # deploy databases
 bash deploy-postgres.bash $subproject
 
+# create or update builds
+bash deploy-builds.bash master
 
 # run if the templates have changed or there are new services
 # - remove all: bash remove-all-services.bash

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ${NAME}
+objects:
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: comp
+    name: comp
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: comp:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: ""
+      images:
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server:latest
+        paths:
+        - destinationDir: chipster-web-server
+          sourcePath: /opt/chipster
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: comp-base:latest
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: ${GITHUB_SECRET}
+      type: GitHub
+    - generic:
+        secret: ${GENERIC_SECRET}
+      type: Generic
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server:latest
+      type: ImageChange
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange
+parameters:
+  - name: NAME
+  - name: BRANCH
+  - name: GITHUB_SECRET
+  - name: GENERIC_SECRET
