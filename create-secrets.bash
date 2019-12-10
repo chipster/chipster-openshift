@@ -165,10 +165,6 @@ done
 cp $build_dir/comp.yaml $build_dir/comp-mylly.yaml
 create_secret_for_service comp-mylly $subproject $subproject_postfix
 
-add_file_to_secret $configured_objects_dir/comp.json 		comp-chipster-config.xml ../chipster-web-server/conf/comp-chipster-config.xml
-add_file_to_secret $configured_objects_dir/comp-mylly.json 	comp-chipster-config.xml ../chipster-web-server/conf/comp-chipster-config.xml
-
-
 echo "configure app"
 
 # Configuration for the Angular app
