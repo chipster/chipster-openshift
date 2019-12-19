@@ -3,24 +3,17 @@ kind: Deployment
 metadata:
   name: {{ include "chipster.fullname" . }}-auth
   labels:
-    {{- include "chipster.labels" . | nindent 4 }}
+    app: chipster
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "chipster.selectorLabels" . | nindent 6 }}
+      app: chipster
   template:
     metadata:
       labels:
-        {{- include "chipster.selectorLabels" . | nindent 8 }}
+        app: chipster
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-      serviceAccountName: {{ include "chipster.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}-auth
           securityContext:
@@ -28,31 +21,23 @@ spec:
           env:
             - name: JAVA_CLASS
               value: fi.csc.chipster.auth.AuthenticationService
-          image: "chipster-web-server:latest"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "chipster-web-server"
+          imagePullPolicy: {{ .Values.image.localPullPolicy }}
           ports:
-            - name: http
-              containerPort: 8001
+            - name: api
+              containerPort: 8002
+              protocol: TCP
+            - name: admin
+              containerPort: 8102
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /admin/alive
+              port: admin
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /admin/alive
+              port: admin
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      
