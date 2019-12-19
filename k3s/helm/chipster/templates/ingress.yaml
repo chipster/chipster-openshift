@@ -1,16 +1,17 @@
-{{- $fullName := include "chipster.fullname" . -}}
+{{- range $index, $deployment := .Values.deployments }}
+---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $deployment.name }}
   labels:
     app: chipster
   annotations:
     "traefik.frontend.rule.type": PathPrefixStrip
 spec:
-{{- if .Values.ingress.tls }}
+{{- if $.Values.ingress.tls }}
   tls:
-  {{- range .Values.ingress.tls }}
+  {{- range $.Values.ingress.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . | quote }}
@@ -19,12 +20,10 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
+    - http:
         paths:
-          - path: /auth
+          - path: /{{ $deployment.name }}
             backend:
-              serviceName: {{ $fullName }}-auth-api
+              serviceName: {{ $deployment.name }}
               servicePort: 80
-  {{- end }}
+{{- end }}

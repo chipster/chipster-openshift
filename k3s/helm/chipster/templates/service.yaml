@@ -1,7 +1,10 @@
+{{- range $index, $deployment := .Values.deployments }}
+{{- if $deployment.apiPort }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "chipster.fullname" . }}-auth-api
+  name: {{ $deployment.name }}
   labels:
     app: chipster
 spec:
@@ -12,3 +15,6 @@ spec:
       name: api
   selector:
     app: chipster
+    deployment: {{ $deployment.name }}
+{{- end }}
+{{- end }}
