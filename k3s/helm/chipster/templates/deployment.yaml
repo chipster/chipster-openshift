@@ -1,7 +1,9 @@
+{{- range $index, $deployment := .Values.deployments }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chipster.fullname" . }}-auth
+  name: {{ $deployment.name }}
   labels:
     app: chipster
 spec:
@@ -9,35 +11,50 @@ spec:
   selector:
     matchLabels:
       app: chipster
+      deployment: {{ $deployment.name }}
   template:
     metadata:
       labels:
         app: chipster
+        deployment: {{ $deployment.name }}
     spec:
       containers:
-        - name: {{ .Chart.Name }}-auth
+        - name: {{ $.Chart.Name }}-{{ $deployment.name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}            
+            {{- toYaml $.Values.securityContext | nindent 12 }}            
           env:
             - name: JAVA_CLASS
-              value: fi.csc.chipster.auth.AuthenticationService
-          image: "chipster-web-server"
-          imagePullPolicy: {{ .Values.image.localPullPolicy }}
+              value: {{ $deployment.class }}
+          image: {{ $deployment.image }}
+          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
           ports:
+            {{- if $deployment.apiPort }}
             - name: api
-              containerPort: 8002
+              containerPort: {{ $deployment.apiPort }}
               protocol: TCP
+            {{- end }}
+            {{- if $deployment.adminPort }}
             - name: admin
-              containerPort: 8102
+              containerPort: {{ $deployment.adminPort }}
               protocol: TCP
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /admin/alive
               port: admin
-          readinessProbe:
-            httpGet:
-              path: /admin/alive
-              port: admin
+          # dead lock between auth and service-locator
+          # readinessProbe:
+          #   httpGet:
+          #     path: /admin/alive
+          #     port: admin
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      
+            {{- toYaml $.Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: conf
+              mountPath: "/opt/chipster/conf"
+              readOnly: true
+      volumes:
+        - name: conf
+          secret:
+            secretName: {{ $deployment.name }}
+{{- end }}
