@@ -63,12 +63,16 @@ sudo systemctl status docker
 
 See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed instructions.
 
-### Install yq
+### Install other utils
 
 ```bash
 sudo add-apt-repository ppa:rmescandon/yq
 sudo apt update
 sudo apt install yq -y
+```
+
+```bash
+sudo apt install jq -y
 ```
 
 ### Install Helm
@@ -120,13 +124,30 @@ for build in chipster-tools chipster-web chipster-web-server chipster-web-server
     cat templates/builds/$build/Dockerfile | sudo docker build -t $build -f - $uri
 done
 
-# these builds need a Dockerfile and a folder from other image
-for build in toolbox; do
-    image=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images[0].from.name)
-    destination=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images[0].paths[0].destinationDir)
-    source=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images[0].paths[0].sourcePath)
+# these builds need a Dockerfile and a folders from other images
+for build in toolbox web-server; do
+    cmd="cat templates/builds/$build/Dockerfile"
 
-    cat templates/builds/$build/Dockerfile | sed "s#COPY tools#COPY --from=$image $source#" | tee /dev/tty | sudo docker build -t $build -
+    image_count=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images --tojson | jq '. | length')
+    last_index=$(($image_count - 1))
+
+    for i in $(seq 0 $last_index); do
+        image=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images[$i].from.name)
+        destination=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images[$i].paths[0].destinationDir)
+        source=$(cat templates/builds/$build/$build.yaml | yq r - objects[0].spec.source.images[$i].paths[0].sourcePath)
+        dir=$(basename $destination)
+
+        if [[ $source == *"mylly"* ]]; then
+            echo "skip mylly"
+        else
+            cmd="$cmd | sed \"s#COPY $dir#COPY --from=$image $source#\""
+        fi
+    done
+
+    cmd="$cmd | tee /dev/tty | sudo docker build -t $build -"
+
+    echo $cmd
+    bash -c "$cmd"
 done
 ```
 
