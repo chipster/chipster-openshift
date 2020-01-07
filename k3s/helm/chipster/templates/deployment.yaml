@@ -38,6 +38,11 @@ spec:
               containerPort: {{ $deployment.adminPort }}
               protocol: TCP
             {{- end }}
+            {{- if $deployment.eventsPort }}
+            - name: events
+              containerPort: {{ $deployment.eventsPort }}
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /admin/alive
@@ -49,12 +54,32 @@ spec:
           #     port: admin
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
-          volumeMounts:
+          volumeMounts:          
             - name: conf
-              mountPath: "/opt/chipster/conf"
+              mountPath: {{ $deployment.workDir }}/conf
               readOnly: true
+            {{- if eq $deployment.name "auth" }}
+            - name: security
+              mountPath: {{ $deployment.workDir }}/security
+              readOnly: true
+            {{- end }}
+            {{- if eq $deployment.name "web-server" }}
+            - name: app-conf
+              mountPath: {{ $deployment.workDir }}/web-root/assets/conf
+              readOnly: true
+            {{- end }}
       volumes:
         - name: conf
           secret:
             secretName: {{ $deployment.name }}
+        {{- if eq $deployment.name "auth" }}
+        - name: security
+          secret:
+            secretName: auth-security
+        {{- end}}
+        {{- if eq $deployment.name "web-server" }}
+        - name: app-conf
+          secret:
+            secretName: web-server-app
+        {{- end}}
 {{- end }}

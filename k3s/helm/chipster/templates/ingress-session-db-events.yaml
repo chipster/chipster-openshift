@@ -1,9 +1,8 @@
-{{- range $index, $deployment := .Values.deployments }}
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $deployment.name }}
+  name: session-db-events
   labels:
     app: chipster
   annotations:
@@ -22,12 +21,7 @@ spec:
   rules:
     - http:
         paths:
-          {{- if eq $deployment.name "web-server" }}
-          - path: /
-          {{- else }}
-          - path: /{{ $deployment.name }}
-          {{- end }}
+          - path: /session-db-events
             backend:
-              serviceName: {{ $deployment.name }}
-              servicePort: 80
-{{- end }}
+              serviceName: session-db-events
+              servicePort: events
