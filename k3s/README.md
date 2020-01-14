@@ -32,6 +32,33 @@ However, k3s offers standardized way of doing all that and we don't want to impl
 
 Let's assume that we have a ssh access to an Ubuntu 16.04 server. It doesn't matter if it is a physical hardwware or a virtual server.
 
+We need a lot of storage space to store all the reference genomes, indexes and databases. 
+ * mount at least 1 TB volume to the server
+ * create a filesystem to the volume 
+ ```bash
+ sudo mkfs.xfs -f -L data /dev/vdb
+ ```
+ * configure the volume mount
+ ```bash
+sudo bash -c "echo 'LABEL=data	/mnt/data	xfs	defaults	0	0' >> /etc/fstab"
+ ```
+ * mount it
+ ```bash
+sudo mount -a
+ ```
+ * make sure you can see it
+ ```bash
+ $ df -h
+ ---
+ /dev/vdb            1000G   60G  940G   6% /mnt/data
+ ---
+ ```
+ * create a symlink to use it as k3s volume storage
+ ```bash
+ sudo mkdir -p /mnt/data/k3s/storage /var/lib/rancher/k3s/
+ ln -s /mnt/data/k3s/storage /var/lib/rancher/k3s/storage
+ ```
+
 The instructions assume that you account has a passwordless sudo rights. TODO how to set it up?
 
 #### Firewall
@@ -198,12 +225,20 @@ done
 
 TODO How to rebuild the images after something has changed?
 
+Restart all pods:
+
+```bash
+for d in $(sudo kubectl get deployment -o name); do 
+    sudo kubectl rollout restart $d
+done
+```
+
 ### Deploy
 
 Remove previous deployment if exists and deploy the new one.
 
 ```bash
-sudo helm uninstall chipster; sudo helm install chipster git/chipster-openshift/k3s/helm/chipster --set host=HOST_ADDRESS
+sudo helm uninstall chipster; sudo helm install chipster git/chipster-openshift/k3s/helm/chipster --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
 ```
 
 See when pod's are running (hit Ctlr + C to quit).
@@ -230,7 +265,68 @@ TODO
 
 ### Persistent storage
 
+Deploy Postgres databases.
+
+```bash
+sudo helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+```
+
+```bash
+sudo helm install auth stable/postgresql --set postgresqlDatabase=auth_db --set postgresqlPassword=a
+sudo helm install session-db stable/postgresql --set postgresqlDatabase=session_db_db --set postgresqlPassword=b
+sudo helm install job-history stable/postgresql --set postgresqlDatabase=job_history_db --set postgresqlPassword=c
+```
+
+If you deploy the databases repeatedly to try different settings, note that `helm uninstall auth` won't delete the `pvc`, which has to be deleted separately (`sudo kubectl delete pvc data-auth-postgresql-0`). Otherwise e.g. the database password won't change.
+
+```
+NAME: session-db
+LAST DEPLOYED: Tue Jan  7 14:43:59 2020
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+** Please be patient while the chart is being deployed **
+
+PostgreSQL can be accessed via port 5432 on the following DNS name from within your cluster:
+
+    session-db-postgresql.default.svc.cluster.local - Read/Write connection
+
+To get the password for "postgres" run:
+
+    export POSTGRES_PASSWORD=$(kubectl get secret --namespace default session-db-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
+
+To connect to your database run the following command:
+
+    kubectl run session-db-postgresql-client --rm --tty -i --restart='Never' --namespace default --image docker.io/bitnami/postgresql:11.6.0-debian-9-r0 --env="PGPASSWORD=$POSTGRES_PASSWORD" --command -- psql --host session-db-postgresql -U postgres -d postgres -p 5432
+
+```
+
 ### Download tools-bin
+
+Run the deployment with a parameter `--set toolsBin.version=chipster-3.15.6` to start a job which downloads the tools-bin package. 
+
+Use the following command to follow its logs. Please note that dots in the version number are replaced with dashes in the job name because of Kubernetes' name requirements.
+
+```bash
+sudo kubectl logs job/download-tools-bin-chipster-3-15-6 -f
+```
+
+When the download is completed, you should restart all pods, e.g.
+
+```bash
+sudo kubectl delete pod --all
+```
+
+If the download doesn't start, use the following commands to check the name and status of the `job`, `pod`, `pvc` and `pv` objects and then use `sudo kubectl describe OBJECT_TYPE OBJECT_NAME` to see more details about those.
+
+```bash
+sudo kubectl get job
+sudo kubectl get pod
+sudo kubectl get pvc
+sudo kubectl get pv
+```
 
 ### Wildcard DNS
 
@@ -242,6 +338,10 @@ session-db in chipster-host.com:8004. How to configure k3s and a wildcard DNS re
 TODO With Let's Encrypt certificates?
 
 ### Authentication
+### JWT keys
+
+TODO Generate and configure JWT keys to keep login tokens valid in `auth` restart.
+
 #### OpenID Connect
 
 TODO Works e.g. with Google authentication, but then all Google accounts have full user permissions in Chipster. Access can be restricted with firewalls or by using other more exclusive OpenID Connect providers.
