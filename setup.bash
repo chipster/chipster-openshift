@@ -19,7 +19,7 @@ DOMAIN=$(get_domain)
 wait_dc auth$subproject_postfix
 
 # check connection first, otherwise connection errors cause the users file to be overwritten
-if oc rsh dc/auth$subproject_postfix hostname && oc rsh dc/auth$subproject_postfix ls /opt/chipster-web-server/security/users > /dev/null ; then
+if oc rsh dc/auth$subproject_postfix hostname && oc rsh dc/auth$subproject_postfix ls /opt/chipster/security/users > /dev/null ; then
   echo "Using old accounts"
 else
   echo Create default accounts
@@ -31,7 +31,7 @@ else
     users_path="../chipster-private/confs/chipster-all/users"
   fi
   
-  cat $users_path | oc rsh dc/auth$subproject_postfix bash -c "cat - > /opt/chipster-web-server/security/users"
+  cat $users_path | oc rsh dc/auth$subproject_postfix bash -c "cat - > /opt/chipster/security/users"
 fi
 
 psql auth-postgres$subproject_postfix        auth_db        'alter system set synchronous_commit to off'
