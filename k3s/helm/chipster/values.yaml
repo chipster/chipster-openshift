@@ -110,6 +110,14 @@ securityContext:
   # runAsUser: 1000
 
 host: ""
+toolsBin:
+  version: ""
+  volumeSize: 500Gi
+
+passwords:
+  authPostgresql: "a"
+  sessionDbPostgresql: "b"
+  jobHistoryPostgresql: "c"
 
 ingress:
   tls: []

@@ -9,7 +9,7 @@ export url="https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin
 # of parallel, equals "--halt now,fail=1" in newer versions.
 #
 # Downlaod packages to local temp file before extraction. We can't pipe directly
-# from the curl to lz4 and targ, becausew when the files
+# from the curl to lz4 and tar, because when the files
 # are small, it would take too much time to create all files in pipe's 64k buffer
 # causing the server to timeout the idle connection. 
   
