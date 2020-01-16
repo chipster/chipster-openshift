@@ -1,0 +1,6 @@
+Following user accounts were configured
+
+USERNAME            PASSWORD
+{{- range $key, $user := .Values.users }}
+{{ $key }}          {{ $user.password }}
+{{- end }}

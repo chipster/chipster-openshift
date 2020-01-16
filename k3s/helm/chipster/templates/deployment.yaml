@@ -1,4 +1,4 @@
-{{- range $index, $deployment := .Values.deployments }}
+{{- range $deploymentKey, $deployment := .Values.deployments }}
 ---
 apiVersion: apps/v1
 kind: Deployment

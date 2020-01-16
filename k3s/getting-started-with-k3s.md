@@ -1,5 +1,5 @@
 # Getting started with k3s
-## Kubernetes terms
+## Some Chipster and Kubernetes terms
 
 * Chipster service
   
@@ -176,6 +176,16 @@ Finally you can check that you can connect to your ingress from your laptop. If 
 ```bash
 $ curl http://HOST_ADDRESS/auth
 HTTP 404
+```
+
+## View content of Chipster configuration file from a Kubernetes secret
+
+Use `kubectl get secret` to get the secret object. Then use `jq` to pick the correct configuration file. Careful quoting of dots is needed, because the file name unfortunately includes a dot character, which has other meaning in `jq` queries by default. Use `-r` to print the value without quotes. Finally, the values in secrets are base64 encoded and has to be decoded with `base64 -d`. 
+
+For example, view the configuration of the service-locator:
+
+```bash
+sudo kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r | base64 -d
 ```
 
 ## Build from local sources
