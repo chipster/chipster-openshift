@@ -99,11 +99,15 @@ See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-doc
 
 ### Install other utils
 
+`yq` for parsing yaml files.
+
 ```bash
 sudo add-apt-repository ppa:rmescandon/yq
 sudo apt update
 sudo apt install yq -y
 ```
+
+`jq` for parsing json.
 
 ```bash
 sudo apt install jq -y
@@ -228,17 +232,27 @@ TODO How to rebuild the images after something has changed?
 Restart all pods:
 
 ```bash
-for d in $(sudo kubectl get deployment -o name); do 
-    sudo kubectl rollout restart $d
-done
+bash restart.bash
 ```
 
 ### Deploy
 
-Remove previous deployment if exists and deploy the new one.
+First we generate passwords. 
+
+Helm doesn't seem to have a standard way for handling passwords. Our solution is to have a separate Helm template `chipster-passwords` which generates the passwords and stores them in a Kubernetes `secret`. The passwords are stored in a same format as our Helm `values.yaml`.
+
+TODO How to update the passwords when new services are added? We can't run this again because the databases won't accept the new passwords unless the database volumes are deleted. We should probably create passwords in the bash script one by one and only the passwords that don't exist yet.
 
 ```bash
-sudo helm uninstall chipster; sudo helm install chipster git/chipster-openshift/k3s/helm/chipster --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
+bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
+```
+
+Remove previous deployment if exists and deploy the new one.
+
+The script takes the passwords from the `passwords` secret that we just created.
+
+```bash
+bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
 ```
 
 See when pod's are running (hit Ctlr + C to quit).
@@ -259,8 +273,12 @@ TODO How to change Chispter configuration files
 
 ### Admin view
 
-TODO
- * add user account `admin` to `users/security` on auth
+ * check the password of `admin` user account from the auth
+
+ ```bash
+ sudo kubectl exec deployment/auth -it -- cat security/users
+ ```
+
  * when logged in with that account, there is `Admin` link in the nav bar. Click that link to see the Admin view
 
 ### Persistent storage
@@ -272,9 +290,7 @@ sudo helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 ```
 
 ```bash
-sudo helm install auth stable/postgresql --set postgresqlDatabase=auth_db --set postgresqlPassword=a
-sudo helm install session-db stable/postgresql --set postgresqlDatabase=session_db_db --set postgresqlPassword=b
-sudo helm install job-history stable/postgresql --set postgresqlDatabase=job_history_db --set postgresqlPassword=c
+bash deploy-databases.bash
 ```
 
 If you deploy the databases repeatedly to try different settings, note that `helm uninstall auth` won't delete the `pvc`, which has to be deleted separately (`sudo kubectl delete pvc data-auth-postgresql-0`). Otherwise e.g. the database password won't change.
@@ -316,7 +332,7 @@ sudo kubectl logs job/download-tools-bin-chipster-3-15-6 -f
 When the download is completed, you should restart all pods, e.g.
 
 ```bash
-sudo kubectl delete pod --all
+bash restart.bash
 ```
 
 If the download doesn't start, use the following commands to check the name and status of the `job`, `pod`, `pvc` and `pv` objects and then use `sudo kubectl describe OBJECT_TYPE OBJECT_NAME` to see more details about those.
@@ -385,8 +401,7 @@ TODO in app-*.html files in chipster-tools image in /home/user/chipster-tools/ma
 
 ### Example sessions
 
-TODO
- * add user account `example_session_owner` to `users/security` on auth
+ * check the password of `example_session_owner` from the auth (see  Admin view topic above)
  * login with that account and create same sessions
  * share them as read-only to user ID `everyone`
 
@@ -394,7 +409,7 @@ TODO
 
 TODO
  * configure support email address on `session-worker`
- * add user account `support_session_owner` to `users/security` on auth
+ * check the password of `support_session_owner` from auth (see  Admin view topic above)
  * login with that account too see the support request sessions
 
 ### Remote management
