@@ -1,5 +1,4 @@
-sudo helm uninstall chipster
-sudo kubectl delete pvc tools-bin-chipster-3.15.6-temp
+helm uninstall chipster
 
-sudo kubectl get secret passwords -o json | jq .data.passwords -r | base64 -d \
-    | sudo helm install chipster helm/chipster -f values.yaml -f - "$@"
+kubectl get secret passwords -o json | jq '.data."values.yaml"' -r | base64 -d \
+    | helm install chipster helm/chipster -f values.yaml -f - "$@"
