@@ -4,3 +4,11 @@ USERNAME            PASSWORD
 {{- range $key, $user := .Values.users }}
 {{ $key }}          {{ $user.password }}
 {{- end }}
+
+Run the following command to see when all pods have started (Ctrl + C to stop):
+
+    watch sudo kubectl get pod
+
+Then open the following address in a browser:
+
+    http://{{ $.Values.host}}

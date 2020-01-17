@@ -49,7 +49,7 @@ docker.io/library/base-java:latest                                              
 List deployments.
 
 ```bash
-$ sudo kubectl get deployment
+$ kubectl get deployment
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
 auth              1/1     1            1           10d
 service-locator   1/1     1            1           10d
@@ -68,7 +68,7 @@ file-broker       1/1     1            1           10d
 List pods.
 
 ```bash
-$ sudo kubectl get pod
+$ kubectl get pod
 NAME                              READY   STATUS              RESTARTS   AGE
 auth-75f564b8dd-xc5t9             1/1     Running             0          10d
 comp-567858974f-9jqtq             0/1     ErrImageNeverPull   0          10d
@@ -87,7 +87,7 @@ scheduler-54db9ff84d-zpznb        1/1     Running             4450       10d
 See more detailts about the pod. If the pod isn't running, this should tell you the reason.
 
 ```bash
-$ sudo kubectl describe pod auth-75f564b8dd-xc5t9
+$ kubectl describe pod auth-75f564b8dd-xc5t9
 Name:         auth-75f564b8dd-xc5t9
 Namespace:    default
 Priority:     0
@@ -105,7 +105,7 @@ IP:           10.42.0.154
 If the pod is running, see it's logs of the container to make sure it started properly.
 
 ```bash
-$ sudo kubectl logs deployment/auth
+$ kubectl logs deployment/auth
 [2019-12-19 15:36:20,033] INFO: get token from http://localhost:8002 (in AuthenticationClient:124)
 [2019-12-19 15:36:21,319] INFO: get cors origin from http://service-locator (in CORSFilter:74)
 [2019-12-19 15:36:21,463] WARN: cors headers not yeat available (request took 98ms) (in CORSFilter:84)
@@ -117,7 +117,7 @@ the next container will be started again from the unchanged container image. You
 that file came from (e.g. code repository, build, or confguration) and change it there instead.
 
 ```bash
-$ sudo kubectl exec -it deployment/auth -- /bin/bash
+$ kubectl exec -it deployment/auth -- /bin/bash
 I have no name!@auth-75f564b8dd-xc5t9:/opt/chipster$
 ```
 
@@ -131,7 +131,7 @@ HTTP 404 Not Found
 List services
 
 ```bash
-$ sudo kubectl get service
+$ kubectl get service
 NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 kubernetes        ClusterIP   10.43.0.1       <none>        443/TCP   14d
 service-locator   ClusterIP   10.43.236.240   <none>        80/TCP    10d
@@ -148,14 +148,14 @@ toolbox           ClusterIP   10.43.154.77    <none>        80/TCP    10d
 Make sure you can access the service from some other pod. Note that the `service` maps the container port `8002` to a default HTTP port `80`, so you don't need to define the port number here anymore. Again, `HTTP 404` here means that the server did respond.
 
 ```bash
-sudo kubectl exec -it deployment/service-locator -- /bin/bash
+kubectl exec -it deployment/service-locator -- /bin/bash
 I have no name!@service-locator-cb95969c5-fxdgz:/opt/chipster$ curl http://auth
 HTTP 404 Not Found
 ```
 
 List ingresses
 ```bash
-$ sudo kubectl get ingress
+$ kubectl get ingress
 NAME              HOSTS   ADDRESS        PORTS   AGE
 file-broker       *       192.168.15.2   80      10d
 web-server        *       192.168.15.2   80      10d
@@ -185,7 +185,7 @@ Use `kubectl get secret` to get the secret object. Then use `jq` to pick the cor
 For example, view the configuration of the service-locator:
 
 ```bash
-sudo kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r | base64 -d
+kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r | base64 -d
 ```
 
 ## Build from local sources
@@ -220,7 +220,7 @@ sudo kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r 
  * Restart pods
 
    ```bash
-   sudo kubectl delete pod --all
+   bash restart.bash
    ```
 
 ## Get a shell to a container that doesn't start
@@ -228,7 +228,7 @@ sudo kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r 
  * Let's make sure the container starts
 
    ```bash
-   sudo kubectl edit deployment/comp
+   kubectl edit deployment/comp
    ```
 
  * Hit `i` to go to the edit mode. Override the container command (defined in the Dockerfile) with infinite sleep
@@ -246,5 +246,5 @@ sudo kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r 
  * Get a shell
 
    ```bash
-   sudo kubectl exec -it deployment/comp -- bash
+   kubectl exec -it deployment/comp -- bash
    ```

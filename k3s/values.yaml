@@ -125,3 +125,9 @@ users:
     password: ""
   support_session_owner:
     password: ""
+
+tokens:
+  auth:
+    privateKey:
+  sessionDb:
+    privateKey:

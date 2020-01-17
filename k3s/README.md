@@ -119,8 +119,8 @@ sudo apt install jq -y
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 # configure Helm to use k3s
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-sudo bash -c "kubectl config view --raw >~/.kube/config"
+sudo bash -c "kubectl config view --raw " > ~/.kube/config
+export KUBECONFIG=~/.kube/config
 ```
 
 More installation options are available in [https://helm.sh/docs/intro/install/](https://helm.sh/docs/intro/install/).
@@ -130,8 +130,8 @@ More installation options are available in [https://helm.sh/docs/intro/install/]
 TODO deploy nginx to test that k3s and helm work.
 
 ```bash
-sudo helm create ...
-sudo helm install nginx-test --generate-name --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/nginx" --set ingress.annotations."traefik\.frontend\.rule\.type"=PathPrefixStrip
+helm create ...
+helm install nginx-test --generate-name --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/nginx" --set ingress.annotations."traefik\.frontend\.rule\.type"=PathPrefixStrip
 ```
 
 TODO check that you can see the nginx welcome page in your browser before starting to deploy Chipster.
@@ -241,6 +241,8 @@ First we generate passwords.
 
 Helm doesn't seem to have a standard way for handling passwords. Our solution is to have a separate Helm template `chipster-passwords` which generates the passwords and stores them in a Kubernetes `secret`. The passwords are stored in a same format as our Helm `values.yaml`.
 
+Replace `HOST_ADDRESS` with host machine's public IP address or DNS name.
+
 TODO How to update the passwords when new services are added? We can't run this again because the databases won't accept the new passwords unless the database volumes are deleted. We should probably create passwords in the bash script one by one and only the passwords that don't exist yet.
 
 ```bash
@@ -258,7 +260,7 @@ bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
 See when pod's are running (hit Ctlr + C to quit).
 
 ```bash
-watch sudo kubectl get pod
+watch kubectl get pod
 ```
 
 ## Configuration and Maintenance
@@ -276,7 +278,7 @@ TODO How to change Chispter configuration files
  * check the password of `admin` user account from the auth
 
  ```bash
- sudo kubectl exec deployment/auth -it -- cat security/users
+ kubectl exec deployment/auth -it -- cat security/users
  ```
 
  * when logged in with that account, there is `Admin` link in the nav bar. Click that link to see the Admin view
@@ -293,7 +295,7 @@ sudo helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 bash deploy-databases.bash
 ```
 
-If you deploy the databases repeatedly to try different settings, note that `helm uninstall auth` won't delete the `pvc`, which has to be deleted separately (`sudo kubectl delete pvc data-auth-postgresql-0`). Otherwise e.g. the database password won't change.
+If you deploy the databases repeatedly to try different settings, note that `helm uninstall auth` won't delete the `pvc`, which has to be deleted separately (`kubectl delete pvc data-auth-postgresql-0`). Otherwise e.g. the database password won't change.
 
 ```
 NAME: session-db
@@ -326,7 +328,7 @@ Run the deployment with a parameter `--set toolsBin.version=chipster-3.15.6` to 
 Use the following command to follow its logs. Please note that dots in the version number are replaced with dashes in the job name because of Kubernetes' name requirements.
 
 ```bash
-sudo kubectl logs job/download-tools-bin-chipster-3-15-6 -f
+kubectl logs job/download-tools-bin-chipster-3-15-6 -f
 ```
 
 When the download is completed, you should restart all pods, e.g.
@@ -335,13 +337,13 @@ When the download is completed, you should restart all pods, e.g.
 bash restart.bash
 ```
 
-If the download doesn't start, use the following commands to check the name and status of the `job`, `pod`, `pvc` and `pv` objects and then use `sudo kubectl describe OBJECT_TYPE OBJECT_NAME` to see more details about those.
+If the download doesn't start, use the following commands to check the name and status of the `job`, `pod`, `pvc` and `pv` objects and then use `kubectl describe OBJECT_TYPE OBJECT_NAME` to see more details about those.
 
 ```bash
-sudo kubectl get job
-sudo kubectl get pod
-sudo kubectl get pvc
-sudo kubectl get pv
+kubectl get job
+kubectl get pod
+kubectl get pvc
+kubectl get pv
 ```
 
 ### Wildcard DNS
