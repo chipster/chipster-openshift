@@ -2,15 +2,162 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+deployments:
+  webServer:
+    name: web-server
+    class: ""
+    image: web-server
+    apiPort: 8000
+    adminPort: 8100
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  auth:
+    name: auth
+    class: fi.csc.chipster.auth.AuthenticationService
+    image: chipster-web-server
+    apiPort: 8002
+    adminPort: 8102
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  serviceLocator:
+    name: service-locator
+    class: fi.csc.chipster.servicelocator.ServiceLocator
+    image: chipster-web-server
+    apiPort: 8003
+    adminPort: 8103
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  sessionDb:
+    name: session-db
+    class: fi.csc.chipster.sessiondb.SessionDb
+    image: chipster-web-server
+    apiPort: 8004
+    adminPort: 8104
+    eventsPort: 8005
+    workDir: /opt/chipster
+    password: ""
+  scheduler:
+    name: scheduler
+    class: fi.csc.chipster.scheduler.Scheduler
+    image: chipster-web-server
+    apiPort: 8006
+    adminPort: 8106
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  fileBroker:
+    name: file-broker
+    class: fi.csc.chipster.filebroker.FileBroker
+    image: chipster-web-server
+    apiPort: 8007
+    adminPort: 8107
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  toolbox:
+    name: toolbox
+    class: ""
+    image: toolbox
+    apiPort: 8008
+    adminPort: 8108    
+    eventsPort: ""
+    workDir: /opt/chipster/toolbox
+    password: ""
+  sessionWorker:
+    name: session-worker
+    class: fi.csc.chipster.sessionworker.SessionWorker
+    image: chipster-web-server
+    apiPort: 8009
+    adminPort: 8109
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  typeService:
+    name: type-service
+    class: ""
+    image: chipster-web-server-js
+    apiPort: 8010
+    adminPort: 8110
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  comp:
+    name: comp
+    class: comp
+    image: comp
+    apiPort: ""
+    adminPort: 8111
+    eventsPort: ""
+    workDir: /opt/chipster/comp
+    password: ""
+  backup:
+    name: backup
+    class: fi.csc.chipster.backup.Backup
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8115
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+  jobHistory:
+    name: job-history
+    class: fi.csc.chipster.jobhistory.JobHistoryService
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8114
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+
+# Yaml path, where the password is stored. We can't store the password here, 
+# because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart.
+databases:
+  auth:
+    passwordKey: "auth.postgresqlPassword"
+  sessionDb:
+    passwordKey: "\"session-db\".postgresqlPassword"
+  jobHistory:
+    passwordKey: "\"job-history\".postgresqlPassword"
+
+users:
+  chipster:
+    password: ""
+  admin:
+    password: ""
+  example_session_owner:
+    password: ""
+  support_session_owner:
+    password: ""
+
+tokens:
+  auth:
+    privateKey:
+  sessionDb:
+    privateKey:
+
+# Configure depenency subcharts
+
+auth:
+  postgresqlDatabase: auth_db
+  postgresqlPassword: ""
+
+session-db:
+  postgresqlDatabase: session_db_db
+  postgresqlPassword: ""
+
+job-history:
+  postgresqlDatabase: job_history_db
+  postgresqlPassword: ""
+
 replicaCount: 1
 
 image:
   pullPolicy: IfNotPresent
   # pull policy for our own local images
   localPullPolicy: Never
-
-deployments: {}
-databases: {}
 
 nameOverride: ""
 fullnameOverride: ""

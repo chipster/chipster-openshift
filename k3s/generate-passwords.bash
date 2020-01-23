@@ -23,33 +23,36 @@ fi
 
 values_json=$(echo "$secret_yaml" | yq r - --tojson | jq '.data."values.yaml"' -r | base64 -d)
 
+default_values_yaml_path="helm/chipster/values.yaml"
+
 #echo "$values_json"
 
-for key in $(yq r values.yaml --tojson | jq '.deployments | keys[]' -r); do
-    name=$(yq r values.yaml --tojson | jq .deployments.$key.name -r)
+for key in $(yq r $default_values_yaml_path --tojson | jq '.deployments | keys[]' -r); do
+    name=$(yq r $default_values_yaml_path --tojson | jq .deployments.$key.name -r)
     old_password=$(echo "$values_json" | jq '.deployments."'$key'".password' -r)
     if [[ $old_password != "null" ]]; then
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
     else
         echo "generate password for $name"
         password=$(openssl rand -base64 30)
-        values_json=$(echo $values_json | jq ".deployments.\"$key\".privateKey = \"$password\"")
+        values_json=$(echo $values_json | jq ".deployments.\"$key\".password = \"$password\"")
     fi
 done
 
-for key in $(yq r values.yaml --tojson | jq '.databases | keys[]' -r); do
+for key in $(yq r $default_values_yaml_path --tojson | jq '.databases | keys[]' -r); do
     name="$key"
-    old_password=$(echo "$values_json" | jq '.databases."'$key'".password' -r)
+    passwordKey=$(yq r $default_values_yaml_path --tojson | jq .databases.$key.passwordKey -r)
+    old_password=$(echo "$values_json" | jq .$passwordKey -r)
     if [[ $old_password != "null" ]]; then
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
     else
         echo "generate password for $name"
         password=$(openssl rand -base64 30)
-        values_json=$(echo $values_json | jq ".databases.\"$key\".privateKey = \"$password\"")
+        values_json=$(echo $values_json | jq ".$passwordKey = \"$password\"")
     fi
 done
 
-for key in $(yq r values.yaml --tojson | jq '.users | keys[]' -r); do
+for key in $(yq r $default_values_yaml_path --tojson | jq '.users | keys[]' -r); do
     name="$key"
     old_password=$(echo "$values_json" | jq '.users."'$key'".password' -r)
     if [[ $old_password != "null" ]]; then
@@ -57,12 +60,12 @@ for key in $(yq r values.yaml --tojson | jq '.users | keys[]' -r); do
     else
         echo "generate password for $name"
         password=$(diceware -w en)
-        values_json=$(echo $values_json | jq ".users.\"$key\".privateKey = \"$password\"")
+        values_json=$(echo $values_json | jq ".users.\"$key\".password = \"$password\"")
     fi
 done
 
-for key in $(yq r values.yaml --tojson | jq '.tokens | keys[]' -r); do
-    name="$key"
+for key in $(yq r $default_values_yaml_path --tojson | jq '.tokens | keys[]' -r); do
+    name="$key"    
     old_password=$(echo "$values_json" | jq '.tokens."'$key'".privateKey' -r)
     if [[ $old_password != "null" ]]; then
         echo "use old key for $name:   $(echo "$old_password" | head -n 1 | cut -c1-20)..."

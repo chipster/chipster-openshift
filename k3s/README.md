@@ -82,7 +82,12 @@ curl -sfL https://get.k3s.io | sh -
 sudo k3s kubectl get node
 ```
 
-Copied from [https://k3s.io](https://k3s.io).
+Allow the current user to use `kubectl` command with k3s without `sudo`.
+
+```bash
+sudo bash -c "kubectl config view --raw " > ~/.kube/config
+echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc; source ~/.bashrc
+```
 
 ### Install Docker
 
@@ -117,10 +122,6 @@ sudo apt install jq -y
 
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-
-# configure Helm to use k3s
-sudo bash -c "kubectl config view --raw " > ~/.kube/config
-export KUBECONFIG=~/.kube/config
 ```
 
 More installation options are available in [https://helm.sh/docs/intro/install/](https://helm.sh/docs/intro/install/).
@@ -239,17 +240,13 @@ bash restart.bash
 
 First we generate passwords. 
 
-Helm doesn't seem to have a standard way for handling passwords. Our solution is to have a separate Helm template `chipster-passwords` which generates the passwords and stores them in a Kubernetes `secret`. The passwords are stored in a same format as our Helm `values.yaml`.
-
-Replace `HOST_ADDRESS` with host machine's public IP address or DNS name.
-
-TODO How to update the passwords when new services are added? We can't run this again because the databases won't accept the new passwords unless the database volumes are deleted. We should probably create passwords in the bash script one by one and only the passwords that don't exist yet.
+Helm doesn't seem to have a standard way for handling passwords. Our solution is to have a separate bash script which generates the passwords and stores them in a Kubernetes `secret`. The passwords are stored in a same format as the `values.yaml` in the Chipster Helm chart.
 
 ```bash
-bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
+bash generate-passwords.bash
 ```
 
-Remove previous deployment if exists and deploy the new one.
+Then we deloy the Chipster itself. Replace `HOST_ADDRESS` with host machine's public IP address or DNS name.
 
 The script takes the passwords from the `passwords` secret that we just created.
 
@@ -265,7 +262,7 @@ watch kubectl get pod
 
 ## Configuration and Maintenance
 
-### Getting started
+### Getting started with k3s
 
 Please see [Getting started with k3s](getting-started-with-k3s.md) for k3s basics.
 
@@ -288,8 +285,11 @@ TODO How to change Chispter configuration files
 Deploy Postgres databases.
 
 ```bash
-sudo helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm dependency update helm/chipster
 ```
+
+
 
 ```bash
 bash deploy-databases.bash
