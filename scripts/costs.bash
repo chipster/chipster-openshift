@@ -51,7 +51,7 @@ total_cpu=0
 total_memory=0
 total_storage=0
 
-printf "%-20s %-30s %-10s %-10s %-10s %-10s %-10s\n" TYPE NAME millicores "RAM GiB" "PVC MiB" BU €
+printf "%-20s %-30s %-10s %-10s %-10s %-10s %-10s\n" TYPE NAME millicores "RAM MiB" "PVC MiB" BU €
 
 for project in $(echo "$projects"); do
 
