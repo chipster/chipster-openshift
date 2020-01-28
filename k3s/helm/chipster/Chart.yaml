@@ -20,16 +20,17 @@ version: 0.1.0
 # incremented each time you make changes to the application.
 appVersion: 4.1.0
 
+# postgresql 8.1.5 is broken: "sed: can't read /opt/bitnami/postgresql/conf/postgresql.conf: Permission denied"
 dependencies:
   - name: postgresql
     version: 8.1.4
-    repository: "@stable"
-    alias: auth
+    repository: "https://kubernetes-charts.storage.googleapis.com/"
+    alias: auth-postgresql
   - name: postgresql
     version: 8.1.4
-    repository: "@stable"
-    alias: session-db
+    repository: "https://kubernetes-charts.storage.googleapis.com/"
+    alias: session-db-postgresql
   - name: postgresql
     version: 8.1.4
-    repository: "@stable"
-    alias: job-history
+    repository: "https://kubernetes-charts.storage.googleapis.com/"
+    alias: job-history-postgresql

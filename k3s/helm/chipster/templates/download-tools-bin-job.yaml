@@ -1,3 +1,4 @@
+{{ if $.Values.toolsBin.version }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -84,10 +85,8 @@ spec:
       - name: tools-bin
         persistentVolumeClaim:
           claimName: tools-bin-{{ $.Values.toolsBin.version }}
-      - name: temp
-        persistentVolumeClaim:
-          claimName: tools-bin-{{ $.Values.toolsBin.version }}-temp
       # usually there isn't enough space in the root file system where emptyDirs are by default
-      # - name: temp
-      #   emptyDir: {}
+      - name: temp
+        emptyDir: {}
       restartPolicy: OnFailure
+{{ end }}
