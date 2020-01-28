@@ -1,0 +1,14 @@
+# k3s local-path refuses to create ReadWriteMany volumes, but still allows multiple pods to mount the volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: chipster
+  name: tools-bin-{{ $.Values.toolsBin.version }}
+spec:
+  accessModes:
+    # - ReadWriteMany
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ $.Values.toolsBin.volumeSize }}

@@ -116,11 +116,11 @@ deployments:
 # because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart.
 databases:
   auth:
-    passwordKey: "auth.postgresqlPassword"
+    passwordKey: "\"auth-postgresql\".postgresqlPassword"
   sessionDb:
-    passwordKey: "\"session-db\".postgresqlPassword"
+    passwordKey: "\"session-db-postgresql\".postgresqlPassword"
   jobHistory:
-    passwordKey: "\"job-history\".postgresqlPassword"
+    passwordKey: "\"job-history-postgresql\".postgresqlPassword"
 
 users:
   chipster:
@@ -140,15 +140,18 @@ tokens:
 
 # Configure depenency subcharts
 
-auth:
+# the key seems to be the dependency alias in Chart.yaml
+# aliases seem to use dashes by convention, but then we have to use
+# index function to access these values
+auth-postgresql:
   postgresqlDatabase: auth_db
   postgresqlPassword: ""
 
-session-db:
+session-db-postgresql:
   postgresqlDatabase: session_db_db
   postgresqlPassword: ""
 
-job-history:
+job-history-postgresql:
   postgresqlDatabase: job_history_db
   postgresqlPassword: ""
 

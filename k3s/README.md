@@ -53,13 +53,20 @@ sudo mount -a
  /dev/vdb            1000G   60G  940G   6% /mnt/data
  ---
  ```
- * create a symlink to use it as k3s volume storage
+ * create a symlink to use the volume for k3s volume storage
  ```bash
  sudo mkdir -p /mnt/data/k3s/storage /var/lib/rancher/k3s/
  ln -s /mnt/data/k3s/storage /var/lib/rancher/k3s/storage
  ```
 
-The instructions assume that you account has a passwordless sudo rights. TODO how to set it up?
+ * create a symlink to use the volume for container root and emptyDir volumes. We'll need a large emptyDir volume for temporary directory of the tools-bin download. K3s stores both root and emptyDir volumes in the same place.
+
+ ```bash
+sudo mkdir -p /mnt/data/k3s/pods /var/lib/kubelet
+ln -s /mnt/data/k3s/pods /var/lib/kubelet/pods
+ ```
+
+The instructions assume that your account has passwordless sudo rights. TODO how to set it up?
 
 #### Firewall
 
@@ -73,6 +80,21 @@ Especially make sure to protect the port X that k3s would use for cummunicating 
 #### Hardware Resources
 
 TODO
+
+### Install Docker
+
+We'll use Docker to to build container images.
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+apt-cache policy docker-ce
+sudo apt-get install -y docker-ce
+sudo systemctl status docker
+```
+
+See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed instructions.
 
 ### Install k3s
 
@@ -89,18 +111,12 @@ sudo bash -c "kubectl config view --raw " > ~/.kube/config
 echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc; source ~/.bashrc
 ```
 
-### Install Docker
+We'll use Docker to build container images. Let's configure K3s to also run images with Docker so the images are readily available in Docker after each build. By default K3s would run containers with Containerd, and we would have to copy each image from Docker to Containerd (`sudo docker save $image | sudo k3s ctr images import -`).
 
 ```bash
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-apt-cache policy docker-ce
-sudo apt-get install -y docker-ce
-sudo systemctl status docker
+sudo sed -i 's/server \\/server --docker \\/' /etc/systemd/system/k3s.service
+sudo systemctl restart k3s
 ```
-
-See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed instructions.
 
 ### Install other utils
 
@@ -214,18 +230,6 @@ base                     latest              e4af660abe0f        3 hours ago    
 ubuntu                   16.04               56bab49eef2e        2 weeks ago         123MB
 ```
 
-### Import images
-
-Export the images from Docker and import to k3s.
-
-```bash
-for path in $(ls templates/builds/); do
-    image=$(basename $path)
-    echo $image
-    sudo docker save $image | sudo k3s ctr images import -
-done
-```
-
 ### Update images
 
 TODO How to rebuild the images after something has changed?
@@ -282,17 +286,13 @@ TODO How to change Chispter configuration files
 
 ### Persistent storage
 
-Deploy Postgres databases.
+Postgres databases are defined as a dependency of the chipster Helm chart. When you deploy the chipster Helm chart, also the databases are deployed.
+
+FIXME this must be run before the chipster is deployed
 
 ```bash
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm dependency update helm/chipster
-```
-
-
-
-```bash
-bash deploy-databases.bash
 ```
 
 If you deploy the databases repeatedly to try different settings, note that `helm uninstall auth` won't delete the `pvc`, which has to be deleted separately (`kubectl delete pvc data-auth-postgresql-0`). Otherwise e.g. the database password won't change.
@@ -425,3 +425,17 @@ TODO
  * How to handle PVCs? Setup a NFS share or Longhorn?
  * How to scale the cluster up and down?
  * How to scale Chipster inside the cluster?
+
+### Uninstall
+
+Command `helm uninstall chipster` should delete all Kubernetes objects, except volumes. This is relatively safe to run when you want run the installation again, but want to keep the data on volumes. Use `kubectl delete pvc --all`, if you want to delete the volumes too.
+
+If the Helm release is too badly broken, you can delete everything manually with `kubectl`.
+
+```bash
+for t in secret pod deployment ingress service statefulset pvc; do 
+    kubectl delete $t --all
+done
+```
+
+

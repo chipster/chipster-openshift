@@ -211,12 +211,6 @@ kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r | bas
     cat templates/builds/chipster-web-server/Dockerfile | tee /dev/tty | sudo docker build -t chipster-web-server -f - ../chipster-web-server
     ```
 
-  * Re-import the image
-
-    ```bash
-    sudo docker save chipster-web-server | sudo k3s ctr images import -
-    ````
-
  * Restart pods
 
    ```bash
@@ -233,12 +227,12 @@ kubectl get secret service-locator -o json | jq '.data."chipster.yaml"' -r | bas
 
  * Hit `i` to go to the edit mode. Override the container command (defined in the Dockerfile) with infinite sleep
 
-   ```bash
-   container
-     command:
-       - sleep
-      args:
-        - inf
+  ```bash
+  containers
+  - command:
+    - sleep
+    args:
+    - inf
     ```
 
  * Hit Esc to go back to the command mode, and `:wq` to save and quit
