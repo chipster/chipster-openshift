@@ -23,6 +23,7 @@ spec:
         - |
           
           set -e
+          set -o pipefail
 
           echo "download tools-bin version ${TOOLS_BIN_VERSION}"
           cd /mnt/tools
@@ -75,7 +76,11 @@ spec:
           # delete old download temp files
           rm -f $temp/*
             
-          curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}"          
+          if ! curl --fail -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}"; then
+            echo "Downloading files $url/files.txt failed"
+            exit 1
+          fi
+        
         volumeMounts:        
         - mountPath: /mnt/tools
           name: tools-bin
