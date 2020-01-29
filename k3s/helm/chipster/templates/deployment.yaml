@@ -68,7 +68,7 @@ spec:
               mountPath: {{ $deployment.workDir }}/web-root/assets/conf
               readOnly: true
             {{- end }}
-            {{- if or (eq $deployment.name "comp") (eq $deployment.name "toolbox") }}
+            {{- if and $.Values.toolsBin.version (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
             - name: tools-bin
               mountPath: /mnt/tools
               readOnly: true
@@ -87,7 +87,7 @@ spec:
           secret:
             secretName: web-server-app
         {{- end}}
-        {{- if or (eq $deployment.name "comp") (eq $deployment.name "toolbox") }}
+        {{- if and $.Values.toolsBin.version (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
         - name: tools-bin
           persistentVolumeClaim:
             claimName: tools-bin-{{ $.Values.toolsBin.version }}
