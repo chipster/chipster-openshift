@@ -4,9 +4,9 @@
 
 These instructions show how to install the Chipster web app v4 to an Ubuntu server. 
 
-Chipster is based on microservice architecture. There is about a dozen different services, but each of service tries to be relatively simple and independent. Each service is run in its own container. The containers are orchestrated with Lightweight Kubernetes k3s.
+Chipster is based on microservice architecture. There is about a dozen different services, but each of service tries to be relatively simple and independent. Each service is run in its own container. The containers are orchestrated with [Lightweight Kubernetes K3s](https://k3s.io).
 
-The user interface in the v4 is a single-page-application (SPA) running in the user's browser. Commnad line client and Rest APIs are also available.
+The user interface in the v4 Chipster is a single-page-application (SPA) running in the user's browser. Commnad line client and Rest APIs are also available.
 
 ## Status
 
@@ -16,15 +16,15 @@ However, tha same cannot be said about these installation instructions. These ar
 
 To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide the critical pointers, because we are migrating our own installations anyway. 
 
-The same goes for many other aspcects of configuring and maintaining the server. Many empty titles are added to highlight different aspects that you should considered when running a server in the public internet. Luckily many of these topics are not actually specific to Chipster (e.g. how to setup https or worker nodes for k3s). Pull requests for improving this documenation are very much welcome.
+The same goes for many other aspcects of configuring and maintaining the server. Many empty titles are added to highlight different aspects that you should considered when running a server in the public internet. Luckily many of these topics are not actually specific to Chipster (e.g. how to setup https or more nodes for K3s). Pull requests for improving this documenation are very much welcome.
 
-These instructions aim to build everything starting from the plain files in GitHub. It's little bit more work, but it allows you update the installation to which ever GitHub branch or fork of Chipster. It also makes it easy to change any part of the system easily. This will be useful now in these early phases of the project. Maybe later we could provide compiled code packges, container images and Helm Charts in public repositories making the initial installation easier, but raising the bar for custom modifications.
+These instructions aim to build everything starting from the plain files in GitHub. It's little bit more work, but it allows you to change any part of the system easily. This will be useful now in these early phases of the project. Maybe later we could provide compiled code packges, container images and Helm Charts in public repositories making the initial installation easier, but raising the bar for custom modifications.
 
 ## Why k3s
 
 K3s is a Lightweight Kubernetes, effectively a container cloud platform. Do we really need the cointainer cloud platform to run a few server processes on single host? Not really, you could checkout the code yourself and follow the Dockerfiles to see what operating system packages and what kind of folder structure is needed for each service, how to compile the code and how to start the processes. Add some form of reverse proxy to terminate HTTPS (e.g. Apache or nginx) and some process monitoring (Java Service Wrapper or systemd) and you are done.
 
-However, k3s offers standardized way of doing all that and we don't want to implement ourselves functionalities that are already offered  by the container cloud platforms, like HTTPS termination. K3s allows us to run small-scale Chipster in very similar environment, that we know well from our larger production installations. We aim to rely even more on the Kubernetes features in the future. For example, it would be nice to run each Chipster job in its own container. This would make it easier to manage tool dependencies and improve security. 
+However, k3s offers standardized way of doing all that and we don't want to implement ourselves functionalities that are already offered in the standard the container cloud platforms, like HTTPS termination. K3s allows us to run small-scale Chipster in very similar environment, that we know well from our larger production installations. We aim to rely even more on the Kubernetes features in the future. For example, it would be nice to run each Chipster job in its own container. This would make it easier to manage tool dependencies and improve security. This kind of changes are probably a lot eaiser in the future, if the Chispter is already running in some kind of container platform.
 
 ## Installation
 ### Requirements
@@ -32,7 +32,10 @@ However, k3s offers standardized way of doing all that and we don't want to impl
 
 Let's assume that we have a ssh access to an Ubuntu 16.04 server. It doesn't matter if it is a physical hardwware or a virtual server.
 
-We need a lot of storage space to store all the reference genomes, indexes and databases. 
+The instructions assume that your account has passwordless sudo rights. TODO how to set it up?
+
+We need a lot of storage space to store all the reference genomes, indexes and users' files.
+
  * mount at least 1 TB volume to the server
  * create a filesystem to the volume 
  ```bash
@@ -53,7 +56,7 @@ sudo mount -a
  /dev/vdb            1000G   60G  940G   6% /mnt/data
  ---
  ```
- * create a symlink to use the volume for k3s volume storage
+ * create a symlink to use the volume for K3s volume storage
  ```bash
  sudo mkdir -p /mnt/data/k3s/storage /var/lib/rancher/k3s/
  ln -s /mnt/data/k3s/storage /var/lib/rancher/k3s/storage
@@ -66,20 +69,26 @@ sudo mkdir -p /mnt/data/k3s/pods /var/lib/kubelet
 ln -s /mnt/data/k3s/pods /var/lib/kubelet/pods
  ```
 
-The instructions assume that your account has passwordless sudo rights. TODO how to set it up?
-
 #### Firewall
 
 Make sure that you have firewall a (in the network / IaaS cloud or the Ubuntu's local iptables) that allows only 
 * inbound access from your laptop to ports 22 (ssh), 80 (http) and maybe also 443 for https in the future
-* inbound access from this machine itself (ports 80 and 443). In OpenStack Security groups this would mean from the IP address of the tenant's router. TODO make it start without this
+* inbound access from this machine itself (ports 80 and 443). In OpenStack's Security groups this would mean from the VM's floating IP address. TODO make it start without this
 * outbound access to anything
 
-Especially make sure to protect the port X that k3s would use for cummunicating with other k3s nodes (although we are going to install only one node now).
+Especially make sure to protect the port 8472 that K3s would use for cummunicating with other K3s nodes (although we are going to install only one node now). 
+
+TODO What is port 6443, is it important to protect that too?
 
 #### Hardware Resources
 
-TODO
+Each Chipster service requires about 0.5 GB of RAM, so Chipster itself uses about 8 GB of RAM. In addition you need 8 GB of memory for each job slot. Most tools use just one job slot. Search for `# SLOTS` in [chipster-tools](https://github.com/chipster/chipster-tools/search?q=%23+SLOTS&unscoped_q=%23+SLOTS) repository to see the tools that need more resources. Then calculate the amount of needed memory with the following formula:
+
+```
+JOB_SLOTS * 8 GB + 8 GB
+```
+
+Number of CPU cores is usually less critical, because nothing breaks if CPU is moderately oversubscribed. We usually have about 2 physical cores per job slot.
 
 ### Install Docker
 
@@ -94,9 +103,9 @@ sudo apt-get install -y docker-ce
 sudo systemctl status docker
 ```
 
-See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed instructions.
+See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed installation instructions.
 
-### Install k3s
+### Install K3s
 
 ```bash
 curl -sfL https://get.k3s.io | sh -
@@ -104,14 +113,14 @@ curl -sfL https://get.k3s.io | sh -
 sudo k3s kubectl get node
 ```
 
-Allow the current user to use `kubectl` command with k3s without `sudo`.
+Allow the current user to use `kubectl` command with K3s without `sudo`.
 
 ```bash
 sudo bash -c "kubectl config view --raw " > ~/.kube/config
 echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc; source ~/.bashrc
 ```
 
-We'll use Docker to build container images. Let's configure K3s to also run images with Docker so the images are readily available in Docker after each build. By default K3s would run containers with Containerd, and we would have to copy each image from Docker to Containerd (`sudo docker save $image | sudo k3s ctr images import -`).
+We'll use Docker to build container images. Let's configure K3s to also run images with Docker so the images are readily available in Docker after each build.
 
 ```bash
 sudo sed -i 's/server \\/server --docker \\/' /etc/systemd/system/k3s.service
@@ -155,9 +164,23 @@ TODO check that you can see the nginx welcome page in your browser before starti
 
 TODO remove nginx-test
 
+### Clone deployment scripts
+
+Clone the deployment repository
+
+```bash
+mkdir ~/git
+cd git
+git clone https://github.com/chipster/chipster-openshift.git
+cd chipster-openshift/k3s
+```
+
+From now on, please run all commands in this `k3s` directory unles told otherwise.
+
 ### Build Images
 
-Building container images will accomplish the following tasks
+Building container images will accomplish the following tasks:
+
 * Checkout code repositories
 * Compile code
 * Install operating system packages
@@ -165,48 +188,13 @@ Building container images will accomplish the following tasks
 In effect we are executing commands defined in Dockerfiles. Most services will run with a minimal image with only Java and Chipster installed on top of Ubuntu, whereas the comp (i.e. analysis) service requires a huge number of operating system
 packages.
 
-Checkout deployment scripts.
+Let's build the images. 
 
 ```bash
-cd
-mkdir git
-cd git
-git clone https://github.com/chipster/chipster-openshift
-cd chipster-openshift
+bash build-image.bash --all
 ```
 
-Let's build the images. The information about build dependencies is in the BuildConfig objects (supported in OpenShfit, another variant of Kubernetes), which don't work in k3s. We have to dig out the GitHub urls and some paths from these objects in bash. There is a small utility scripts that converts the BuildConfig and Dockerfile to a `docker build` command. For example running
-
-```bash
-bash k3s/buildconfig-to-docker.bash templates/builds/base
-```
-prints
-```bash
-cat ../templates/builds/base/Dockerfile | tee /dev/tty | sudo docker build -t base -
-```
-
-This one was simple, but it gets a bit tortuous when the images copy directories from other images:
-
-```bash
-$ bash k3s/buildconfig-to-docker.bash templates/builds/web-server
-```
-
-```bash
-cat templates/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#" | tee /dev/tty | sudo docker build -t web-server -
-```
-
-You could repeat that command to build an image from each diretory in `templates/builds`, or we can use a bash loop to do that for us:
-
-```bash
-set -e
-
-for build in $(ls templates/builds/ | grep -v chipster-jenkins | grep -v web-server-mylly); do
-    echo "** $build"
-    cmd="$(bash k3s/buildconfig-to-docker.bash templates/builds/$build)"
-    echo "build command: $cmd"
-    bash -c "$cmd"
-done
-```
+This will take about half an hour.
 
 List images.
 
@@ -230,16 +218,6 @@ base                     latest              e4af660abe0f        3 hours ago    
 ubuntu                   16.04               56bab49eef2e        2 weeks ago         123MB
 ```
 
-### Update images
-
-TODO How to rebuild the images after something has changed?
-
-Restart all pods:
-
-```bash
-bash restart.bash
-```
-
 ### Deploy
 
 First we generate passwords. 
@@ -250,12 +228,12 @@ Helm doesn't seem to have a standard way for handling passwords. Our solution is
 bash generate-passwords.bash
 ```
 
-Then we deloy the Chipster itself. Replace `HOST_ADDRESS` with host machine's public IP address or DNS name.
+Then we deploy the Chipster itself. Replace `HOST_ADDRESS` with host machine's public IP address or DNS name.
 
 The script takes the passwords from the `passwords` secret that we just created.
 
 ```bash
-bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
+bash deploy.bash --set host=HOST_ADDRESS
 ```
 
 See when pod's are running (hit Ctlr + C to quit).
@@ -264,11 +242,62 @@ See when pod's are running (hit Ctlr + C to quit).
 watch kubectl get pod
 ```
 
+The `deploy.bash` script above showed you the address of the Chipster web app, which you can open in your browser. It will also print the credentials of the `chipster` account that you can use to log in to the app.
+
+Most tools wont work yet, because we haven't downloaded the tools-bin package. Let's make a small test before that to make sure that all the basic Chipster work. Upload some file to Chipster and run a tool `Misc` -> `Tests` -> `Test data input and output in Python`. If the result file appears in the Workflow view after few seconds, you can continue to the next chapter. If you encounter any errors, please try to solve them before continuing, because it's a lot easier and faster to change the deployment before you start the hefty tools-bin download.
+
+### Download the tools-bin package
+
+When you have checked that the Chipster itself works, you can start the tools-bin download. Simply run the deployment again, but set the tools-bin version this time.
+
+TODO How to find out available tools-bin versions?
+
+```bash
+bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
+```
+
+That will also will print you insctructions for how to follow the progress of the download and how to restart pods when it completes.
+
+### Updates
+
+Update operating system packages on the host.
+
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+TODO How to update Helm and K3s?
+
+Pull latest changes from the deployment repository.
+
+```bash
+git pull
+```
+
+Rebuild images.
+
+```bash
+bash build-image.bash --all
+```
+
+Upate the deployment.
+
+```bash
+bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=TOOLS_BIN_VERSION
+```
+
+Restart all pods.
+
+```bash
+bash restart.bash
+```
+
 ## Configuration and Maintenance
 
 ### Getting started with k3s
 
-Please see [Getting started with k3s](getting-started-with-k3s.md) for k3s basics.
+Please see [Getting started with k3s](getting-started-with-k3s.md) for K3s basics.
 
 ### Chipster settings
 
@@ -433,7 +462,7 @@ Command `helm uninstall chipster` should delete all Kubernetes objects, except v
 If the Helm release is too badly broken, you can delete everything manually with `kubectl`.
 
 ```bash
-for t in secret pod deployment ingress service statefulset pvc; do 
+for t in job deployment statefulset pod secret ingress service pvc; do 
     kubectl delete $t --all
 done
 ```

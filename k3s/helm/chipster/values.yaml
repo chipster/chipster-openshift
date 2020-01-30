@@ -57,6 +57,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    storageVolumeSize: 300Gi
   toolbox:
     name: toolbox
     class: ""
