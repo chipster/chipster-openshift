@@ -73,6 +73,10 @@ spec:
               mountPath: /mnt/tools
               readOnly: true
             {{- end }}
+            {{- if eq $deployment.name "file-broker" }}
+            - name: storage
+              mountPath: /opt/chipster/storage
+            {{- end }}
       volumes:
         - name: conf
           secret:
@@ -91,5 +95,10 @@ spec:
         - name: tools-bin
           persistentVolumeClaim:
             claimName: tools-bin-{{ $.Values.toolsBin.version }}
+        {{- end}}
+        {{- if eq $deployment.name "file-broker" }}
+        - name: storage
+          persistentVolumeClaim:
+            claimName: file-broker-storage
         {{- end}}
 {{- end }}

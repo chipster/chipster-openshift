@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# The information about build dependencies is in the BuildConfig objects 
+# (supported in OpenShfit, another variant of Kubernetes), which don't work 
+# in k3s. We have to dig out the GitHub urls and some paths from these objects 
+# in bash. This is a small utility scripts that converts the BuildConfig and 
+# Dockerfile to a `docker build` command. For example running
+# 
+#   $ bash k3s/buildconfig-to-docker.bash templates/builds/base
+# 
+# prints
+#
+#   cat ../templates/builds/base/Dockerfile | tee /dev/tty | sudo docker build -t base -
+#
+# This one was simple, but it gets a bit tortuous when the images copy 
+# directories from other images:
+#
+#   $ bash k3s/buildconfig-to-docker.bash templates/builds/web-server
+#
+#   cat templates/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#" | tee /dev/tty | sudo docker build -t web-server -
+# 
+
 set -e
 #set -x
 
@@ -45,11 +65,11 @@ if [[ $image_count != 0 ]]; then
         fi
     done
 
-    >&2 echo "modified Dockerfile:"
-    >&2 echo "$(bash -c "$cmd")"
+    # >&2 echo "modified Dockerfile:"
+    # >&2 echo "$(bash -c "$cmd")"
 fi
 
-cmd="$cmd | tee /dev/tty"
+# cmd="$cmd | tee /dev/tty"
 
 if [[ $uri == "null" ]]; then
     cmd="$cmd | sudo docker build -t $build -"
