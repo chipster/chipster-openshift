@@ -12,6 +12,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -21,6 +22,8 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: 
+      db-fallback-auth: false
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -30,6 +33,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -39,6 +43,8 @@ deployments:
     eventsPort: 8005
     workDir: /opt/chipster
     password: ""
+    configs: 
+      db-fallback-session-db: false
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -48,6 +54,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -58,6 +65,7 @@ deployments:
     workDir: /opt/chipster
     password: ""
     storageVolumeSize: 300Gi
+    configs: {}
   toolbox:
     name: toolbox
     class: ""
@@ -67,6 +75,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster/toolbox
     password: ""
+    configs: {}
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -76,6 +85,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
   typeService:
     name: type-service
     class: ""
@@ -85,6 +95,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
   comp:
     name: comp
     class: comp
@@ -94,6 +105,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster/comp
     password: ""
+    configs: {}
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -103,6 +115,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -112,6 +125,8 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: 
+      db-fallback-job-history: false
 
 # Yaml path, where the password is stored. We can't store the password here, 
 # because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart.

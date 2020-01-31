@@ -149,6 +149,12 @@ sudo apt install jq -y
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 ```
 
+Install a Helm chart repository called `stable`. The Postgresql chart will be installed from there.
+
+```bash
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+```
+
 More installation options are available in [https://helm.sh/docs/intro/install/](https://helm.sh/docs/intro/install/).
 
 ### Check that k3s and Helm work
@@ -228,6 +234,12 @@ Helm doesn't seem to have a standard way for handling passwords. Our solution is
 bash generate-passwords.bash
 ```
 
+Download dependencies.
+
+```bash
+helm dependency update helm/chipster
+```
+
 Then we deploy the Chipster itself. Replace `HOST_ADDRESS` with host machine's public IP address or DNS name.
 
 The script takes the passwords from the `passwords` secret that we just created.
@@ -244,21 +256,77 @@ watch kubectl get pod
 
 The `deploy.bash` script above showed you the address of the Chipster web app, which you can open in your browser. It will also print the credentials of the `chipster` account that you can use to log in to the app.
 
+If something goes wrong in the deployment and you want to start from scratch, see the [uninstall](#uninstall) chapter.
+
 Most tools wont work yet, because we haven't downloaded the tools-bin package. Let's make a small test before that to make sure that all the basic Chipster work. Upload some file to Chipster and run a tool `Misc` -> `Tests` -> `Test data input and output in Python`. If the result file appears in the Workflow view after few seconds, you can continue to the next chapter. If you encounter any errors, please try to solve them before continuing, because it's a lot easier and faster to change the deployment before you start the hefty tools-bin download.
 
-### Download the tools-bin package
+We'll get to the tools-bin download soon, but let's take a quick look to the configuration system and updates first.
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. Simply run the deployment again, but set the tools-bin version this time.
+## Configuration and Maintenance
 
-TODO How to find out available tools-bin versions?
+### Getting started with k3s
+
+Please see [Getting started with k3s](getting-started-with-k3s.md) for K3s basics.
+
+### Helm chart values
+
+Deployment settings are defined in the `helm/chipster/values.yaml` file. You can override any of these values by passing `--set KEY=VALUE` arguments to the `deploy.bash` script (in addition to all the previous arguments), just like you have already done with the host name.
+
+For example, to create a new user account `john` with a password `verysecretpassword`, you would check the file `values.yaml` to see which object needs to modified. 
+You would run the `deploy.bash` scripte then again with an additional argument:
 
 ```bash
-bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=chipster-3.15.6
+--set users.john.password=verysecretpassword
 ```
 
-That will also will print you insctructions for how to follow the progress of the download and how to restart pods when it completes.
+More instructions about the `--set` argument can be found from the documentation of the command [`helm install`](https://helm.sh/docs/intro/using_helm/).
+
+Managing all the changes in the arguments becomes soon overwhelming. It's better to create your own `values.yaml`, to your home directory for instance, which could look like this:
+
+```yaml
+host: HOST 
+
+users:
+  john:
+    password: "verysecretpassword"
+```
+
+You can then simply pass this file to the deployment script.
+
+```bash
+bash deploy.bash -f ~/values.yaml
+```
+
+If you need to debug this process, you can run the above command with `--debug --dry-run` options to see how Helm processes the values.
+
+### Chipster settings
+
+All Chipster configuration options can be found from the [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs. 
+
+Command line argument format:
+
+```bash
+--set deployments.comp.configs.comp-max-jobs=5
+```
+
+YAML file format:
+
+```yaml
+deployments:
+  comp:
+    configs:
+      comp-max-job: 5
+```
+
+Please note that two-word Chipster service names like `file-broker` are written with `camelCase` in the `deployments` map, i.e. `fileBroker`.
 
 ### Updates
+
+If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-annoncements](https://chipster.csc.fi/contact.shtml) email list to get notifications about new features and critical vulnerabilities. Consider subsribing to the [chipster-tech](https://chipster.csc.fi/contact.shtml) list too to share your experiences and learn from others.
+
+TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
+
+If you have just installed Chipster, you can simply skim through this chapter now and return here when it's time to update your installation.
 
 Update operating system packages on the host.
 
@@ -281,10 +349,10 @@ Rebuild images.
 bash build-image.bash --all
 ```
 
-Upate the deployment.
+Upate the deployment (assuming that you have created your own `values.yaml`).
 
 ```bash
-bash deploy.bash --set host=HOST_ADDRESS --set toolsBin.version=TOOLS_BIN_VERSION
+bash deploy.bash -f ~/values.yaml
 ```
 
 Restart all pods.
@@ -293,15 +361,24 @@ Restart all pods.
 bash restart.bash
 ```
 
-## Configuration and Maintenance
+### Download the tools-bin package
 
-### Getting started with k3s
+When you have checked that the Chipster itself works, you can start the tools-bin download. Simply run the deployment again, but set the tools-bin version this time.
 
-Please see [Getting started with k3s](getting-started-with-k3s.md) for K3s basics.
+TODO How to find out available tools-bin versions?
 
-### Chipster settings
+Command line argument format
+```bash
+bash deploy.bash OTHER_ARGS --set toolsBin.version=chipster-3.15.6
+```
 
-TODO How to change Chispter configuration files
+YAML file format:
+```yaml
+toolsBin:
+  version: chipster-3.15.6
+```
+
+That will also will print you insctructions for how to follow the progress of the download and how to restart pods when it completes.
 
 ### Admin view
 
@@ -311,83 +388,32 @@ TODO How to change Chispter configuration files
  kubectl exec deployment/auth -it -- cat security/users
  ```
 
- * when logged in with that account, there is `Admin` link in the nav bar. Click that link to see the Admin view
+ * when logged in with that account, there is `Admin` link in the top bar of the web app. Click that link to see the Admin view
 
-### Persistent storage
+### Custom DB queries
 
-Postgres databases are defined as a dependency of the chipster Helm chart. When you deploy the chipster Helm chart, also the databases are deployed.
+Postgres databases are defined as a dependency of the Chipster Helm chart. When you deploy the Chipster Helm chart, also the databases are deployed.
 
-FIXME this must be run before the chipster is deployed
-
-```bash
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
-helm dependency update helm/chipster
-```
-
-If you deploy the databases repeatedly to try different settings, note that `helm uninstall auth` won't delete the `pvc`, which has to be deleted separately (`kubectl delete pvc data-auth-postgresql-0`). Otherwise e.g. the database password won't change.
-
-```
-NAME: session-db
-LAST DEPLOYED: Tue Jan  7 14:43:59 2020
-NAMESPACE: default
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
-** Please be patient while the chart is being deployed **
-
-PostgreSQL can be accessed via port 5432 on the following DNS name from within your cluster:
-
-    session-db-postgresql.default.svc.cluster.local - Read/Write connection
-
-To get the password for "postgres" run:
-
-    export POSTGRES_PASSWORD=$(kubectl get secret --namespace default session-db-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
-
-To connect to your database run the following command:
-
-    kubectl run session-db-postgresql-client --rm --tty -i --restart='Never' --namespace default --image docker.io/bitnami/postgresql:11.6.0-debian-9-r0 --env="PGPASSWORD=$POSTGRES_PASSWORD" --command -- psql --host session-db-postgresql -U postgres -d postgres -p 5432
-
-```
-
-### Download tools-bin
-
-Run the deployment with a parameter `--set toolsBin.version=chipster-3.15.6` to start a job which downloads the tools-bin package. 
-
-Use the following command to follow its logs. Please note that dots in the version number are replaced with dashes in the job name because of Kubernetes' name requirements.
+If you want to make custom queries to the databases, you can run the `psql` client program in the database container.
 
 ```bash
-kubectl logs job/download-tools-bin-chipster-3-15-6 -f
+kubectl exec statefulset/chipster-session-db-postgresql -it -- bash -c 'psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB'
 ```
 
-When the download is completed, you should restart all pods, e.g.
-
-```bash
-bash restart.bash
-```
-
-If the download doesn't start, use the following commands to check the name and status of the `job`, `pod`, `pvc` and `pv` objects and then use `kubectl describe OBJECT_TYPE OBJECT_NAME` to see more details about those.
-
-```bash
-kubectl get job
-kubectl get pod
-kubectl get pvc
-kubectl get pv
-```
+Single quotes (`'`) are important so that your local shell doesn't try to expand the variables, which are only defined inside of the container.
 
 ### Wildcard DNS
 
-TODO Now we have each service running in different port, i.e. web-server in chipster-host.com:8000 and 
-session-db in chipster-host.com:8004. How to configure k3s and a wildcard DNS record, so that we could use web-server.chipster-host.com and session-db.chipster-host.com?
+TODO Now the Ingress is passing requests from different subpaths like http://HOST/auth and http://HOST/file-broker to different services and rewriting the request paths. How to configure K3s and a wildcard DNS record, so that we could use web-server.HOST and session-db.HOST addresses instead?
 
 ### HTTPS
 
-TODO With Let's Encrypt certificates?
+TODO With Let's Encrypt certificates? Then change the service addressess in secrets.
 
 ### Authentication
 ### JWT keys
 
-TODO Generate and configure JWT keys to keep login tokens valid in `auth` restart.
+Chipster services ´auth´ and ´session-db´ create authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kep secret. If you have to invalidate all current authentication tokens, you can generate new private keys.
 
 #### OpenID Connect
 
@@ -399,12 +425,12 @@ TODO A similar jaas config should still work like in the old Chipster v3, but it
 
 #### File authentication
 
-TODO A file in security/users, just like in the old Chipster v3.
+TODO A file security/users on `auth`, just like in the old Chipster v3. New users can be added there through `values.yaml`.
 
 ### Backups
 #### Backup deployment configuration
 
-TODO
+Take a copy of your ´~/values.yaml´.
 
 #### Backup databases
 
@@ -445,7 +471,7 @@ TODO
 
 ### Remote management
 
-TODO create k3s service account and use `kubectl` from your laptop
+TODO copy kubectl configuration from the host and use `kubectl` from your laptop
 
 ### K3s cluster
 
@@ -457,12 +483,14 @@ TODO
 
 ### Uninstall
 
-Command `helm uninstall chipster` should delete all Kubernetes objects, except volumes. This is relatively safe to run when you want run the installation again, but want to keep the data on volumes. Use `kubectl delete pvc --all`, if you want to delete the volumes too.
+Command `helm uninstall chipster` should delete all Kubernetes objects, except volumes. This is relatively safe to run when you want run the installation again, but want to keep the data volumes. Use `kubectl delete pvc --all`, if you want to delete the volumes too.
+
+The `helm uninstall` command gives you almost a fresh start with one caveat. The databases store their password on their volume. If you generate the passwords again, the databases won't accept the new passwords. In the early phases when you don't have anything valuable in the databases, it's easiest to simply delete the database volumes.
 
 If the Helm release is too badly broken, you can delete everything manually with `kubectl`.
 
 ```bash
-for t in job deployment statefulset pod secret ingress service pvc; do 
+for t in job deployment statefulset pod secret ingress service pvc; do  
     kubectl delete $t --all
 done
 ```
