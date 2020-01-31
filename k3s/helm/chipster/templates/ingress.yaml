@@ -9,6 +9,7 @@ metadata:
   annotations:
     "traefik.frontend.rule.type": PathPrefixStrip
 spec:
+# from chart template, not tested
 {{- if $.Values.ingress.tls }}
   tls:
   {{- range $.Values.ingress.tls }}
@@ -23,11 +24,14 @@ spec:
     - http:
         paths:
           {{- if eq $deployment.name "web-server" }}
+          # serve web app in the root
           - path: /
           {{- else }}
+          # other services are served in subpaths
           - path: /{{ $deployment.name }}
           {{- end }}
             backend:
               serviceName: {{ $deployment.name }}
+              # services map everything to the port 80
               servicePort: 80
 {{- end }}

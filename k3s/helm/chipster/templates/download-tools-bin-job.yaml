@@ -1,3 +1,5 @@
+# job for downloding the tools-bin package
+# created only when the version is set to allow deployment without this
 {{ if $.Values.toolsBin.version }}
 apiVersion: batch/v1
 kind: Job
@@ -12,6 +14,8 @@ spec:
     spec:
       containers:
       - env:
+        # pass the version string
+        # I guess we could simply replace it in the script too
         - name: TOOLS_BIN_VERSION
           value: {{ $.Values.toolsBin.version }}
         name: download-tools-bin-{{ $.Values.toolsBin.version | replace "." "-" }}
@@ -23,11 +27,14 @@ spec:
         - |
           
           set -e
+          # exit with error when the curl fails, for example when the version doesn't exist
           set -o pipefail
 
           echo "download tools-bin version ${TOOLS_BIN_VERSION}"
+          # the images symlink tools-bin from here
           cd /mnt/tools
 
+          # we'll need a lot of temp space, generally the total size of n largest packages, where n is the number of parallel jobs
           export temp="/mnt/temp"
           export url="https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts"
 
@@ -76,6 +83,7 @@ spec:
           # delete old download temp files
           rm -f $temp/*
             
+          # -j 1 downloads packages one by one. Increase it if your volumes are on a storage cluster that can handle lots of parallelism
           if ! curl --fail -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}"; then
             echo "Downloading files $url/files.txt failed"
             exit 1

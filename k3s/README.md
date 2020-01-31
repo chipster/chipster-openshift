@@ -1,4 +1,4 @@
-# Chipster in k3s
+# Chipster in K3s
 
 ## Overview
 
