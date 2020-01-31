@@ -1,17 +1,29 @@
-# Default values for chipster.
+# Default values for Chipster Helm chart
 # This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# Declare variables to be passed into the templates.
 
+# deployments defines all Chipster services
+# generate-passwords.bash will generate all deployments.*.password fields
 deployments:
+  # keys written in camelCase to make them easier to use in templates
   webServer:
+    # name is the Chipster service name in its usual dash-separated form
     name: web-server
+    # class to start if using chipster-web-server image
     class: ""
+    # image is the name of the container image
     image: web-server
+    # apiPort is the port which the process binds to serve API requests
     apiPort: 8000
+    # adminPort is the port which the process binds to serve admin requests
     adminPort: 8100
+    # eventsPort is the port which the process binds to serve WebSocket connections
     eventsPort: ""
+    # workDir is the working directory in container where the process is started
     workDir: /opt/chipster
+    # password is used by a Chipster service to authenticate to the auth service
     password: ""
+    # configs is a YAML map to pass configuration key-value pairs to the Chipster service
     configs: {}
   auth:
     name: auth
@@ -22,8 +34,9 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
-    configs: 
-      db-fallback-auth: false
+    configs:
+      # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
+      db-fallback: false
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -44,7 +57,8 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: 
-      db-fallback-session-db: false
+      # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
+      db-fallback: false
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -64,6 +78,7 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
     configs: {}
   toolbox:
@@ -73,6 +88,7 @@ deployments:
     apiPort: 8008
     adminPort: 8108    
     eventsPort: ""
+    # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
     workDir: /opt/chipster/toolbox
     password: ""
     configs: {}
@@ -125,11 +141,14 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
-    configs: 
+    configs:
+      # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
       db-fallback-job-history: false
 
-# Yaml path, where the password is stored. We can't store the password here, 
-# because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart.
+# databases is a section for Chipster scripts to know which databases exist
+# passwordKey is the YAML path where generate-passwords.bash will store the password
+# we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
+# names with dashes have to be quoted to work in jq
 databases:
   auth:
     passwordKey: "\"auth-postgresql\".postgresqlPassword"
@@ -138,6 +157,7 @@ databases:
   jobHistory:
     passwordKey: "\"job-history-postgresql\".postgresqlPassword"
 
+# generate-passwords.bash will generate all users.*.password fields
 users:
   chipster:
     password: ""
@@ -148,6 +168,7 @@ users:
   support_session_owner:
     password: ""
 
+# generate-passwords.bash will generate all tokens.*.privateKey fields
 tokens:
   auth:
     privateKey:
@@ -156,11 +177,12 @@ tokens:
 
 # Configure depenency subcharts
 
-# the key seems to be the dependency alias in Chart.yaml
-# aliases seem to use dashes by convention, but then we have to use
-# index function to access these values
+# the key is the dependency alias in Chart.yaml
+# aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
 auth-postgresql:
+  # postgresqlDatabase is the name of the database
   postgresqlDatabase: auth_db
+  # postgresqlPassword is the database password, see the comment of "databases" section 
   postgresqlPassword: ""
 
 session-db-postgresql:
@@ -171,16 +193,14 @@ job-history-postgresql:
   postgresqlDatabase: job_history_db
   postgresqlPassword: ""
 
-replicaCount: 1
-
+# image is a section for defining how to get the images
 image:
+  # pullPolicy defines how to pull images from public repositories
   pullPolicy: IfNotPresent
-  # pull policy for our own local images
+  # localPullPolicy defines how to pull our own Chipster images
   localPullPolicy: Never
 
-nameOverride: ""
-fullnameOverride: ""
-
+# securityContext sets the access rights of the container user
 securityContext: 
   runAsNonRoot: true
   runAsUser: 1000
@@ -190,17 +210,25 @@ securityContext:
   #   - ALL
   # readOnlyRootFilesystem: true
 
+# host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network
 host: ""
+
+# toolsBin is a section for settings related to the tools-bin package
 toolsBin:
+  # version is the tools-bin package version
   version: ""
+  # volumeSize is the size of the tools-bin volume
   volumeSize: 500Gi
 
+# ingress is reserved for future configuration of https
 ingress:
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
+
+# resources are not used in the templates yet. We would need separate definitions for different kind of services
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

@@ -1,3 +1,4 @@
+# deployment for each Chipster service
 {{- range $deploymentKey, $deployment := .Values.deployments }}
 ---
 apiVersion: apps/v1
@@ -19,13 +20,15 @@ spec:
         deployment: {{ $deployment.name }}
     spec:
       containers:
-        - name: {{ $.Chart.Name }}-{{ $deployment.name }}
+        - name: {{ $deployment.name }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}            
+          # Java class to start for the chipster-web-server image
           env:
             - name: JAVA_CLASS
               value: {{ $deployment.class }}
           image: {{ $deployment.image }}
+          # pull policy for Chipster images
           imagePullPolicy: {{ $.Values.image.localPullPolicy }}
           ports:
             {{- if $deployment.apiPort }}
@@ -54,25 +57,30 @@ spec:
           #     port: admin
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
-          volumeMounts:          
+          volumeMounts:
+            # config secret is mounted to all services          
             - name: conf
               mountPath: {{ $deployment.workDir }}/conf
               readOnly: true
+            # auth's users file
             {{- if eq $deployment.name "auth" }}
             - name: security
               mountPath: {{ $deployment.workDir }}/security
               readOnly: true
             {{- end }}
+            # web-server's web app config
             {{- if eq $deployment.name "web-server" }}
             - name: app-conf
               mountPath: {{ $deployment.workDir }}/web-root/assets/conf
               readOnly: true
             {{- end }}
+            # tools-bin for toolbox and comp
             {{- if and $.Values.toolsBin.version (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
             - name: tools-bin
               mountPath: /mnt/tools
               readOnly: true
             {{- end }}
+            # file-broker's storage
             {{- if eq $deployment.name "file-broker" }}
             - name: storage
               mountPath: /opt/chipster/storage

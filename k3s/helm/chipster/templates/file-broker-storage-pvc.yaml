@@ -1,3 +1,4 @@
+# file-broker's storage for users' files
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

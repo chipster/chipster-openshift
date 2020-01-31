@@ -13,7 +13,8 @@ Then open the following address in a browser:
 
     http://{{ $.Values.host }}
 
-{{ if $.Values.toolsBin.version }}
+{{- if $.Values.toolsBin.version }}
+
 A job was created to download the tools-bin package. Follow its progress:
 
     kubectl logs job/download-tools-bin-{{ $.Values.toolsBin.version | replace "." "-" }} -f
@@ -23,6 +24,7 @@ Restart pods when it completes.
     bash restart.bash
 
 {{ else }}
+
 Chipster was deployed without so called tools-bin package, which includes 
 tool binaries and reference data. Run the deployment again and set the tools-bin 
 version to download it.
