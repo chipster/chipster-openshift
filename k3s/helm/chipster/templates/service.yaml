@@ -1,5 +1,7 @@
 {{- range $deploymentKey, $deployment := .Values.deployments }}
 {{- if $deployment.apiPort }}
+# Kubernetes service for the main API port of each Chipster service,
+# making the port accessible for other services
 ---
 apiVersion: v1
 kind: Service
@@ -9,7 +11,9 @@ metadata:
     app: chipster
 spec:
   ports:
+      # the service can be accessed with the default port
     - port: 80
+      # use the named port of the deployment
       targetPort: api
       protocol: TCP
       name: api

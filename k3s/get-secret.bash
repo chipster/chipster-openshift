@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Small utility for checking the content of the Kubernetes secret
+#
+# Shows the value of the Chipster configuration file "chipster.yaml" by default.
+
 secret="$1"
 key="${2:-chipster.yaml}"
 

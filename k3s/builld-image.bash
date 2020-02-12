@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Build container images for running Chipster in K3s
+#
+# The necessary information is parsed from the OpenShift configurations.
+
 set -e
 
 if [ -z $1 ]; then

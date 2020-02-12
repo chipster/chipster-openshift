@@ -1,3 +1,6 @@
+# Install or upgrade Chipster to K3s
+#
+# Assumes that passwords are stored in a seccret "passwords" in K3s
 
 # "helm upgrade --install" should do this, but -f option didn't work on the first run
 if helm status chipster > /dev/null 2> /dev/null; then
