@@ -1,3 +1,4 @@
+# tools-bin is a volume for storing read-only (after download) reference data and program binaries
 {{ if $.Values.toolsBin.version }}
 # k3s local-path refuses to create ReadWriteMany volumes, but still allows multiple pods to mount the volume
 apiVersion: v1

@@ -16,15 +16,15 @@ However, tha same cannot be said about these installation instructions. These ar
 
 To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide the critical pointers, because we are migrating our own installations anyway. 
 
-The same goes for many other aspcects of configuring and maintaining the server. Many empty titles are added to highlight different aspects that you should considered when running a server in the public internet. Luckily many of these topics are not actually specific to Chipster (e.g. how to setup https or more nodes for K3s). Pull requests for improving this documenation are very much welcome.
+The same goes for many other aspcects of configuring and maintaining the server. Many empty titles are added to highlight different aspects that you should consider when running a server in the public internet. Luckily many of these topics are not actually specific to Chipster (e.g. how to setup https or more nodes for K3s). Pull requests for improving this documenation are very much welcome.
 
-These instructions aim to build everything starting from the plain files in GitHub. It's little bit more work, but it allows you to change any part of the system easily. This will be useful now in these early phases of the project. Maybe later we could provide compiled code packges, container images and Helm Charts in public repositories making the initial installation easier, but raising the bar for custom modifications.
+These instructions aim to build everything starting from the plain files in GitHub. It's little bit more work, but it allows you to change any part of the system easily. This will be useful now in these early phases of the project, when you might want to fine-tune some things here and there. Maybe later we could provide compiled code packges, container images and Helm Charts in public repositories making the initial installation easier, but raising the bar for custom modifications.
 
 ## Why k3s
 
 K3s is a Lightweight Kubernetes, effectively a container cloud platform. Do we really need the cointainer cloud platform to run a few server processes on single host? Not really, you could checkout the code yourself and follow the Dockerfiles to see what operating system packages and what kind of folder structure is needed for each service, how to compile the code and how to start the processes. Add some form of reverse proxy to terminate HTTPS (e.g. Apache or nginx) and some process monitoring (Java Service Wrapper or systemd) and you are done.
 
-However, k3s offers standardized way of doing all that and we don't want to implement ourselves functionalities that are already offered in the standard the container cloud platforms, like HTTPS termination. K3s allows us to run small-scale Chipster in very similar environment, that we know well from our larger production installations. We aim to rely even more on the Kubernetes features in the future. For example, it would be nice to run each Chipster job in its own container. This would make it easier to manage tool dependencies and improve security. This kind of changes are probably a lot eaiser in the future, if the Chispter is already running in some kind of container platform.
+However, k3s offers standardized way of doing all that and we don't want to implement ourselves functionalities that are already offered in the standard container cloud platforms, like HTTPS termination. K3s allows us to run small-scale Chipster in very similar environment, that we know well from our larger production installations. We aim to rely even more on the Kubernetes features in the future. For example, it would be nice to run each Chipster job in its own container. This would make it easier to manage tool dependencies and improve security. This kind of changes are probably a lot eaiser in the future, if the Chispter is already running in the container platform.
 
 ## Installation
 ### Requirements
@@ -37,7 +37,7 @@ The instructions assume that your account has passwordless sudo rights. TODO how
 We need a lot of storage space to store all the reference genomes, indexes and users' files.
 
  * mount at least 1 TB volume to the server
- * create a filesystem to the volume 
+ * create a filesystem to the volume (assuming it's `/dev/vdb`)
  ```bash
  sudo mkfs.xfs -f -L data /dev/vdb
  ```

@@ -1,3 +1,11 @@
+# Generate passwords and store them in a Kubernetes secret
+# 
+# The Helm values.yaml file is iterated to check which passwords are needed.
+# Passswords that are already stored are preserved. New or missing
+# passwords are generated.
+#
+# The passwords are stored in the same format with the values.yaml file,
+# allowing it to be passed directly to the Helm deployemnt.
 
 # exit on error
 set -e

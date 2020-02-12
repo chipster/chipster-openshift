@@ -1,3 +1,5 @@
+# Kubernetes service for the session-db events port,
+# making the port accessible for other services
 ---
 apiVersion: v1
 kind: Service

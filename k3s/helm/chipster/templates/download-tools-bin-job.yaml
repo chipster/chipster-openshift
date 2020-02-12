@@ -98,7 +98,8 @@ spec:
       - name: tools-bin
         persistentVolumeClaim:
           claimName: tools-bin-{{ $.Values.toolsBin.version }}
-      # usually there isn't enough space in the root file system where emptyDirs are by default
+      # the installation instructions should shown how to stored emptyDirs
+      # on a volume, because we need hundreds of gigabytes for the download temp
       - name: temp
         emptyDir: {}
       restartPolicy: OnFailure
