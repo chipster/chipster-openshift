@@ -71,7 +71,7 @@ fi
 
 # cmd="$cmd | tee /dev/tty"
 
-if [[ $uri == "null" ]]; then
+if [[ -z $uri ]]; then
     cmd="$cmd | sudo docker build -t $build -"
 else
     cmd="$cmd | sudo docker build -t $build -f - $uri"

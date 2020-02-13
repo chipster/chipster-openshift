@@ -1,4 +1,4 @@
-FROM comp-base
+FROM base-java-comp
 
 COPY chipster-web-server /opt/
 
