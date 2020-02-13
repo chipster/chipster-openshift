@@ -95,7 +95,7 @@ $ sudo systemctl status docker
 
 See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed installation instructions.
 
-TODO Replace Docker with a userspace build system, e.g. [Kaniko](https://github.com/GoogleContainerTools/kaniko), and some imgage repository.
+TODO Replace Docker with a userspace build system, e.g. [Kaniko](https://github.com/GoogleContainerTools/kaniko), and some image repository.
 
 ## Install K3s
 
