@@ -7,13 +7,13 @@ objects:
   kind: BuildConfig
   metadata:
     labels:
-      build: comp-base
-    name: comp-base
+      build: base-java-comp
+    name: base-java-comp
   spec:
     output:
       to:
         kind: ImageStreamTag
-        name: comp-base:latest
+        name: base-java-comp:latest
     postCommit: {}
     resources: {}
     runPolicy: Serial

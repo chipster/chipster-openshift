@@ -7,7 +7,7 @@ USERNAME            PASSWORD
 
 Run the following command to see when all pods have started (Ctrl + C to stop):
 
-    watch sudo kubectl get pod
+    watch kubectl get pod
 
 Then open the following address in a browser:
 
@@ -25,7 +25,7 @@ Restart pods when it completes.
 
 {{ else }}
 
-Chipster was deployed without so called tools-bin package, which includes 
+Chipster was deployed without the tools-bin package, which includes 
 tool binaries and reference data. Run the deployment again and set the tools-bin 
 version to download it.
     

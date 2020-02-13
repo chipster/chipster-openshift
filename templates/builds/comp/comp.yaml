@@ -32,7 +32,7 @@ objects:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: comp-base:latest
+          name: base-java-comp:latest
       type: Docker
     successfulBuildsHistoryLimit: 5
     triggers:
