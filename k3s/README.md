@@ -221,9 +221,9 @@ bash restart.bash
 
 ### Download the tools-bin package
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. Simply run the deployment again, but set the tools-bin version this time. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/).
+When you have checked that the Chipster itself works, you can start the tools-bin download. Simply run the deployment again, but set the tools-bin version this time. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version.
 
-Set the version in your `~/values.yaml`.
+Set the tools-bin version in your `~/values.yaml`.
 
 ```yaml
 toolsBin:
