@@ -262,7 +262,7 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 
 ### HTTPS
 
-TODO With Let's Encrypt certificates? Then change the service addressess in bsecrets.
+TODO With Let's Encrypt certificates? Then change the service addressess in the secrets.
 
 ### Authentication
 ### JWT keys
