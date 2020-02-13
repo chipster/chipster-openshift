@@ -2,7 +2,7 @@
 
 ## Overview
 
-These instructions show how to install the Chipster web app verion 4 to an Ubuntu server. 
+These instructions show how to install the Chipster web app version 4 to an Ubuntu server. 
 
 Chipster is based on microservice architecture. There is about a dozen different services, but each of service tries to be relatively simple and independent. Each service is run in its own container. The containers are orchestrated with [Lightweight Kubernetes K3s](https://k3s.io).
 
