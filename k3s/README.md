@@ -286,7 +286,7 @@ There is a file `security/users` on `auth`, just like in the old Chipster v3, bu
 ### Backups
 #### Backup deployment configuration
 
-Take a copy of your ´~/values.yaml´.
+Take a copy of your `~/values.yaml`.
 
 #### Backup databases
 
