@@ -89,6 +89,8 @@ services="session-db
 	scheduler
 	comp
 	file-broker
+	file-storage
+	file-storage-single
 	session-worker
 	auth
 	toolbox
@@ -112,6 +114,11 @@ for service in $authenticated_services; do
   
   echo $config_key: $service_password | tee $build_dir/$service.yaml >> $build_dir/auth.yaml
 done
+
+# file-storage-single for migrating files from the old volume
+file_storage_password="$(echo "$passwords" | jq -r .data[\"service-password-file-storage\"] | base64 --decode)" 
+echo service-password-file-storage: $file_storage_password | tee $build_dir/file-storage-single.yaml >> $build_dir/auth.yaml
+echo url-int-file-storage-single: http://file-storage-single$subproject_postfix >> $build_dir/service-locator.yaml
 
 # get the (multiline) private key from the passwords, and prefix each line with a space character to make it a yaml block 
 jws_private_key_auth="$(      echo "$passwords" | jq -r .data[\"jws-private-key-auth\"]       | base64 --decode | sed -e 's/^/ /')"

@@ -186,12 +186,15 @@ configure_java_service "$subproject_postfix" session-worker fi.csc.chipster.sess
 configure_java_service "$subproject_postfix" backup fi.csc.chipster.backup.Backup &
 configure_java_service "$subproject_postfix" job-history fi.csc.chipster.jobhistory.JobHistoryService &
 
+
 # shared templates and custom image 
 
 configure_service "$subproject_postfix" toolbox toolbox toolbox &
 configure_service "$subproject_postfix" type-service chipster-web-server-js type-service &
 configure_service "$subproject_postfix" web-server web-server web-server &
 configure_service "$subproject_postfix" comp comp comp &
+
+configure_service "$subproject_postfix" file-storage-single chipster-web-server file-storage fi.csc.chipster.filestorage.FileStorage &
 
 if [ "$mylly" = true ]; then
   configure_service "$subproject_postfix" comp-mylly comp-mylly comp &
@@ -200,6 +203,18 @@ else
 fi
 
 wait
+
+mkdir -p $template_dir/file-storage
+oc process -f templates/file-storage/file-storage.yaml --local \
+  -p API_PORT=8016 \
+  -p ADMIN_PORT=8116 \
+  -p JAVA_CLASS=fi.csc.chipster.filestorage.FileStorage \
+  -p PROJECT=$PROJECT \
+  -p IMAGE=chipster-web-server \
+  -p IMAGE_PROJECT=$image_project \
+  -p SUBPROJECT=$subproject \
+  -p SUBPROJECT_POSTFIX=$subproject_postfix \
+  > $template_dir/file-storage.yaml
 
 oc process -f templates/custom-objects.yaml --local \
     -p PROJECT=$PROJECT \

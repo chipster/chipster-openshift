@@ -1,0 +1,178 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: file-storage${SUBPROJECT_POSTFIX}
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: chipster${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
+    name: file-storage${SUBPROJECT_POSTFIX}
+  spec:
+    ports:
+    - port: 80
+      protocol: TCP
+      name: api
+    selector:
+      name: file-storage${SUBPROJECT_POSTFIX}
+    clusterIP: None
+- apiVersion: apps/v1beta1
+  kind: StatefulSet
+  metadata:
+    labels:
+      app: chipster${SUBPROJECT_POSTFIX}
+      subproject: ${{SUBPROJECT}}
+      server: file-storage
+    name: file-storage${SUBPROJECT_POSTFIX}
+  spec:
+    serviceName: file-storage${SUBPROJECT_POSTFIX}
+    replicas: 2
+    selector:
+      matchLabels:
+        app: chipster${SUBPROJECT_POSTFIX}
+    template:
+      metadata:
+        labels:
+          app: chipster${SUBPROJECT_POSTFIX}
+          name: file-storage${SUBPROJECT_POSTFIX}
+          server: file-storage
+      spec:
+        containers:
+          - env:
+              - name: JAVA_CLASS
+                value: ${{JAVA_CLASS}}
+            image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/${IMAGE}
+            imagePullPolicy: Always
+            name: file-storage
+            ports:
+              - containerPort: 8016
+                name: api
+                protocol: TCP
+              - containerPort: 8116
+                name: admin
+                protocol: TCP
+            readinessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /admin/alive
+                port: ${{ADMIN_PORT}}
+                scheme: HTTP
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 5
+            resources:
+              limits:
+                cpu: 1600m
+                memory: 512Mi
+              requests:
+                cpu: 1600m
+                memory: 512Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+              - mountPath: /opt/chipster/logs
+                name: logs
+              - mountPath: /opt/chipster/conf
+                name: conf
+          - env:
+              - name: admin_port
+                value: "${ADMIN_PORT}"
+              - name: role
+                value: file-storage
+              - name: password
+                valueFrom:
+                  secretKeyRef:
+                    key: password
+                    name: monitoring${SUBPROJECT_POSTFIX}
+            image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/monitoring
+            imagePullPolicy: Always
+            name: status
+            readinessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /admin/alive
+                port: ${{ADMIN_PORT}}
+                scheme: HTTP
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 5
+            resources:
+              limits:
+                cpu: 200m
+                memory: 100Mi
+              requests:
+                cpu: 200m
+                memory: 10Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          - image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/filebeat
+            imagePullPolicy: Always
+            name: filebeat
+            volumeMounts:
+              - mountPath: /opt/chipster/file-storage/logs
+                name: logs
+            readinessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /admin/alive
+                port: ${{ADMIN_PORT}}
+                scheme: HTTP
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 5
+            resources:
+              limits:
+                cpu: 200m
+                memory: 100Mi
+              requests:
+                cpu: 200m
+                memory: 10Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+          - emptyDir: {}
+            name: logs
+          - name: conf
+            secret:
+              defaultMode: 420
+              secretName: file-storage${SUBPROJECT_POSTFIX}
+    test: false
+    # triggers:
+    #   - type: ConfigChange
+    #   - imageChangeParams:
+    #       automatic: true
+    #       containerNames:
+    #         - file-storage
+    #       from:
+    #         kind: ImageStreamTag
+    #         name: ${IMAGE}:latest
+    #         namespace: ${{IMAGE_PROJECT}}
+    #     type: ImageChange
+    volumeClaimTemplates:
+    - metadata:
+        labels:
+          app: chipster${SUBPROJECT_POSTFIX}
+          subproject: ${{SUBPROJECT}}
+        name: file-storage${SUBPROJECT_POSTFIX}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+
+parameters:
+  - name: API_PORT
+  - name: ADMIN_PORT
+  - name: JAVA_CLASS
+  - name: PROJECT
+  - name: IMAGE
+  - name: IMAGE_PROJECT
+  - name: SUBPROJECT
+  - name: SUBPROJECT_POSTFIX
