@@ -1,0 +1,20 @@
+- name: Install K3s (with Docker container runtime)
+  shell: "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=\"server --docker\" sh -"
+  args:
+    warn: no
+
+- name: Allow the current user to use kubectl command with K3s without sudo
+  file:
+    path: /home/{{ user }}/.kube
+    state: directory
+    recurse: yes
+    owner: "{{ user }}"
+
+- name: Copy kubctl config
+  shell: "bash -c \"kubectl config view --raw\" > /home/{{ user }}/.kube/config"
+
+- name: Use the kubectl config after next login
+  lineinfile:
+    dest: /home/{{ user }}/.bashrc
+    regexp: '^export KUBECONFIG='
+    line: export KUBECONFIG=~/.kube/config

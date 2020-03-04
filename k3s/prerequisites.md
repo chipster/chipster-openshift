@@ -13,7 +13,7 @@ Each Chipster service requires about 0.5 GB of RAM, so Chipster itself uses abou
 JOB_SLOTS * 8 GB + 8 GB
 ```
 
-Number of CPU cores is usually less critical, because nothing breaks if CPU is moderately oversubscribed. We usually have about 2 physical cores per job slot.
+Number of CPU cores is usually less critical, because nothing breaks if CPU is moderately oversubscribed. We usually have about 2 physical cores per 8 GB of RAM.
 
 ## Disk
 
@@ -35,7 +35,7 @@ sudo bash -c "echo 'LABEL=data /mnt/data xfs defaults 0 0' >> /etc/fstab"
  * mount it
 
  ```bash
-sudo mkdir /mnt/data
+sudo mkdir -p /mnt/data
 sudo mount -a
  ```
 
@@ -71,17 +71,28 @@ Especially make sure to protect the port 8472 that K3s would use for cummunicati
 
 TODO What is port 6443, is it important to protect that too?
 
-## Install Docker
+## Install Ansible
 
-We'll use Docker to to build container images.
+We'll use Ansible to install other required programs.
 
 ```bash
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-apt-cache policy docker-ce
-sudo apt-get install -y docker-ce
+sudo apt install -y ansible
 ```
+
+## Install Docker, K3s, Helm and other utils
+
+We'll use Docker to build container images. K3s will be configured to also run images with Docker so the images are readily available in Docker after each build.
+
+```bash
+cd ~/git/chipster-openshift/k3s
+ansible-playbook ansible/install.yml -i "localhost," -c local -e user=$(whoami)
+```
+
+Soon we'll use `kubectl` command, which requires an environment variable initialised in the `.bashrc` file. Logout and open a new ssh connection to initialise it now.
+
+TODO Replace Docker with a userspace build system, e.g. [Kaniko](https://github.com/GoogleContainerTools/kaniko), and some image repository.
+
+## Test Docker
 
 Check that Docker is running.
 
@@ -93,82 +104,11 @@ $ sudo systemctl status docker
 ---
 ```
 
-See [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04) for more detailed installation instructions.
+## Test `kubectl`
 
-TODO Replace Docker with a userspace build system, e.g. [Kaniko](https://github.com/GoogleContainerTools/kaniko), and some image repository.
+Check that you can now run `kubectl get node` without `sudo`.
 
-## Install K3s
-
-```bash
-curl -sfL https://get.k3s.io | sh -
-```
-
-Check that K3s works.
-
-```bash
-$ sudo k3s kubectl get node
-NAME                  STATUS   ROLES    AGE   VERSION
-HOST                  Ready    master   38s   v1.17.2+k3s1
-```
-
-Allow the current user to use `kubectl` command with K3s without `sudo`.
-
-```bash
-sudo chown $(whoami) ~/.kube
-sudo bash -c "kubectl config view --raw " > ~/.kube/config
-echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc; source ~/.bashrc
-```
-
-Check that you can now run `kubectl get node` also without `sudo`.
-
-We'll use Docker to build container images. Let's configure K3s to also run images with Docker so the images are readily available in Docker after each build.
-
-```bash
-sudo sed -i 's/server \\/server --docker \\/' /etc/systemd/system/k3s.service
-sudo systemctl daemon-reload
-sudo systemctl restart k3s
-```
-
-## Install other utils
-
-`yq` for parsing yaml files.
-
-```bash
-sudo snap install yq
-```
-
-`jq` for parsing json.
-
-```bash
-sudo apt install jq -y
-```
-
-`diceware` for generating human friendly passwords
-
-```bash
-sudo apt install python3-pip -y
-pip3 install diceware
-```
-
-If you get an error `unsupported locale setting`, run a command `export LC_ALL=C` and then then the installation again.
-
-## Install Helm
-
-```bash
-curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-```
-
-Install a Helm chart repository called `stable`. The Postgresql chart will be installed from there.
-
-```bash
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
-```
-
-More installation options are available in [https://helm.sh/docs/intro/install/](https://helm.sh/docs/intro/install/).
-
-## Check that k3s and Helm work
-
-TODO deploy nginx to test that k3s and helm work.
+## Test K3s and Helm
 
 Generate an example project to a folder `nginx-test`.
 

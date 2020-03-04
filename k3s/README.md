@@ -6,7 +6,7 @@ These instructions show how to install the Chipster web app version 4 to an Ubun
 
 Chipster is based on microservice architecture. There is about a dozen different services, but each of service tries to be relatively simple and independent. Each service is run in its own container. The containers are orchestrated with [Lightweight Kubernetes K3s](https://k3s.io).
 
-The user interface in the v4 Chipster is a single-page-application (SPA) running in the user's browser. Commnad line client and Rest APIs are also available.
+The user interface in the v4 Chipster is a single-page-application (SPA) running in the user's browser. [Commnad line client](chipster-cli.md) and Rest APIs are also available.
 
 ## Status
 

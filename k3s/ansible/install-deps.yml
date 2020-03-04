@@ -1,0 +1,10 @@
+---    
+- name: Install Chipster K3s prerequisites
+  hosts: all
+  become: yes
+
+  roles:
+  - install-docker
+  - install-k3s
+  - install-utils
+  - install-helm
