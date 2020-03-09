@@ -1,4 +1,4 @@
-# Tool development
+# Mount tools from the host
 ## Overview
 
 These instructions show how to mount a directory of the host to the container.
