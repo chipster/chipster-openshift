@@ -323,7 +323,7 @@ TODO
 
 1. Open a shell with `kubectl exec` to the container and edit files directly in the container.
 2. Edit files on the host or on your laptop and copy files with with `kubectl cp` to the container.
-3. [Mount a directory of the host to the container](tool-development.md). Edit the files on the host or copy them from your laptop to the host.
+3. [Mount a directory of the host to the container](host-mount.md). Edit the files on the host or copy them from your laptop to the host.
 
 ### Container images
 
