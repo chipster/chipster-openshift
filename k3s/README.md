@@ -18,8 +18,6 @@ To get started as fast as possible, these instructinos assume that were are sett
 
 The same goes for many other aspcects of configuring and maintaining the server. Many empty titles are added to highlight different aspects that you should consider when running a server in the public internet. Luckily many of these topics are not actually specific to Chipster (e.g. how to setup https or more nodes for K3s). Pull requests for improving this documenation are very much welcome.
 
-These instructions aim to build everything starting from the plain files in GitHub. It's little bit more work, but it allows you to change any part of the system easily. This will be useful now in these early phases of the project, when you might want to fine-tune some things here and there. Maybe later we could provide compiled code packges, container images and Helm Charts in public repositories making the initial installation easier, but raising the bar for custom modifications.
-
 ## Why K3s
 
 K3s is a Lightweight Kubernetes, effectively a container cloud platform. Do we really need the cointainer cloud platform to run a few server processes on single host? Not really, you could checkout the code yourself and follow the Dockerfiles to see what operating system packages and what kind of folder structure is needed for each service, how to compile the code and how to start the processes. Add some form of reverse proxy to terminate HTTPS (e.g. Apache or nginx) and some process monitoring (Java Service Wrapper or systemd) and you are done.
@@ -45,25 +43,6 @@ cd chipster-openshift/k3s
 ```
 
 From now on, please run all commands in this `k3s` directory unles told otherwise.
-
-### Build Images
-
-Building container images will accomplish the following tasks:
-
-* Checkout code repositories
-* Compile code
-* Install operating system packages
-
-In effect we are executing commands defined in Dockerfiles. Most services will run with a minimal image with only Java and Chipster installed on top of Ubuntu, whereas the comp (i.e. analysis) service requires a huge number of operating system
-packages.
-
-Let's build the images. 
-
-```bash
-bash build-image.bash --all
-```
-
-This will take about half an hour.
 
 ### Deploy
 
@@ -162,6 +141,12 @@ Then deploy Chipster again.
 bash deploy.bash -f ~/values.yaml
 ```
 
+If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value form your own or default `values.yaml`.
+
+```bash
+bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-job=10
+```
+
 You can check that configuration file was changed correctly.
 
 ```bash
@@ -201,15 +186,10 @@ Pull latest changes from the deployment repository.
 git pull
 ```
 
-Rebuild images.
+Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. The second run puts back the default pull policy `IfNotPresent`, so that you can restart pods without pulling images in every restart. 
 
 ```bash
-bash build-image.bash --all
-```
-
-Upate the deployment (assuming that you have created your own `~/values.yaml`).
-
-```bash
+bash deploy.bash -f ~/values.yaml --set image.localPullPolicy=Always
 bash deploy.bash -f ~/values.yaml
 ```
 
@@ -336,6 +316,19 @@ TODO
  * How to handle PVCs? Setup a NFS share or Longhorn?
  * How to scale the cluster up and down?
  * How to scale Chipster inside the cluster?
+
+### Tool development
+
+[Building a new container image](build-image.md) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually to slow for any interactive development work. There many ways to edit files faster:
+
+1. Open a shell with `kubectl exec` to the container and edit files directly in the container.
+2. Edit files on the host or on your laptop and copy files with with `kubectl cp` to the container.
+3. [Mount a directory of the host to the container](tool-development.md). Edit the files on the host or copy them from your laptop to the host.
+
+### Container images
+
+When running Chipster in containers, the program itself, tool scripts and operating system packages come from the container images. By default these images are pulled from
+public repositories. If you want to change anything in the images, you can [build your own](build-image.md).
 
 ### Uninstall Chipster
 

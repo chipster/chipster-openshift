@@ -43,6 +43,15 @@ for build_template in templates/builds/*/*.yaml; do
   #| oc apply -f -  | grep -v "$hide_message"
 done
 
+echo "create imagestreams"
+for is_yaml in $(ls templates/imagestreams/*.yaml | grep -v imagestream.yaml); do
+  is=$(basename $is_yaml .yaml)
+  echo $is
+  oc process -f templates/imagestreams/$is.yaml --local -o json \
+    > $parts_dir/$is-is.yaml 
+
+done
+
 echo "apply build configs"
 
 do_merge=1

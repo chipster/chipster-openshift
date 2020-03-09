@@ -27,7 +27,11 @@ spec:
           env:
             - name: JAVA_CLASS
               value: {{ $deployment.class }}
+          {{- if $deployment.useDefaultImageRepo }}
+          image: {{$.Values.image.chipsterImageRepo}}{{ $deployment.image }}
+          {{- else }}
           image: {{ $deployment.image }}
+          {{- end }}
           # pull policy for Chipster images
           imagePullPolicy: {{ $.Values.image.localPullPolicy }}
           ports:
@@ -85,6 +89,10 @@ spec:
             - name: storage
               mountPath: /opt/chipster/storage
             {{- end }}
+            {{- if and $.Values.volumes.hostTools (eq $deployment.name "toolbox") }}
+            - name: tool-scripts
+              mountPath: /opt/chipster/toolbox/tools
+            {{- end }}
       volumes:
         - name: conf
           secret:
@@ -101,12 +109,25 @@ spec:
         {{- end}}
         {{- if and $.Values.toolsBin.version (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
         - name: tools-bin
+        {{- if $.Values.volumes.hostToolsBin }}
+          hostPath:
+            path: {{ $.Values.volumes.hostToolsBin }}
+            type: Directory
+        {{- else }}
           persistentVolumeClaim:
             claimName: tools-bin-{{ $.Values.toolsBin.version }}
+        {{- end}}
         {{- end}}
         {{- if eq $deployment.name "file-broker" }}
         - name: storage
           persistentVolumeClaim:
             claimName: file-broker-storage
+        {{- end}}
+        {{- if and $.Values.volumes.hostTools (eq $deployment.name "toolbox") }}
+        - name: tool-scripts
+          hostPath:
+            # directory location on host
+            path: {{ $.Values.volumes.hostTools }}
+            type: Directory
         {{- end}}
 {{- end }}

@@ -25,6 +25,8 @@ deployments:
     password: ""
     # configs is a YAML map to pass configuration key-value pairs to the Chipster service
     configs: {}
+    # useDefaultImageRepo decides whether image value above should be prefixed with a value of images.chipsterImageRepo
+    useDefaultImageRepo: true
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -36,7 +38,8 @@ deployments:
     password: ""
     configs:
       # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
-      db-fallback: false
+    db-fallback: false
+    useDefaultImageRepo: true
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -47,6 +50,7 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -57,8 +61,9 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: 
-      # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
-      db-fallback: false
+    # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
+    db-fallback: false
+    useDefaultImageRepo: true
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -69,6 +74,7 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -81,6 +87,7 @@ deployments:
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
     configs: {}
+    useDefaultImageRepo: true
   toolbox:
     name: toolbox
     class: ""
@@ -92,6 +99,7 @@ deployments:
     workDir: /opt/chipster/toolbox
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -102,6 +110,7 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   typeService:
     name: type-service
     class: ""
@@ -112,6 +121,7 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   comp:
     name: comp
     class: comp
@@ -122,6 +132,7 @@ deployments:
     workDir: /opt/chipster/comp
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -132,6 +143,7 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
+    useDefaultImageRepo: true
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -142,8 +154,9 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs:
-      # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
-      db-fallback-job-history: false
+    # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
+    db-fallback-job-history: false
+    useDefaultImageRepo: true
 
 # databases is a section for Chipster scripts to know which databases exist
 # passwordKey is the YAML path where generate-passwords.bash will store the password
@@ -198,7 +211,9 @@ image:
   # pullPolicy defines how to pull images from public repositories
   pullPolicy: IfNotPresent
   # localPullPolicy defines how to pull our own Chipster images
-  localPullPolicy: Never
+  localPullPolicy: IfNotPresent
+  #localPullPolicy: Never
+  chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images/
 
 # securityContext sets the access rights of the container user
 securityContext: 
@@ -212,6 +227,12 @@ securityContext:
 
 # host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network
 host: ""
+
+volumes:
+  # hostTools is the host path where from the tool scripts are mounted . By default the tools scripts from the image are used.
+  hostTools: ""
+  # hostToolsBin is the host path where from the tools-bin is mounted. By default it's mounted from the PVC.
+  hostToolsBin: ""
 
 # toolsBin is a section for settings related to the tools-bin package
 toolsBin:
