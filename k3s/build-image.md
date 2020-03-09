@@ -1,8 +1,5 @@
 # Build images
 
-TODO Write instructions for mounting container directories to the host. Making changes through builds is good for final production versions, but 
-it's too slow for development work.
-
 Building container images will accomplish the following tasks:
 
 * Checkout code repositories
