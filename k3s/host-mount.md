@@ -19,8 +19,8 @@ popd
 Change your `~/values.yaml` to mount tool scripts from the host.
 
 ```yaml
-volumes:
-  hostTools: /opt/chipster/toolbox/tools
+tools:
+  hostPath: /opt/chipster/toolbox/tools
 ```
 
 Deploy changes.
@@ -72,8 +72,8 @@ ln -s /mnt/data/tools-bin /opt/chipster/tools
 Change your `~/values.yaml` to mount tools-bin from this host directory.
 
 ```yaml
-volumes:
-  hostToolsBin: /opt/chipster/tools
+toolsBin:
+  hostPath: /opt/chipster/tools
 ```
 
 Deploy changes.

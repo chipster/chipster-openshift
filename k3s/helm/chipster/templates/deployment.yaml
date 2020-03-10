@@ -79,7 +79,7 @@ spec:
               readOnly: true
             {{- end }}
             # tools-bin for toolbox and comp
-            {{- if and $.Values.toolsBin.version (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
+            {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
             - name: tools-bin
               mountPath: /mnt/tools
               readOnly: true
@@ -89,7 +89,7 @@ spec:
             - name: storage
               mountPath: /opt/chipster/storage
             {{- end }}
-            {{- if and $.Values.volumes.hostTools (eq $deployment.name "toolbox") }}
+            {{- if and $.Values.tools.hostPath (eq $deployment.name "toolbox") }}
             - name: tool-scripts
               mountPath: /opt/chipster/toolbox/tools
             {{- end }}
@@ -107,11 +107,11 @@ spec:
           secret:
             secretName: web-server-app
         {{- end}}
-        {{- if and $.Values.toolsBin.version (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
+        {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
         - name: tools-bin
-        {{- if $.Values.volumes.hostToolsBin }}
+        {{- if $.Values.toolsBin.hostPath }}
           hostPath:
-            path: {{ $.Values.volumes.hostToolsBin }}
+            path: {{ $.Values.toolsBin.hostPath }}
             type: Directory
         {{- else }}
           persistentVolumeClaim:
@@ -123,11 +123,11 @@ spec:
           persistentVolumeClaim:
             claimName: file-broker-storage
         {{- end}}
-        {{- if and $.Values.volumes.hostTools (eq $deployment.name "toolbox") }}
+        {{- if and $.Values.tools.hostPath (eq $deployment.name "toolbox") }}
         - name: tool-scripts
           hostPath:
             # directory location on host
-            path: {{ $.Values.volumes.hostTools }}
+            path: {{ $.Values.tools.hostPath }}
             type: Directory
         {{- end}}
 {{- end }}

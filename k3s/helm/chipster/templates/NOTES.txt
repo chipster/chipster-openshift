@@ -13,7 +13,11 @@ Then open the following address in a browser:
 
     http://{{ $.Values.host }}
 
-{{- if $.Values.toolsBin.version }}
+{{- if $.Values.toolsBin.hostPath }}
+
+Chipster is using the tools-bin from the host path {{ $.Values.toolsBin.hostPath }}.
+
+{{- else if $.Values.toolsBin.version }}
 
 A job was created to download the tools-bin package. Follow its progress:
 
@@ -26,9 +30,8 @@ Restart pods when it completes.
 {{ else }}
 
 Chipster was deployed without the tools-bin package, which includes 
-tool binaries and reference data. Run the deployment again and set the tools-bin 
-version to download it.
-    
-    bash install.bash --set host={{ $.Values.host }} --set toolsBin.version=chipster-3.15.6
+tool binaries and reference data. Instructions for downloading it:
+
+    https://github.com/chipster/chipster-openshift/blob/master/k3s/README.md#download-the-tools-bin-package
 
 {{ end }}
