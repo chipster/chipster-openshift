@@ -4,7 +4,11 @@ set -e
 
 source scripts/utils.bash
 
-export PROJECT=$(oc project -q)
+PROJECT=$(oc project -q)
+
+if oc get job download-tools-bin-mylly > /dev/null 2>&1; then
+  oc delete job download-tools-bin-mylly
+fi
 
 oc process -f templates/jobs/download-tools-bin-mylly.yaml --local \
 	-p PROJECT=$PROJECT \
