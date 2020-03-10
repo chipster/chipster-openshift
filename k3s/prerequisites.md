@@ -79,12 +79,25 @@ We'll use Ansible to install other required programs.
 sudo apt install -y ansible
 ```
 
+### Clone deployment scripts
+
+Clone the deployment repository
+
+```bash
+cd
+mkdir git
+cd git
+git clone https://github.com/chipster/chipster-openshift.git --branch k3s
+cd chipster-openshift/k3s
+```
+
+From now on, please run all commands in this `k3s` directory unles told otherwise.
+
 ## Install Docker, K3s, Helm and other utils
 
 We'll use Docker to build container images. K3s will be configured to also run images with Docker so the images are readily available in Docker after each build.
 
 ```bash
-cd ~/git/chipster-openshift/k3s
 ansible-playbook ansible/install.yml -i "localhost," -c local -e user=$(whoami)
 ```
 

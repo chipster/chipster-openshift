@@ -30,20 +30,6 @@ However, k3s offers standardized way of doing all that and we don't want to impl
 
 Please follow a separate document [Chipster in K3s prerequisites](prerequisites.md) to make sure that you have necessary hardware resources, K3s, Helm and a few other utilities installed.
 
-### Clone deployment scripts
-
-Clone the deployment repository
-
-```bash
-cd
-mkdir git
-cd git
-git clone https://github.com/chipster/chipster-openshift.git --branch k3s
-cd chipster-openshift/k3s
-```
-
-From now on, please run all commands in this `k3s` directory unles told otherwise.
-
 ### Deploy
 
 First we generate passwords. 
