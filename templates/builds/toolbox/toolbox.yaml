@@ -54,6 +54,11 @@ objects:
           kind: ImageStreamTag
           name: chipster-tools:latest
       type: ImageChange
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mylly-tools:latest
+      type: ImageChange
     - type: ConfigChange
     - imageChange:
       type: ImageChange
