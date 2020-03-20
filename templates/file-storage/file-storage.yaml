@@ -28,7 +28,7 @@ objects:
     name: file-storage${SUBPROJECT_POSTFIX}
   spec:
     serviceName: file-storage${SUBPROJECT_POSTFIX}
-    replicas: 2
+    replicas: 1
     selector:
       matchLabels:
         app: chipster${SUBPROJECT_POSTFIX}
@@ -76,6 +76,8 @@ objects:
                 name: logs
               - mountPath: /opt/chipster/conf
                 name: conf
+              - mountPath: /opt/chipster/storage
+                name: storage
           - env:
               - name: admin_port
                 value: "${ADMIN_PORT}"
@@ -160,7 +162,7 @@ objects:
         labels:
           app: chipster${SUBPROJECT_POSTFIX}
           subproject: ${{SUBPROJECT}}
-        name: file-storage${SUBPROJECT_POSTFIX}
+        name: storage
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:

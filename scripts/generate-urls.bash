@@ -47,8 +47,12 @@ while read line; do
 		if [[ $proto == "http://" ]]; then
 			proto="https://"
 		fi
-		
-		echo url-admin-ext-$service: $proto$service$subproject_postfix-admin-$PROJECT.$DOMAIN		
+
+		if [[ $service == file-storage ]]; then
+			echo url-admin-ext-$service: '""'
+		else
+			echo url-admin-ext-$service: $proto$service$subproject_postfix-admin-$PROJECT.$DOMAIN		
+		fi
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
 
@@ -59,6 +63,10 @@ while read line; do
 		default_url=$(echo $line | cut -d " " -f 2)
 		proto=$(echo $default_url | cut -d { -f 1)
 		
-		echo url-int-$service: $proto$service$subproject_postfix
+		if [[ $service == file-storage ]]; then
+			echo url-int-$service: '""'
+		else
+			echo url-int-$service: $proto$service$subproject_postfix
+		fi
 	fi
 done < ../chipster-web-server/src/main/resources/chipster-defaults.yaml
