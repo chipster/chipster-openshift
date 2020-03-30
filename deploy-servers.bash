@@ -194,7 +194,7 @@ configure_service "$subproject_postfix" type-service chipster-web-server-js type
 configure_service "$subproject_postfix" web-server web-server web-server &
 configure_service "$subproject_postfix" comp comp comp &
 
-configure_service "$subproject_postfix" file-storage-single chipster-web-server file-storage fi.csc.chipster.filestorage.FileStorage &
+# configure_service "$subproject_postfix" file-storage-single chipster-web-server file-storage fi.csc.chipster.filestorage.FileStorage &
 
 if [ "$mylly" = true ]; then
   configure_service "$subproject_postfix" comp-mylly comp-mylly comp &
