@@ -7,8 +7,8 @@ function get_project {
 
 # parse the current project domain (i.e. the address of this OpenShift)
 function get_domain {
-  #oc status | grep "In project" | cut -d " " -f 6 | cut -d / -f 3 | cut -d : -f 1
-  console=$(oc status | grep "In project" | cut -d / -f 3 | cut -d : -f 1)
+  #oc project | grep "Using project" | cut -d "\"" -f 4 | cut -d / -f 3 | cut -d : -f 1
+  console=$(oc project | grep "Using project" | cut -d "\"" -f 4 | cut -d / -f 3 | cut -d : -f 1)
 
   if [[ $console == "rahti.csc.fi" ]]; then
     echo "rahtiapp.fi"
