@@ -65,12 +65,12 @@ patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp$subproject_pos
   spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin-$tools_bin
 " false
 
-patch_kind_and_name $template_dir/file-storage-single.yaml DeploymentConfig file-storage-single$subproject_postfix "
-  spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/storage
-  spec.template.spec.containers[0].volumeMounts[2].name: storage
-  spec.template.spec.volumes[2].name: storage
-  spec.template.spec.volumes[2].persistentVolumeClaim.claimName: file-broker-storage$subproject_postfix
-" false
+# patch_kind_and_name $template_dir/file-storage-single.yaml DeploymentConfig file-storage-single$subproject_postfix "
+#   spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/storage
+#   spec.template.spec.containers[0].volumeMounts[2].name: storage
+#   spec.template.spec.volumes[2].name: storage
+#   spec.template.spec.volumes[2].persistentVolumeClaim.claimName: file-broker-storage$subproject_postfix
+# " false
 
 patch_kind_and_name $template_dir/session-db.yaml DeploymentConfig session-db$subproject_postfix "
   spec.template.spec.containers[0].ports[2].name: events
