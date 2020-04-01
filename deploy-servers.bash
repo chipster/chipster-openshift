@@ -156,6 +156,11 @@ if [ -z "$mylly" ]; then
   mylly=false
 fi
 
+only_critical_services=$(get_deploy_config $private_config_path only-critical-services $PROJECT $DOMAIN)
+if [ -z "$only_critical_services" ]; then  
+  only_critical_services=false
+fi
+
 tools_bin=$(get_deploy_config $private_config_path tools-bin $PROJECT $DOMAIN)
 if [ -z "$tools_bin" ]; then  
   echo "Tools-bin version is not configured in deploy.yaml"
@@ -260,7 +265,7 @@ bash templates/java-server/patch.bash $template_dir $PROJECT $DOMAIN $tools_bin 
 
 max_pods=$(oc get quota -o json | jq .items[].spec.hard.pods -r | grep -v null)
 
-if [ "$max_pods" -lt 40 ]; then
+if [ "$max_pods" -lt 40 ] || [ "$only_critical_services" = true ]; then
   echo "disable non-critical services because of low pod quota"
   bash templates/patch-low-pod-quota.bash $template_dir $subproject_postfix
   
