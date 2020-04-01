@@ -1,6 +1,7 @@
-<?xml version="1.1" encoding="UTF-8"?><project>
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
   <actions/>
-  <description/>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.29">
@@ -16,7 +17,7 @@
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>SUBPROJECT</name>
-          <description/>
+          <description></description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
               {{SUBPROJECT_OPTIONS}}
@@ -64,25 +65,25 @@
         </hudson.model.ChoiceParameterDefinition>
         <org.biouno.unochoice.ChoiceParameter plugin="uno-choice@2.1">
           <name>TOOLS_BIN_VERSION</name>
-          <description>The options are taken from the object storage and may contain choices that haven't been downloaded to OpenShift yet. Use the Jenkins job download-tools-bin-from-object-storage to see if the version is downloaded already or to download it.</description>
+          <description>The options are taken from the object storage and may contain choices that haven&apos;t been downloaded to OpenShift yet. Use the Jenkins job download-tools-bin-from-object-storage to see if the version is downloaded already or to download it.</description>
           <randomName>choice-parameter-3543489150877066</randomName>
           <visibleItemCount>1</visibleItemCount>
           <script class="org.biouno.unochoice.model.GroovyScript">
             <secureScript plugin="script-security@1.48">
               <script>// Set the URL we want to read from, it is MySQL from official Library for this example, limited to 20 results only.
-url = "https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/"
+url = &quot;https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/&quot;
 try {
     def http_client = new URL(url).openConnection() as HttpURLConnection
-    http_client.setRequestMethod('GET')
+    http_client.setRequestMethod(&apos;GET&apos;)
     http_client.connect()
-    def response = ""
+    def response = &quot;&quot;
     if (http_client.responseCode == 200) {
-        response = http_client.inputStream.getText('UTF-8')
+        response = http_client.inputStream.getText(&apos;UTF-8&apos;)
     } else {
-        println("HTTP response error")
+        println(&quot;HTTP response error&quot;)
         System.exit(0)
     }
-    def list = response.readLines().collect { it.split("/")[0] }
+    def list = response.readLines().collect { it.split(&quot;/&quot;)[0] }
     return list.sort()
 } catch (Exception e) {
          println(e)
@@ -90,7 +91,7 @@ try {
               <sandbox>false</sandbox>
             </secureScript>
             <secureFallbackScript plugin="script-security@1.48">
-              <script/>
+              <script></script>
               <sandbox>false</sandbox>
             </secureFallbackScript>
           </script>
@@ -111,7 +112,7 @@ try {
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
+        <name>*/prod</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -131,14 +132,14 @@ try {
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
-      
+
 set -e
 set +x
 
-OPENSHIFT_PROJECT="$(cat $OPENSHIFT_PROJECT_PATH)"
-DEPLOY_CONF="$(cat $DEPLOY_CONF_PATH)"
-CHIPSTER_DEV_PATCH="$(cat $CHIPSTER_DEV_PATCH_PATH)"
-      
+OPENSHIFT_PROJECT=&quot;$(cat $OPENSHIFT_PROJECT_PATH)&quot;
+DEPLOY_CONF=&quot;$(cat $DEPLOY_CONF_PATH)&quot;
+CHIPSTER_DEV_PATCH=&quot;$(cat $CHIPSTER_DEV_PATCH_PATH)&quot;
+
 if [ -d chipster-web-server ]; then
   pushd chipster-web-server; git pull; popd
 else
@@ -155,72 +156,71 @@ oc login https://rahti.csc.fi:8443 --token=$OPENSHIFT_TOKEN
 
 oc project $OPENSHIFT_PROJECT
 
-project="$(oc project -q)"
-if [ "$project" != $OPENSHIFT_PROJECT ]; then
-  echo "project change failed, stop here"
+project=&quot;$(oc project -q)&quot;
+if [ &quot;$project&quot; != $OPENSHIFT_PROJECT ]; then
+  echo &quot;project change failed, stop here&quot;
   exit 1
 fi
 
-mkdir -p chipster-private/confs/chipster-all
-mkdir -p chipster-private/confs/rahti-int
+pushd chipster-openshift
 
-echo "$DEPLOY_CONF" &gt; chipster-private/confs/chipster-all/deploy.yaml
-echo "$USERS_CONF" &gt; chipster-private/confs/chipster-all/users
-echo "$CHIPSTER_DEV_PATCH" &gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
+source scripts/utils.bash
+
+subproject=&quot;$SUBPROJECT&quot;
+
+mkdir -p ../chipster-private/confs/chipster-all
+mkdir -p ../chipster-private/confs/rahti-int
+
+echo &quot;$DEPLOY_CONF&quot; &gt; ../chipster-private/confs/chipster-all/deploy.yaml
+echo &quot;$USERS_CONF&quot; &gt; ../chipster-private/confs/chipster-all/users
+echo &quot;$CHIPSTER_DEV_PATCH&quot; &gt; ../chipster-private/confs/chipster-all/chipster-template-patch.bash
 
 # chipster-all is actually a place for organization wide configs, but we can use it to configure individual installations
-# as long as these jobs are not run in parallel in Jenkins  
-echo "comp-max-jobs: $COMP_SLOTS" &gt; chipster-private/confs/chipster-all/comp.yaml
-echo "tools-bin: $TOOLS_BIN_VERSION" &gt;&gt; chipster-private/confs/chipster-all/deploy.yaml
+# as long as these jobs are not run in parallel in Jenkins
+echo &quot;comp-max-jobs: $COMP_SLOTS&quot; &gt; ../chipster-private/confs/chipster-all/comp.yaml
+echo &quot;tools-bin: $TOOLS_BIN_VERSION&quot; &gt;&gt; ../chipster-private/confs/chipster-all/deploy.yaml
+echo &quot;file-broker-storage-dns-domain-0: file-storage-$subproject.$project.svc.cluster.local&quot; &gt;&gt; ../chipster-private/confs/chipster-all/file-broker.yaml
 
 COMP_RAM_MB=$(($COMP_RAM * 1000 - 100))
 COMP_CPU_MILLIS=$(($COMP_CPU * 1000 - 100))
 COMP_RAM_MB_REQUEST=$(($COMP_RAM_MB / 2))
 COMP_CPU_MILLIS_REQUEST=$(($COMP_CPU_MILLIS / 2))
 
-echo "
+# write a patch file
+echo &quot;
 source scripts/utils.bash
 
-template_dir="\$1"
-subproject_postfix="\$2"
+template_dir=&quot;\$1&quot;
+subproject_postfix=&quot;\$2&quot;
 
-patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp-$SUBPROJECT \"
+patch_kind_and_name \$template_dir/comp.yaml DeploymentConfig comp-$SUBPROJECT \&quot;
   spec.template.spec.containers[0].resources.limits.cpu: ${COMP_CPU_MILLIS}m
   spec.template.spec.containers[0].resources.limits.memory: ${COMP_RAM_MB}Mi
   spec.template.spec.containers[0].resources.requests.cpu: ${COMP_CPU_MILLIS_REQUEST}m
   spec.template.spec.containers[0].resources.requests.memory: ${COMP_RAM_MB_REQUEST}Mi
-\" true
+\&quot; true
+&quot; &gt;&gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
 
-" &gt;&gt; chipster-private/confs/chipster-all/chipster-template-patch.bash
+echo DELETE_VOLUMES &quot;$DELETE_VOLUMES&quot;
 
-
-pushd chipster-openshift
-
-source scripts/utils.bash
-
-subproject="$SUBPROJECT"
-
-
-echo DELETE_VOLUMES "$DELETE_VOLUMES"
-
-if [ $DELETE_VOLUMES == "true" ]; then
+if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
   bash remove-servers.bash $subproject
-  
+
   oc delete all -l subproject=${subproject}-db
   oc delete secret -l subproject=${subproject}-db
-  
-  if oc get secret passwords-${subproject} > /dev/null; then
-  	oc delete secret passwords-${subproject}
+
+  if oc get secret passwords-${subproject} &gt; /dev/null; then
+        oc delete secret passwords-${subproject}
   fi
-  
+
   oc delete pvc -l subproject=$subproject
   t=30
-  echo "Waiting $t seconds to make sure OpenShift has removed everything"
+  echo &quot;Waiting $t seconds to make sure OpenShift has removed everything&quot;
   sleep $t
 fi
 
 
-if [ $DELETE_VOLUMES == "true" ]; then
+if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
   bash generate-passwords.bash $subproject
   bash deploy-postgres.bash $subproject
 fi
@@ -229,13 +229,13 @@ bash create-secrets.bash $subproject
 
 bash deploy-servers.bash $subproject
 
-if [ $DELETE_VOLUMES == "true" ]; then
+if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
   bash setup.bash $subproject
 fi
 
 wait_dc web-server-$subproject
 
-echo "The application is available in"
+echo &quot;The application is available in&quot;
 echo https://$(oc get route web-server-$subproject -o json | jq .spec.host -r)
 </command>
     </hudson.tasks.Shell>
