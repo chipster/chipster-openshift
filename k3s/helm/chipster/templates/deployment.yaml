@@ -1,5 +1,6 @@
 # deployment for each Chipster service
 {{- range $deploymentKey, $deployment := .Values.deployments }}
+{{- if ne $deployment.name "file-storage" }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -130,4 +131,5 @@ spec:
             path: {{ $.Values.tools.hostPath }}
             type: Directory
         {{- end}}
+{{- end }}
 {{- end }}

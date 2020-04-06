@@ -84,10 +84,21 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    configs: {}
+    useDefaultImageRepo: true
+  fileStorage:
+    name: file-storage
+    class: fi.csc.chipster.filestorage.FileStorage
+    image: chipster-web-server
+    apiPort: 8016
+    adminPort: 8116
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
     configs: {}
-    useDefaultImageRepo: true
+    useDefaultImageRepo: true  
   toolbox:
     name: toolbox
     class: ""

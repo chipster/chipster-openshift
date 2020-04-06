@@ -1,0 +1,93 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: file-storage
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    name: api
+  selector:
+    name: file-storage
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: chipster
+    server: file-storage
+  name: file-storage
+spec:
+  serviceName: file-storage
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chipster
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: file-storage
+        server: file-storage
+    spec:
+      containers:
+        - securityContext:
+          {{- toYaml $.Values.securityContext | nindent 12 }}            
+          # Java class to start for the chipster-web-server image
+          env:
+            - name: JAVA_CLASS
+              value: {{ $.Values.deployments.fileStorage.class }}
+          {{- if $.Values.deployments.fileStorage.useDefaultImageRepo }}
+          image: {{$.Values.image.chipsterImageRepo}}{{ $.Values.deployments.fileStorage.image }}
+          {{- else }}
+          image: {{ $.Values.deployments.fileStorage.image }}
+          {{- end }}
+          # pull policy for Chipster images
+          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          name: file-storage
+          ports:
+            - containerPort: {{ $.Values.deployments.fileStorage.apiPort }}
+              name: api
+              protocol: TCP
+            - containerPort: {{ $.Values.deployments.fileStorage.adminPort }}
+              name: admin
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /admin/alive
+              port: admin
+          # dead lock between auth and service-locator
+          # readinessProbe:
+          #   httpGet:
+          #     path: /admin/alive
+          #     port: admin    
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /opt/chipster/logs
+              name: logs
+            - mountPath: /opt/chipster/conf
+              name: conf
+            - mountPath: /opt/chipster/storage
+              name: storage
+      volumes:
+        - emptyDir: {}
+          name: logs
+        - name: conf
+          secret:
+            defaultMode: 420
+            secretName: file-storage
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        app: chipster
+      name: storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ $.Values.deployments.fileStorage.storageVolumeSize }}

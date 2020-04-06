@@ -7,6 +7,9 @@
 # but maybe we should get the current list of deployments form the 
 # Helm values.yaml file to be more explicit.
 
+
 for d in $(kubectl get deployment -o name); do 
     kubectl rollout restart $d
 done
+
+kubectl rollout restart sts/file-storage

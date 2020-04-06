@@ -98,7 +98,7 @@ From now on, please run all commands in this `k3s` directory unles told otherwis
 We'll use Docker to build container images. K3s will be configured to also run images with Docker so the images are readily available in Docker after each build.
 
 ```bash
-ansible-playbook ansible/install.yml -i "localhost," -c local -e user=$(whoami)
+ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami)
 ```
 
 Soon we'll use `kubectl` command, which requires an environment variable initialised in the `.bashrc` file. Logout and open a new ssh connection to initialise it now.
@@ -133,6 +133,13 @@ Deploy it. Replace `HOST_ADDRESS` with your server's DNS name or IP address.
 
 ```bash
 helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/" --set ingress.hosts[0].host="HOST_ADDRESS"
+```
+
+If you don't have a DNS name for your host, you can leave the `HOST_ADDRESS` parameter away. In this case the example won't be able to print the correct address for you to open
+in the next step, but just use the host's IP address there.
+
+```bash
+helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"
 ```
 
 Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page starting with a title `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before  starting to deploy Chipster.

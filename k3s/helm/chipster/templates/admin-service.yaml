@@ -1,12 +1,12 @@
 {{- range $deploymentKey, $deployment := .Values.deployments }}
-{{- if and $deployment.apiPort (ne $deployment.name "file-storage") }}
-# Kubernetes service for the main API port of each Chipster service,
+{{- if and $deployment.adminPort (ne $deployment.name "file-storage") }}
+# Kubernetes service for the main admin port of each Chipster service,
 # making the port accessible for other services
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $deployment.name }}
+  name: {{ $deployment.name }}-admin
   labels:
     app: chipster
 spec:
@@ -14,9 +14,9 @@ spec:
       # the service can be accessed with the default port
     - port: 80
       # use the named port of the deployment
-      targetPort: api
+      targetPort: admin
       protocol: TCP
-      name: api
+      name: admin
   selector:
     app: chipster
     deployment: {{ $deployment.name }}

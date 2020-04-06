@@ -1,12 +1,10 @@
 {{- range $deploymentKey, $deployment := .Values.deployments }}
 {{- if ne $deployment.name "file-storage" }}
-# http/websocket reverse proxy for making Chipster APIs accessible
-# from the internet
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $deployment.name }}
+  name: {{ $deployment.name }}-admin
   labels:
     app: chipster
   annotations:
@@ -26,15 +24,10 @@ spec:
   rules:
     - http:
         paths:
-          {{- if eq $deployment.name "web-server" }}
-          # serve web app in the root
-          - path: /
-          {{- else }}
           # other services are served in subpaths
-          - path: /{{ $deployment.name }}
-          {{- end }}
+          - path: /{{ $deployment.name }}-admin 
             backend:
-              serviceName: {{ $deployment.name }}
+              serviceName: {{ $deployment.name }}-admin
               # services map everything to the port 80
               servicePort: 80
 {{- end }}
