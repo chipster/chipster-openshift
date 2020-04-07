@@ -85,11 +85,6 @@ spec:
               mountPath: /mnt/tools
               readOnly: true
             {{- end }}
-            # file-broker's storage
-            {{- if eq $deployment.name "file-broker" }}
-            - name: storage
-              mountPath: /opt/chipster/storage
-            {{- end }}
             {{- if and $.Values.tools.hostPath (eq $deployment.name "toolbox") }}
             - name: tool-scripts
               mountPath: /opt/chipster/toolbox/tools
@@ -118,11 +113,6 @@ spec:
           persistentVolumeClaim:
             claimName: tools-bin-{{ $.Values.toolsBin.version }}
         {{- end}}
-        {{- end}}
-        {{- if eq $deployment.name "file-broker" }}
-        - name: storage
-          persistentVolumeClaim:
-            claimName: file-broker-storage
         {{- end}}
         {{- if and $.Values.tools.hostPath (eq $deployment.name "toolbox") }}
         - name: tool-scripts
