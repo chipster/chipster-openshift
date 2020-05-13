@@ -100,7 +100,7 @@ objects:
               imagePullPolicy: Always
               name: filebeat
               volumeMounts:
-                - mountPath: /opt/chipster/${NAME}/logs
+                - mountPath: /opt/chipster/logs
                   name: logs
               readinessProbe:
                 failureThreshold: 3

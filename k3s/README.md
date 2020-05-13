@@ -241,7 +241,7 @@ TODO How to generate new keys if the old keys have leaked?
 
 #### OpenID Connect
 
-TODO Works e.g. with Google authentication, but then all Google accounts have full user permissions in Chipster. Access can be restricted with firewalls or by using other more exclusive OpenID Connect providers.
+A separate document has instructions for [authenticating Chipster users with OpenID Connect](oidc.md) protocol.
 
 #### LDAP authentication
 
@@ -268,7 +268,7 @@ TODO FileBroker can encrypt and upload incremental file backups to S3. BackupArc
 
 TODO Collect logs with Filebeat (running in a sidecar container) and push them to Logstash
 
-### Graphana
+### Grafana
 
 TODO Collect statistics from the admin Rest API, push them to InfluxDB and show in Grafana
 
