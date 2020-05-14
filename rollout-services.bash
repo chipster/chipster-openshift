@@ -22,4 +22,4 @@ for d in auth service-locator session-db file-broker scheduler comp session-work
 done
 
 # is there a better way?
-json=$(oc get sts file-storage$subproject_postfix -o json); oc delete sts file-storage$subproject_postfix; echo "$json" | oc apply -f -
+#json=$(oc get sts file-storage$subproject_postfix -o json); oc delete sts file-storage$subproject_postfix; echo "$json" | oc apply -f -
