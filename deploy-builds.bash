@@ -19,7 +19,11 @@ fi
 
 private_config_path=" ../chipster-private/confs"
 hide_message="oc apply should be used on resource created by either oc create --save-config or oc apply"
-build_dir="build_DO_NOT_COMMIT"
+
+# better to do this outside repo
+build_dir=$(mktemp -d -t chipster-openshift_create-secrets)
+echo -e "build dir is \033[33;1m$build_dir\033[0m"
+
 parts_dir="$build_dir/parts"
 
 mkdir -p $parts_dir
@@ -69,6 +73,7 @@ else
   apply_out="$build_dir/apply.out"
   oc apply -f $template | tee $apply_out | grep -v unchanged
   echo $(cat $apply_out | grep unchanged | wc -l) objects unchanged
-
-  rm -rf $build_dir
 fi
+
+echo "delete build dir $build_dir"
+rm -rf $build_dir

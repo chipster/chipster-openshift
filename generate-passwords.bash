@@ -26,9 +26,9 @@ keys+="auth-db-password"$'\n'
 keys+="session-db-db-password"$'\n'
 keys+="job-history-db-password"$'\n'
 
-build_dir="build_DO_NOT_COMMIT"
-rm -rf $build_dir
-mkdir -p $build_dir
+# better to do this outside repo
+build_dir=$(mktemp -d -t chipster-openshift_generate-passwords)
+echo -e "build dir is \033[33;1m$build_dir\033[0m"
 
 secret_file="$build_dir/passwords.json"
 get_secret passwords$subproject_postfix $subproject \
@@ -41,6 +41,8 @@ done
 add_literal_to_secret $secret_file "jws-private-key-auth" "$(openssl ecparam -genkey -name secp521r1 -noout)"
 add_literal_to_secret $secret_file "jws-private-key-session-db" "$(openssl ecparam -genkey -name secp521r1 -noout)"
 
+echo "apply changes"
 oc apply -f $secret_file
 
+echo "delete build dir $build_dir"
 rm -rf $build_dir
