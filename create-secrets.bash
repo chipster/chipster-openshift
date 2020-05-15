@@ -77,11 +77,12 @@ fi
 
 # generate configs and save them as openshift secrets
 
-# contains passwords, don't commit
-build_dir="build-DO-NOT_COMMIT"
+# better to do this outside repo
+build_dir=$(mktemp -d -t chipster-openshift_create-secrets)
+echo -e "build dir is \033[33;1m$build_dir\033[0m"
+
 configured_objects_dir="$build_dir/configured-objects"
 
-rm -rf $build_dir/*
 mkdir -p $configured_objects_dir
 
 services="session-db 
@@ -192,6 +193,7 @@ add_file_to_secret $secret_file chipster.yaml $build_dir/web-server-app/chipster
 
 echo "apply to server"
 
-oc apply -f "$configured_objects_dir"
+#oc apply -f "$configured_objects_dir"
 
+echo "delete build dir $build_dir"
 rm -rf $build_dir
