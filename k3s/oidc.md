@@ -16,7 +16,7 @@ Register you Chipster installation in [Google API Console](https://console.devel
 - Set `Application type` to `Web application`
 - Set some name for your Chipster installation
 - Set `Authorised JavaScript origins` to the address of your host: `http://HOST_ADDRESS`
-- Set `Authorised rediredt URIs` to `http://HOST_ADDRESS/oidc/callback`
+- Set `Authorised redirect URIs` to `http://HOST_ADDRESS/oidc/callback`
 - The service will show you a long string called `Client ID`. Copy it. There is a client secret next to it, but Chipster uses so called "implicit flow" by default, where the client secret isn't used.
 
 ## Setup OAuth consent screen
