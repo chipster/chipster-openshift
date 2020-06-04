@@ -63,9 +63,11 @@ sudo ln -s /mnt/data/k3s/pods /var/lib/kubelet/pods
 ## Firewall
 
 Make sure that you have firewall a (in the network / IaaS cloud or the Ubuntu's local iptables) that allows only 
-* inbound access from your laptop to ports 22 (ssh), 80 (http) and maybe also 443 for https in the future
+* inbound access from your laptop to ports 22 (ssh), 80 (http) and optionally 443 for https
 * inbound access from this machine itself (ports 80 and 443). In OpenStack's Security groups this would mean from the VM's floating IP address. TODO make it start without this
 * outbound access to anything
+
+* Optional [TLS (https) instructions](tls.md#firewall) will have a few additional requirements for the firewall
 
 Especially make sure to protect the port 8472 that K3s would use for cummunicating with other K3s nodes (although we are going to install only one node now). 
 
@@ -144,7 +146,9 @@ helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.host
 
 Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page starting with a title `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before  starting to deploy Chipster.
 
-Uninstall the test project from K3s and delete the folder.
+If you are plan to use [TLS (https) encryption](tls.md), the nginx-test offers a great platform for sorting it out.
+
+When you are done, uninstall the test project from K3s and delete the folder.
 
 ```bash
 helm uninstall nginx-test
