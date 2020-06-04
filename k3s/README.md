@@ -12,11 +12,7 @@ The user interface in the v4 Chipster is a single-page-application (SPA) running
 
 Chipster v4 is under heavy development and is still a bit rough around the edges. Nevertheless, it should be nicely usable for the end users running real analysis jobs. We are running it ourselves for that purpose. Many architectural choices are based on the old tried-and-tested Chipster v3.
 
-However, tha same cannot be said about these installation instructions. These are the first attempt to show how to get the Chipster running. 
-
 To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide [the critical pointers](migration.md), because we are migrating our own installations anyway. 
-
-The same goes for many other aspcects of configuring and maintaining the server. Many empty titles are added to highlight different aspects that you should consider when running a server in the public internet. Luckily many of these topics are not actually specific to Chipster (e.g. how to setup https or more nodes for K3s). Pull requests for improving this documenation are very much welcome.
 
 ## Why K3s
 
@@ -230,7 +226,7 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 
 ### HTTPS
 
-TODO With Let's Encrypt certificates? Then change the service addressess in the secrets.
+Chipster can use TLS (https) to encrypt and validate the network traffic between the browser and the server. In case you created the certificate already for the nginx-test, simply adding the configuration to to your `~/values.yaml` like shown in [the end of instructions](tls.md#apply) is enough.
 
 ### Authentication
 ### JWT keys
@@ -300,7 +296,7 @@ TODO copy kubectl configuration from the host and use `kubectl` from your laptop
 ### K3s cluster
 
 TODO 
- * How to handle images? Copy manually to each node or setup an image registry?
+ * How to handle possible custom images? Copy manually to each node or setup an image registry?
  * How to handle PVCs? Setup a NFS share or Longhorn?
  * How to scale the cluster up and down?
  * How to scale Chipster inside the cluster?
@@ -316,15 +312,15 @@ TODO
 ### Container images
 
 When running Chipster in containers, the program itself, tool scripts and operating system packages come from the container images. By default these images are pulled from
-public repositories. If you want to change anything in the images, you can [build your own](build-image.md).
+public repositories. If you want to change anything in the images, you can [build your own container images](build-image.md).
 
 ### Uninstall Chipster
 
 Command `helm uninstall chipster` should delete all Kubernetes objects, except volumes. This is relatively safe to run when you want run the installation again, but want to keep the data volumes. Use `kubectl delete pvc --all`, if you want to delete the volumes too.
 
-The `helm uninstall` command gives you almost a fresh start with one caveat. The databases store their password on their volumes. If you generate the passwords again, the databases won't accept the new passwords. In the early phases when you don't have anything valuable in the databases, it's easiest to simply delete the database volumes.
+The `helm uninstall chipster` command gives you almost a fresh start with one caveat. The databases store their password on their volumes. If you generate the passwords again, the databases won't accept the new passwords. In the early phases when you don't have anything valuable in the databases, it's easiest to simply delete the database volumes too.
 
-If the Helm release is too badly broken, you can delete everything manually with `kubectl`.
+If the Helm release is too badly broken for the uninstallation, you can delete everything manually with `kubectl`.
 
 ```bash
 for t in job deployment statefulset pod secret ingress service pvc; do  

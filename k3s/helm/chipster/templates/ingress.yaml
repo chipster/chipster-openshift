@@ -11,6 +11,9 @@ metadata:
     app: chipster
   annotations:
     "traefik.frontend.rule.type": PathPrefixStrip
+    {{- if $.Values.ingress.tls }}
+    "traefik.ingress.kubernetes.io/redirect-entry-point": https
+    {{- end }}
 spec:
 # from chart template, not tested
 {{- if $.Values.ingress.tls }}
