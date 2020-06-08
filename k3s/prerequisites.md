@@ -146,8 +146,6 @@ helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.host
 
 Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page starting with a title `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before  starting to deploy Chipster.
 
-If you are plan to use [TLS (https) encryption](tls.md), the nginx-test offers a great platform for sorting it out.
-
 When you are done, uninstall the test project from K3s and delete the folder.
 
 ```bash
