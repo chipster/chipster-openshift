@@ -236,7 +236,7 @@ securityContext:
   #   - ALL
   # readOnlyRootFilesystem: true
 
-# host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network
+# host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network. For OIDC and TLS (Let's Encrypt) this must be a DNS name.
 host: ""
 
 # toolsBin is a section for settings related to the tools-bin package
@@ -252,7 +252,13 @@ tools:
   # hostPath where from tool scripts are mounted . By default the tools scripts from the image are used.
   hostPath: ""
 
-# ingress is reserved for future configuration of https
+tls:
+  # env decides which Let's Encrypt environment to use. Set to "staging" to use the staging, "prod" to use the production, or "" to disable TLS.
+  env: ""
+  # email is the address where Let's Encrypt sends expiration notifications, when the automatic certificate renewal fails.
+  email: ""
+
+# ingress is sectino for the optional https configuration
 ingress:
   tls: []
   #  - secretName: chart-example-tls
