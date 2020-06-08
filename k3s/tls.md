@@ -21,7 +21,7 @@ We'll install [cert-manager](https://cert-manager.io/docs/), which gets certific
 
 This will show a short version of cert-manager installation. You can find more details from [the original manual page](https://cert-manager.io/docs/installation/kubernetes/).
 
-Use Ansible playbook to add the Helm repository of cert-manager and installed its CustomResourceDefinitions.
+Use Ansible playbook to add the Helm repository of cert-manager and install its CustomResourceDefinitions.
 
 ```bash
 ansible-playbook ansible/install-tls-deps.yml -i "localhost," -c local -e user=$(whoami)
@@ -44,7 +44,7 @@ Browsers won't trust the staging certificates, but use those first when getting 
 
 ## Get a staging certificate
 
-First, we'll configure cert-manager to use the Let's encrypt stagin environment. Add this to your `~/values.yaml` file. Replace `EMAIL_ADDRESS` with the address where you want to receive certificate expiration notifications, in case something goes wrong with the automatic certificate renewal.
+First, we'll configure cert-manager to use the Let's encrypt staging environment. Add this to your `~/values.yaml` file. Replace `EMAIL_ADDRESS` with the address where you want to receive certificate expiration notifications, in case something goes wrong with the automatic certificate renewal.
 
 ```yaml
 tls:
@@ -56,7 +56,6 @@ Then deploy the new settings:
 
 ```bash
 bash deploy.bash -f ~/values.yaml
-bash restart.bash
 ```
 
 The cert-manager will try to get a staging certificate for you. Check that the certificate was issued:
@@ -87,7 +86,7 @@ tls:
   email: EMAL_ADDRESSS
 ```
 
-Again, deploy the new settings:
+Again, deploy the new settings. Restart also all deployments to make sure that they can still connect to each other.
 
 ```bash
 bash deploy.bash -f ~/values.yaml
