@@ -226,7 +226,7 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 
 ### HTTPS
 
-Chipster can use TLS (https) to encrypt and validate the network traffic between the browser and the server. In case you created the certificate already for the nginx-test, simply adding the configuration to to your `~/values.yaml` like shown in [the end of instructions](tls.md#apply) is enough.
+[Configure Chipster to use TLS](tls.md) (https) to encrypt and validate the network traffic between the browser and the server.
 
 ### Authentication
 ### JWT keys

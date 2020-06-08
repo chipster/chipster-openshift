@@ -77,7 +77,7 @@ kubectl describe order
 
 Seeing that the certificate is ready is actually enough at this point. This certificate is only from the Let's encrypt staging environment, so browsers won't trust it anyway. Actually some Chipster services won't event start, because those don't trust it either. 
 
-# Get a production certificate
+## Get a production certificate
 
 After you have succesfully received a staging certificate, it's time to get a real one. In your `~/values.yaml`, change the `env` to `prod` and keep your email address for the certificate expiration notifications.
 
