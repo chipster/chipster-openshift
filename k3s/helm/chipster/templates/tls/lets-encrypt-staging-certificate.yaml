@@ -1,0 +1,18 @@
+{{ if eq $.Values.tls.env "staging" }}
+# The certificate object could be created implicitly by adding annotations 
+# to the Ingress object. However, we'll do it now separately, because otherwise 
+# we would repeat the annotations in our each and every ingress
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: chipster-tls-staging
+  namespace: default
+spec:
+  secretName: chipster-tls-staging
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: {{ $.Values.host }}
+  dnsNames:
+  - {{ $.Values.host }}
+{{ end }}
