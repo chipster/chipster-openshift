@@ -44,7 +44,7 @@ kubectl exec deployment/toolbox -it touch /opt/chipster/toolbox/.reload/touch-me
 Restart toolbox once to make it watch this file.
 
 ```bash
-kubectl rollout latest deployment toolbox
+kubectl rollout restart deployment toolbox
 ```
 
 Now running the `kubectl ... touch` command above will trigger the toolbox reload instantaneously. You can see its results from the log file.
