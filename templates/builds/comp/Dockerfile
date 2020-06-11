@@ -10,4 +10,4 @@ RUN mkdir -p /opt/chipster/comp \
 
 WORKDIR /opt/chipster/comp
 
-CMD ["java", "-cp", "../lib/*:", "fi.csc.chipster.comp.RestCompServer"]
+CMD ["java", "-cp", "../lib/*:", "-Xmx512m", "fi.csc.chipster.comp.RestCompServer"]
