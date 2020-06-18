@@ -193,7 +193,7 @@ add_file_to_secret $secret_file chipster.yaml $build_dir/web-server-app/chipster
 
 echo "apply to server"
 
-#oc apply -f "$configured_objects_dir"
+oc apply -f "$configured_objects_dir"
 
 echo "delete build dir $build_dir"
 rm -rf $build_dir
