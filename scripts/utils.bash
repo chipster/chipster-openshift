@@ -325,7 +325,7 @@ function follow_job {
   oc logs --follow $pod
 }
 
-fucntion make_temp {
+function make_temp {
   name="$1"
 
   if mktemp --version > /dev/null 2>&1; then
