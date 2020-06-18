@@ -214,6 +214,8 @@ if [ $DELETE_VOLUMES == &quot;true&quot; ]; then
   fi
 
   oc delete pvc -l subproject=$subproject
+  # why this pvc doesn't get the subproject label?
+  oc delete pvc storage-file-storage-${subproject}-0
   t=30
   echo &quot;Waiting $t seconds to make sure OpenShift has removed everything&quot;
   sleep $t
