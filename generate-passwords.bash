@@ -27,7 +27,7 @@ keys+="session-db-db-password"$'\n'
 keys+="job-history-db-password"$'\n'
 
 # better to do this outside repo
-build_dir=$(mktemp -d -t chipster-openshift_generate-passwords)
+build_dir=$(make_temp chipster-openshift_generate-passwords)
 echo -e "build dir is \033[33;1m$build_dir\033[0m"
 
 secret_file="$build_dir/passwords.json"

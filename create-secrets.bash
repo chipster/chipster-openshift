@@ -78,7 +78,7 @@ fi
 # generate configs and save them as openshift secrets
 
 # better to do this outside repo
-build_dir=$(mktemp -d -t chipster-openshift_create-secrets)
+build_dir=$(make_temp chipster-openshift_create-secrets)
 echo -e "build dir is \033[33;1m$build_dir\033[0m"
 
 configured_objects_dir="$build_dir/configured-objects"
