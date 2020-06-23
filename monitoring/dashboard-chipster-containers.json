@@ -46,7 +46,7 @@
     "gnetId": null,
     "graphTooltip": 0,
     "id": null,
-    "iteration": 1592311987596,
+    "iteration": 1592900620261,
     "links": [],
     "panels": [
       {
@@ -1029,7 +1029,7 @@
         ]
       }
     ],
-    "refresh": false,
+    "refresh": "10s",
     "schemaVersion": 16,
     "style": "dark",
     "tags": [],
@@ -1058,8 +1058,8 @@
       ]
     },
     "time": {
-      "from": "2020-06-16T12:56:07.374Z",
-      "to": "2020-06-16T13:26:07.374Z"
+      "from": "now-3h",
+      "to": "now"
     },
     "timepicker": {
       "refresh_intervals": [
@@ -1089,5 +1089,5 @@
     "timezone": "browser",
     "title": "Chipster containers",
     "uid": "rAeCewgmk",
-    "version": 13
+    "version": 20
   }

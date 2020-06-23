@@ -46,7 +46,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1571032559108,
+  "iteration": 1592900687861,
   "links": [],
   "panels": [
     {
@@ -2443,7 +2443,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "chipster-dev",
+  "title": "Chipster summary",
   "uid": "rAeCewgmk",
-  "version": 8
+  "version": 22
 }
