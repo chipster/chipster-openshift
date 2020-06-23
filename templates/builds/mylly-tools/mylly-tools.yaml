@@ -20,7 +20,7 @@ objects:
     source:
       dockerfile: ""
       git:
-        ref: dev-tools
+        ref: ${BRANCH}
         uri: https://github.com/CSCfi/Kielipankki-mylly.git
       type: Git
     strategy:

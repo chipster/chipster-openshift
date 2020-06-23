@@ -32,10 +32,23 @@ echo "create build configs"
 
 for build_template in templates/builds/*/*.yaml; do
   build=$(basename $build_template .yaml)
+  branch2="$branch"
+
+  # Kielipankki-mylly repo has different branches
+  if [ $build = "mylly-tools" ]; then
+    if [ $PROJECT = "mylly-dev" ]; then
+      # dev
+      branch2="dev-tools"
+    else
+      # prod
+      branch2="master"
+    fi
+  fi
+
   echo $build
   oc process -f templates/builds/$build/$build.yaml --local -o json \
     -p NAME=$build-bc-template \
-    -p BRANCH=$branch \
+    -p BRANCH=$branch2 \
     -p GITHUB_SECRET="$(get_deploy_config $private_config_path bc-github-secret $PROJECT $DOMAIN)" \
     -p GENERIC_SECRET="$(get_deploy_config $private_config_path bc-generic-secret $PROJECT $DOMAIN)" \
     | jq .items[0].spec.source.dockerfile="$(cat templates/builds/$build/Dockerfile | jq -s -R .)" \
