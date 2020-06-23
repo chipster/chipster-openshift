@@ -13,4 +13,4 @@ RUN mkdir -p /home/user/.cache \
   
 RUN curl -s https://korp.csc.fi/download/.mylly/kielipankki_local_root_install.sh | sed 's/pip /pip2 /g' | bash
 
-CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.comp.RestCompServer"]
+CMD ["java", "-cp", "lib/*:", "-Xmx512m", "fi.csc.chipster.comp.RestCompServer"]
