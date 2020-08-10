@@ -89,6 +89,10 @@ spec:
             - name: tool-scripts
               mountPath: /opt/chipster/toolbox/tools
             {{- end }}
+            {{- if eq $deployment.name "comp" }}
+            - name: jobs-data
+              mountPath: {{ $deployment.workDir }}/jobs-data
+            {{- end }}
       volumes:
         - name: conf
           secret:
@@ -120,6 +124,10 @@ spec:
             # directory location on host
             path: {{ $.Values.tools.hostPath }}
             type: Directory
+        {{- end}}
+        {{- if eq $deployment.name "comp" }}
+        - name: jobs-data
+          emptyDir: {}
         {{- end}}
 {{- end }}
 {{- end }}
