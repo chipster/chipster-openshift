@@ -324,3 +324,15 @@ function follow_job {
   pod="$(oc get pod  | grep $job | grep "Running" | cut -d " " -f 1)"
   oc logs --follow $pod
 }
+
+function make_temp {
+  name="$1"
+
+  if mktemp --version > /dev/null 2>&1; then
+    # GNU
+    mktemp -d -t $name.XXX
+  else
+    # MacOS
+    mktemp -d -t $name
+  fi
+}

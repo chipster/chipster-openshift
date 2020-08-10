@@ -78,7 +78,7 @@ fi
 # generate configs and save them as openshift secrets
 
 # better to do this outside repo
-build_dir=$(mktemp -d -t chipster-openshift_create-secrets)
+build_dir=$(make_temp chipster-openshift_create-secrets)
 echo -e "build dir is \033[33;1m$build_dir\033[0m"
 
 configured_objects_dir="$build_dir/configured-objects"
@@ -115,12 +115,6 @@ for service in $authenticated_services; do
   
   echo $config_key: $service_password | tee $build_dir/$service.yaml >> $build_dir/auth.yaml
 done
-
-# file-storage-single for migrating files from the old volume
-# file_storage_password="$(echo "$passwords" | jq -r .data[\"service-password-file-storage\"] | base64 --decode)" 
-# echo service-password-file-storage: $file_storage_password | tee $build_dir/file-storage-single.yaml >> $build_dir/auth.yaml
-# echo url-int-file-storage-single: http://file-storage-single$subproject_postfix >> $build_dir/service-locator.yaml
-# echo url-admin-ext-file-storage-single: http://file-storage-single-admin$subproject_postfix >> $build_dir/service-locator.yaml
 
 # get the (multiline) private key from the passwords, and prefix each line with a space character to make it a yaml block 
 jws_private_key_auth="$(      echo "$passwords" | jq -r .data[\"jws-private-key-auth\"]       | base64 --decode | sed -e 's/^/ /')"
@@ -193,7 +187,7 @@ add_file_to_secret $secret_file chipster.yaml $build_dir/web-server-app/chipster
 
 echo "apply to server"
 
-#oc apply -f "$configured_objects_dir"
+oc apply -f "$configured_objects_dir"
 
 echo "delete build dir $build_dir"
 rm -rf $build_dir
