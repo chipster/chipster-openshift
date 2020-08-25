@@ -20,7 +20,7 @@ DOMAIN=$(get_domain)
 wait_dc auth$subproject_postfix
 
 # check connection first, otherwise connection errors cause the users file to be overwritten
-if oc rsh dc/auth$subproject_postfix hostname && oc rsh dc/auth$subproject_postfix ls /opt/chipster/security/users > /dev/null ; then
+if oc rsh -c auth dc/auth$subproject_postfix hostname && oc rsh -c auth dc/auth$subproject_postfix ls /opt/chipster/security/users > /dev/null ; then
   echo "Using old accounts"
 else
   echo "Create default accounts"
@@ -32,9 +32,8 @@ else
     users_path="../chipster-private/confs/chipster-all/users"
   fi
   
-  sleep 4 # sleep a bit to keep the ansible-vault prompt and script output order correct
   echo "Paste ansible-vault password below and hit enter"
-  ansible-vault view $users_path | oc rsh dc/auth$subproject_postfix bash -c "cat - > /opt/chipster/security/users"
+  ansible-vault view $users_path | oc rsh -c auth dc/auth$subproject_postfix bash -c "cat - > /opt/chipster/security/users"
   # ansible-vault view --vault-password-file password.txt $users_path
 
 fi
