@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 source scripts/utils.bash
 
@@ -22,7 +23,7 @@ wait_dc auth$subproject_postfix
 if oc rsh dc/auth$subproject_postfix hostname && oc rsh dc/auth$subproject_postfix ls /opt/chipster/security/users > /dev/null ; then
   echo "Using old accounts"
 else
-  echo Create default accounts
+  echo "Create default accounts"
   # copy with "oc rsh", because oc cp would require a pod name
   
   users_path="../chipster-private/confs/$PROJECT.$DOMAIN/users"
@@ -31,7 +32,11 @@ else
     users_path="../chipster-private/confs/chipster-all/users"
   fi
   
-  cat $users_path | oc rsh dc/auth$subproject_postfix bash -c "cat - > /opt/chipster/security/users"
+  sleep 4 # sleep a bit to keep the ansible-vault prompt and script output order correct
+  echo "Paste ansible-vault password below and hit enter"
+  ansible-vault view $users_path | oc rsh dc/auth$subproject_postfix bash -c "cat - > /opt/chipster/security/users"
+  # ansible-vault view --vault-password-file password.txt $users_path
+
 fi
 
 psql auth-postgres$subproject_postfix        auth_db        'alter system set synchronous_commit to off'
