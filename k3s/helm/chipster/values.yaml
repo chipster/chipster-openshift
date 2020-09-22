@@ -193,10 +193,13 @@ deploymentDefault:
 databases:
   auth:
     passwordKey: "\"auth-postgresql\".postgresqlPassword"
+    enabled: true
   sessionDb:
     passwordKey: "\"session-db-postgresql\".postgresqlPassword"
+    enabled: true
   jobHistory:
     passwordKey: "\"job-history-postgresql\".postgresqlPassword"
+    enabled: true
 
 # generate-passwords.bash will generate all users.*.password fields
 users:
@@ -224,18 +227,15 @@ auth-postgresql:
   # postgresqlDatabase is the name of the database
   postgresqlDatabase: auth_db
   # postgresqlPassword is the database password, see the comment of "databases" section 
-  postgresqlPassword: ""
-  enabled: true
+  postgresqlPassword: ""  
 
 session-db-postgresql:
   postgresqlDatabase: session_db_db
   postgresqlPassword: ""
-  enabled: true
 
 job-history-postgresql:
   postgresqlDatabase: job_history_db
   postgresqlPassword: ""
-  enabled: true
 
 # image is a section for defining how to get the images
 image:
