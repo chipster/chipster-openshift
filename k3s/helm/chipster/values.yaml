@@ -225,14 +225,17 @@ auth-postgresql:
   postgresqlDatabase: auth_db
   # postgresqlPassword is the database password, see the comment of "databases" section 
   postgresqlPassword: ""
+  enabled: true
 
 session-db-postgresql:
   postgresqlDatabase: session_db_db
   postgresqlPassword: ""
+  enabled: true
 
 job-history-postgresql:
   postgresqlDatabase: job_history_db
   postgresqlPassword: ""
+  enabled: true
 
 # image is a section for defining how to get the images
 image:
