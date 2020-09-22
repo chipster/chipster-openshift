@@ -9,10 +9,10 @@ metadata:
   labels:
     app: chipster
 spec:
-  {{- if $.Values.deployments.default.replicas }}
-  replicas: {{ $.Values.deployments.default.replicas }}
-  {{- else }}
+  {{- if $deployment.replicas }}
   replicas: {{ $deployment.replicas }}
+  {{- else }}
+  replicas: {{ $.Values.deploymentDefault.replicas }}
   {{- end }}
   selector:
     matchLabels:

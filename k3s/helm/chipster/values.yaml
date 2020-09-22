@@ -28,7 +28,7 @@ deployments:
     # useDefaultImageRepo decides whether image value above should be prefixed with a value of images.chipsterImageRepo
     useDefaultImageRepo: true
     # replicas is the number of containers that run this service
-    replicas: 1
+    replicas: ""
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -42,7 +42,7 @@ deployments:
       # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback: false
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -54,7 +54,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -68,7 +68,7 @@ deployments:
     # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback: false
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -80,7 +80,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -92,7 +92,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
@@ -106,7 +106,7 @@ deployments:
     storageVolumeSize: 300Gi
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   toolbox:
     name: toolbox
     class: ""
@@ -119,7 +119,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -131,7 +131,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   typeService:
     name: type-service
     class: ""
@@ -143,7 +143,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   comp:
     name: comp
     class: comp
@@ -155,7 +155,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -167,7 +167,7 @@ deployments:
     password: ""
     configs: {}
     useDefaultImageRepo: true
-    replicas: 1
+    replicas: ""
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -181,9 +181,10 @@ deployments:
     # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback-job-history: false
     useDefaultImageRepo: true
-    replicas: 1
-  default:
     replicas: ""
+
+deploymentDefault:
+  replicas: 1
 
 # databases is a section for Chipster scripts to know which databases exist
 # passwordKey is the YAML path where generate-passwords.bash will store the password
