@@ -26,14 +26,14 @@ dependencies:
     version: 8.1.4
     repository: "https://kubernetes-charts.storage.googleapis.com/"
     alias: auth-postgresql
-    condition: auth-postgresql.enabled
+    condition: \"auth-postgresql\".enabled
   - name: postgresql
     version: 8.1.4
     repository: "https://kubernetes-charts.storage.googleapis.com/"
     alias: session-db-postgresql
-    condition: session-db-postgresql.enabled
+    condition: \"session-db-postgresql\".enabled
   - name: postgresql
     version: 8.1.4
     repository: "https://kubernetes-charts.storage.googleapis.com/"
     alias: job-history-postgresql
-    condition: job-history-postgresql.enabled
+    condition: \"job-history-postgresql\".enabled

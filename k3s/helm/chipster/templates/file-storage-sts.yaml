@@ -23,7 +23,11 @@ metadata:
   name: file-storage
 spec:
   serviceName: file-storage
-  replicas: 1
+  {{- if $.Values.deployments.fileStorage.replicas }}
+  replicas: {{ $.Values.deployments.fileStorage.replicas }}
+  {{- else }}
+  replicas: {{ $.Values.deploymentDefault.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: chipster
