@@ -43,7 +43,7 @@ function merge_custom_confs {
   fi
   
   if [ -f $projectConfPath ]; then
-    echo "apply configuration $projectConfPath" 	
+    echo "apply configuration $projectConfPath"		
     mv $resultConfPath $tempConfPath
 	yq merge $projectConfPath $tempConfPath > $resultConfPath
 	rm $tempConfPath
@@ -111,7 +111,14 @@ passwords="$(oc get secret passwords$subproject_postfix -o json)"
 for service in $authenticated_services; do
 
   config_key=service-password-${service}
-  service_password="$(echo "$passwords" | jq -r .data[\"$config_key\"] | base64 --decode)"
+
+  service_password_base64="$(echo "$passwords" | jq -r .data[\"$config_key\"])"
+
+  if [ $service_password_base64 == "null" ]; then
+    echo "There is no password for $config_key. Run 'bash generate-passwords.bash' first."
+	exit 1
+  fi
+  service_password="$(echo "$service_password_base64" | base64 --decode)"
   
   echo $config_key: $service_password | tee $build_dir/$service.yaml >> $build_dir/auth.yaml
 done
