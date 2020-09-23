@@ -116,6 +116,8 @@ for service in $authenticated_services; do
 
   if [ $service_password_base64 == "null" ]; then
     echo "There is no password for $config_key. Run 'bash generate-passwords.bash' first."
+	# TODO use exit trap
+	rm -rf $build_dir
 	exit 1
   fi
   service_password="$(echo "$service_password_base64" | base64 --decode)"
