@@ -93,7 +93,7 @@ git clone https://github.com/chipster/chipster-openshift.git --branch k3s
 cd chipster-openshift/k3s
 ```
 
-From now on, please run all commands in this `k3s` directory unles told otherwise.
+From now on, please run all commands in this `k3s` directory unless told otherwise.
 
 ## Install Docker, K3s, Helm and other utils
 
