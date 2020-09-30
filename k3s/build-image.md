@@ -47,15 +47,15 @@ nano ../templates/builds/chipster-tools/chipster-tools.yaml
 The current build script assumes that all source image are present locally. The easiest way to accomplish this is to build all images once. Building all images will take about half an hour. 
 
 ```bash
-bash build-image.bash --all
+bash scripts/build-image.bash --all
 ```
 
 Now that Docker has local copies of the source images, you can build only the image that you changed and other images that are using it as their source. By looking at the `source` sections of the buildconfigs, you can see that this `chipster-tools` image is a source of two other images: `toolbox` and `web-server`. We have to build those too.
 
 ```bash
-bash build-image.bash chipster-tools
-bash build-image.bash chipster-toolbox
-bash build-image.bash web-server
+bash scripts/build-image.bash chipster-tools
+bash scripts/build-image.bash chipster-toolbox
+bash scripts/build-image.bash web-server
 ```
 
 Then we have to change our deployment to use these new images. In practice we only have to disable use of the default image repository for those Chipster services in our `~/values.yaml`. After this the deployment will use your own local image.

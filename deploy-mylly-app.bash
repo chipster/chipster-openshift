@@ -117,7 +117,16 @@ if [[ $backend_project != "$PROJECT" ]]; then
 fi
 
 service_locator_uri="$(curl -s https://service-locator-${backend}/services?pretty | grep service-locator | grep publicUri | cut -d '"' -f 4)"
-secret_web_server="$(oc get secret web-server -n $backend_project -o json | jq '.data["chipster.yaml"]' -r | base64 --decode | yq w - url-int-service-locator $service_locator_uri | base64)"
+secret_web_server_yaml="$(oc get secret web-server -n $backend_project -o json | jq '.data["chipster.yaml"]' -r | base64 --decode | yq w - url-int-service-locator $service_locator_uri)"
+
+secret_web_server_yaml="$(echo "$secret_web_server_yaml" | yq w - url-int-service-locator $service_locator_uri)"
+
+# use external addresses if this is a different project
+if [[ $backend_project != "$PROJECT" ]]; then
+  secret_web_server_yaml="$(echo "$secret_web_server_yaml" | yq w - use-external-addresses true)"
+fi
+
+secret_web_server="$(echo "$secret_web_server_yaml" | base64)"
 
 if oc get secret web-server-mylly > /dev/null 2>&1; then
   oc delete secret web-server-mylly
