@@ -46,6 +46,8 @@ deployments:
 It doesn't really matter what the `-google` string is at the end of each configuration key, as long as you use the same string for all configuration items referring to the same authentication method. 
 Multiple authentication methods can be configured simply by repeating the same configuration keys but inventing a new postfix for each method.
 
+If you need more special configuration, take a look at all other `auth-oidc-` configuration keys in the file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml).
+
 Deploy the configuration and restart `auth`.
 
 ```bash
