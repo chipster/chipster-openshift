@@ -251,10 +251,13 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 1000
 
-  # capabilities:
+# capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
+
+# podSecurityContext allows you set fsGroup: 0, if the file permissions prevent containers to modify volumes
+podSecurityContext: {}
 
 # host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network. For OIDC and TLS (Let's Encrypt) this must be a DNS name.
 host: ""

@@ -24,6 +24,8 @@ spec:
         app: chipster
         deployment: {{ $deployment.name }}
     spec:
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ $deployment.name }}
           securityContext:
