@@ -29,6 +29,7 @@ fi
 oc process -f templates/jobs/pvc.yaml --local \
 	-p NAME=$pvc_name \
 	-p SIZE=$tools_bin_size \
+  -p STORAGE_CLASS="glusterfs-storage" \
 	| oc create -f - --validate
 	
 temp_pvc="${pvc_name}-temp"
@@ -40,6 +41,7 @@ done
 oc process -f templates/jobs/pvc.yaml --local \
 	-p NAME=$temp_pvc \
 	-p SIZE=400Gi \
+  -p STORAGE_CLASS="standard-rwo" \
 	| oc create -f - --validate
 
 bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version" "$temp_pvc"
