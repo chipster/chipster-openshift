@@ -16,7 +16,7 @@ Register you Chipster installation in [Google API Console](https://console.devel
 - Set `Application type` to `Web application`
 - Set some name for your Chipster installation
 - Set `Authorised JavaScript origins` to the address of your host: `http://HOST_ADDRESS`
-- Set `Authorised rediredt URIs` to `http://HOST_ADDRESS/oidc/callback`
+- Set `Authorised redirect URIs` to `http://HOST_ADDRESS/oidc/callback`
 - The service will show you a long string called `Client ID`. Copy it. There is a client secret next to it, but Chipster uses so called "implicit flow" by default, where the client secret isn't used.
 
 ## Setup OAuth consent screen
@@ -45,6 +45,8 @@ deployments:
 
 It doesn't really matter what the `-google` string is at the end of each configuration key, as long as you use the same string for all configuration items referring to the same authentication method. 
 Multiple authentication methods can be configured simply by repeating the same configuration keys but inventing a new postfix for each method.
+
+If you need more special configuration, take a look at all other `auth-oidc-` configuration keys in the file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml).
 
 Deploy the configuration and restart `auth`.
 

@@ -114,7 +114,7 @@ For example, edit your `~/values.yaml` to add the new setting.
 deployments:
   comp:
     configs:
-      comp-max-job: 5
+      comp-max-jobs: 5
 ```
 
 Then deploy Chipster again.
@@ -126,7 +126,7 @@ bash deploy.bash -f ~/values.yaml
 If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value form your own or default `values.yaml`.
 
 ```bash
-bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-job=10
+bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-jobs=10
 ```
 
 You can check that configuration file was changed correctly.
@@ -135,7 +135,7 @@ You can check that configuration file was changed correctly.
 $ bash get-secret.bash comp
 url-int-service-locator: http://service-locator
 service-password-comp: "PASSWORD_HIDDEN"    
-comp-max-job: 5
+comp-max-jobs: 5
 ```
 Restart services.
 

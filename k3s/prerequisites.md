@@ -64,7 +64,6 @@ sudo ln -s /mnt/data/k3s/pods /var/lib/kubelet/pods
 
 Make sure that you have firewall a (in the network / IaaS cloud or the Ubuntu's local iptables) that allows only 
 * inbound access from your laptop to ports 22 (ssh), 80 (http) and optionally 443 for https
-* inbound access from this machine itself (ports 80 and 443). In OpenStack's Security groups this would mean from the VM's floating IP address. TODO make it start without this
 * outbound access to anything
 
 * Optional [TLS (https) instructions](tls.md#firewall) will have a few additional requirements for the firewall
@@ -93,7 +92,7 @@ git clone https://github.com/chipster/chipster-openshift.git --branch k3s
 cd chipster-openshift/k3s
 ```
 
-From now on, please run all commands in this `k3s` directory unles told otherwise.
+From now on, please run all commands in this `k3s` directory unless told otherwise.
 
 ## Install Docker, K3s, Helm and other utils
 
