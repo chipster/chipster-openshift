@@ -123,7 +123,7 @@ Then deploy Chipster again.
 bash deploy.bash -f ~/values.yaml
 ```
 
-If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value form your own or default `values.yaml`.
+If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value from your own or default `values.yaml`.
 
 ```bash
 bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-jobs=10
@@ -147,7 +147,7 @@ Please note that two-word Chipster service names like `file-broker` are written 
 
 ### Updates
 
-If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-annoncements](https://chipster.csc.fi/contact.shtml) email list to get notifications about new features and critical vulnerabilities. Consider subsribing to the [chipster-tech](https://chipster.csc.fi/contact.shtml) list too to share your experiences and learn from others.
+If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-annoncements](https://chipster.csc.fi/contact.shtml) email list to get notifications about new features and critical vulnerabilities. Consider subscribing to the [chipster-tech](https://chipster.csc.fi/contact.shtml) list too to share your experiences and learn from others.
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
@@ -231,7 +231,7 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 ### Authentication
 ### JWT keys
 
-Chipster services `auth` and `session-db` create authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kep secret. 
+Chipster services `auth` and `session-db` create authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
 
 TODO How to generate new keys if the old keys have leaked?
 
@@ -303,7 +303,7 @@ TODO
 
 ### Tool development
 
-[Building a new container image](build-image.md) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually to slow for any interactive development work. There many ways to edit files faster:
+[Building a new container image](build-image.md) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work. There many ways to edit files faster:
 
 1. Open a shell with `kubectl exec` to the container and edit files directly in the container.
 2. Edit files on the host or on your laptop and copy files with with `kubectl cp` to the container.

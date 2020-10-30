@@ -143,7 +143,7 @@ in the next step, but just use the host's IP address there.
 helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"
 ```
 
-Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page starting with a title `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before  starting to deploy Chipster.
+Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page `404 Not Found` and `nginx/` followed by the nginx version number. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before  starting to deploy Chipster.
 
 When you are done, uninstall the test project from K3s and delete the folder.
 
