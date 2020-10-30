@@ -13,6 +13,12 @@
 - name: Copy kubctl config
   shell: "bash -c \"kubectl config view --raw\" > /home/{{ user }}/.kube/config"
 
+- name: Change config file ownership and permissions
+  file:
+    path: /home/{{ user }}/.kube/config
+    owner: '{{ user }}'
+    mode: '0600'
+
 - name: Use the kubectl config after next login
   lineinfile:
     dest: /home/{{ user }}/.bashrc
