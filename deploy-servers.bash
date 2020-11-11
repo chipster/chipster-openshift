@@ -1,8 +1,21 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 source scripts/utils.bash
+
+function vault_view {
+  file="$1"
+
+  if [ -z "$VAULT_PASS" ]; then
+    echo "enter ansible-vault password for file $file or store it in \$VAULT_PASS" >&2
+    ansible-vault view "$file"
+  else
+    echo "using ansible-vault password for file $file from \$VAULT_PASS" >&2
+    ansible-vault view "$file" --vault-password-file <(echo "$VAULT_PASS")
+  fi
+}
 
 # add the ip whitelist annotation to all routes in the given template
 function apply_firewall {
@@ -247,12 +260,15 @@ oc process -f templates/logging.yaml --local \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/logging.yaml
 
+# has to be a simple variable assignment to fail on errors
+replay_password=$(vault_view ../chipster-private/confs/$PROJECT.$DOMAIN/users | grep replay_test | cut -d ":" -f 2)
+
 oc process -f templates/replay.yaml --local \
     -p PROJECT=$PROJECT \
     -p DOMAIN=$DOMAIN \
     -p SUBPROJECT=$subproject \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
-    -p PASSWORD=$(cat ../chipster-private/confs/$PROJECT.$DOMAIN/users | grep replay_test | cut -d ":" -f 2) \
+    -p PASSWORD=$replay_password \
     > $template_dir/replay.yaml
 
 apply_firewall $template_dir/monitoring.yaml "$ip_whitelist_admin"
