@@ -50,7 +50,7 @@ The script takes the passwords from the `passwords` secret that we just created.
 bash deploy.bash --set host=HOST_ADDRESS
 ```
 
-See when pod's are running (hit Ctlr + C to quit).
+See when pod's are running (hit Ctrl + C to quit).
 
 ```bash
 watch kubectl get pod
