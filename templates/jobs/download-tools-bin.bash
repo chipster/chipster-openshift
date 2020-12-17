@@ -47,6 +47,9 @@ function download_file {
 
 export -f download_file
 
+# what creates this?
+rm -rf $temp/lost+found
+
 # delete old download temp files
 rm -f $temp/*
           
