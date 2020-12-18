@@ -82,17 +82,33 @@ Deploy changes.
 bash deploy.bash -f ~/values.yaml
 ```
 
-Now you would have to download the tools-bin package. In a perfect world that would be just a matter of running a few commands.
+Now you would have to download and extract the tools-bin packages. 
 
-```bash
-cd /opt/chipster/tools
-wget http://bio.nic.funet.fi/pub/sci/molbio/chipster/dist/virtual_machines/CHIPSTER_VERSION/tools/tools.tar.gz
-tar -zxf tools.tar.gz -C /opt/chipster/tools/
+
+```
+# make a temporary directory for the download packages
+cd /mnt/data
+sudo mkdir temp
+sudo chown $(whoami) temp
+cd temp
+
+# get a list of packages
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-3.16.4 | grep .tar.lz4$ > files.txt
+# download packages
+for f in $(cat files.txt); do wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$f; done
+cd ..
+
+# install lz4
+sudo apt install -y liblz4-tool
+
+# extract packages 
+for f in temp/*.tar.lz4; do lz4 -d $f | tar -x -C tools-bin; done
+
+# remove packages
+rm -rf temp
 ```
 
-If you are not that lucky, you can take a look at [the download script](https://github.com/chipster/chipster-openshift/blob/master/k3s/helm/chipster/templates/download-tools-bin-job.yaml) that downloads the tools-bin package in pieces (and optionally in parallel).
-
-You can also take a look at the [instructions of the old Chipster](https://github.com/chipster/chipster/wiki/TechnicalManual#download-tools-package-manually).
+You can also take a look at [the download script](https://github.com/chipster/chipster-openshift/blob/master/k3s/helm/chipster/templates/download-tools-bin-job.yaml) that downloads the tools-bin package in pieces (and optionally in parallel).
 
 If you already downloaded the tools-bin to a PVC, you could also locate the correct volume:
 
