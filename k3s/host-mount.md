@@ -84,7 +84,6 @@ bash deploy.bash -f ~/values.yaml
 
 Now you would have to download and extract the tools-bin packages. 
 
-
 ```
 # make a temporary directory for the download packages
 cd /mnt/data
@@ -106,6 +105,14 @@ for f in temp/*.tar.lz4; do lz4 -d $f | tar -x -C tools-bin; done
 
 # remove packages
 rm -rf temp
+```
+
+Finally restart pods to enable all tools that were disabled before because of the missing files.
+
+```
+cd ~/git/chipster-openshift/k3s/
+bash restart.bash
+watch kubectl get pod
 ```
 
 You can also take a look at [the download script](https://github.com/chipster/chipster-openshift/blob/master/k3s/helm/chipster/templates/download-tools-bin-job.yaml) that downloads the tools-bin package in pieces (and optionally in parallel).
