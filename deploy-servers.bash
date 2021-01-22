@@ -211,6 +211,7 @@ configure_service "$subproject_postfix" toolbox toolbox toolbox &
 configure_service "$subproject_postfix" type-service chipster-web-server-js type-service &
 configure_service "$subproject_postfix" web-server web-server web-server &
 configure_service "$subproject_postfix" comp comp comp &
+configure_service "$subproject_postfix" comp-large comp comp &
 
 # configure_service "$subproject_postfix" file-storage-single chipster-web-server file-storage fi.csc.chipster.filestorage.FileStorage &
 

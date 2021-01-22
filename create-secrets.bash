@@ -177,6 +177,10 @@ done
 cp $build_dir/comp.yaml $build_dir/comp-mylly.yaml
 create_secret_for_service comp-mylly $subproject $subproject_postfix
 
+# comp-large
+cp $build_dir/comp.yaml $build_dir/comp-large.yaml
+create_secret_for_service comp-large $subproject $subproject_postfix
+
 echo "configure app"
 
 # Configuration for the Angular app

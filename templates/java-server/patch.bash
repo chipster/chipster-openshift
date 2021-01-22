@@ -65,6 +65,24 @@ patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp$subproject_pos
   spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin-$tools_bin
 " false
 
+patch_kind_and_name $template_dir/comp-large.yaml DeploymentConfig comp-large$subproject_postfix "
+  spec.template.spec.containers[0].resources.limits.cpu: 1600m
+  spec.template.spec.containers[0].resources.limits.memory: 7900Mi
+  spec.template.spec.containers[0].resources.requests.cpu: 1000m
+  spec.template.spec.containers[0].resources.requests.memory: 4000Mi
+  spec.template.spec.containers[0].volumeMounts[0].mountPath: /opt/chipster/comp/logs
+  spec.template.spec.containers[0].volumeMounts[1].mountPath: /opt/chipster/comp/conf  
+  spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/comp/jobs-data
+  spec.template.spec.containers[0].volumeMounts[2].name: jobs-data
+  spec.template.spec.containers[0].volumeMounts[3].mountPath: /mnt/tools
+  spec.template.spec.containers[0].volumeMounts[3].name: tools-bin
+  spec.template.spec.containers[0].volumeMounts[3].readOnly: true
+  spec.template.spec.volumes[2].name: jobs-data
+  spec.template.spec.volumes[2].emptyDir: {}
+  spec.template.spec.volumes[3].name: tools-bin
+  spec.template.spec.volumes[3].persistentVolumeClaim.claimName: tools-bin-$tools_bin
+" false
+
 # patch_kind_and_name $template_dir/file-storage-single.yaml DeploymentConfig file-storage-single$subproject_postfix "
 #   spec.template.spec.containers[0].volumeMounts[2].mountPath: /opt/chipster/storage
 #   spec.template.spec.containers[0].volumeMounts[2].name: storage
