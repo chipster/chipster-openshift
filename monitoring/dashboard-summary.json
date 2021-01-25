@@ -46,7 +46,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1592900687861,
+  "iteration": 1611056869367,
   "links": [],
   "panels": [
     {
@@ -708,7 +708,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "runningJobCount",
+          "measurement": "runningSlotCount",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "C",
@@ -751,10 +751,53 @@
               "type": "fill"
             }
           ],
-          "measurement": "scheduledJobCount",
+          "measurement": "scheduledSlotCount",
           "orderByTime": "ASC",
           "policy": "default",
-          "refId": "D",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "dsType": "influxdb",
+          "groupBy": [
+            {
+              "params": [
+                "$custom_interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "id"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "newSlotCount",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
           "resultFormat": "time_series",
           "select": [
             [
@@ -776,7 +819,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Jobs",
+      "title": "Job slots",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1791,9 +1834,12 @@
               "type": "fill"
             }
           ],
+          "hide": false,
           "measurement": "diskFree",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT mean(\"value\") FROM \"diskFree\" WHERE (\"fs\" = 'storage') AND $timeFilter GROUP BY time($long_custom_interval), \"fs\", \"id\" fill(null)",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1810,7 +1856,13 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "id",
+              "operator": "!=",
+              "value": "comp-"
+            }
+          ]
         },
         {
           "dsType": "influxdb",
@@ -1823,14 +1875,29 @@
             },
             {
               "params": [
+                "fs"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "id"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
                 "null"
               ],
               "type": "fill"
             }
           ],
-          "measurement": "fileTotalSize",
+          "hide": true,
+          "measurement": "diskFree",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT mean(\"value\") FROM \"diskFree\" WHERE (\"fs\" = 'storage') AND $timeFilter GROUP BY time($long_custom_interval), \"fs\", \"id\" fill(null)",
+          "rawQuery": false,
           "refId": "C",
           "resultFormat": "time_series",
           "select": [
@@ -1847,7 +1914,13 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "fs",
+              "operator": "=",
+              "value": "storage"
+            }
+          ]
         }
       ],
       "thresholds": [],
@@ -2225,7 +2298,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": "30d",
+      "timeFrom": "365d",
       "timeShift": null,
       "title": "DB rows",
       "tooltip": {
@@ -2261,7 +2334,7 @@
       ]
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "schemaVersion": 16,
   "style": "dark",
   "tags": [],
@@ -2445,5 +2518,5 @@
   "timezone": "browser",
   "title": "Chipster summary",
   "uid": "rAeCewgmk",
-  "version": 22
+  "version": 30
 }
