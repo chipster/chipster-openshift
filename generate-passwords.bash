@@ -26,6 +26,8 @@ keys+="auth-db-password"$'\n'
 keys+="session-db-db-password"$'\n'
 keys+="job-history-db-password"$'\n'
 
+keys+="monitoring-password"$'\n'
+
 # better to do this outside repo
 build_dir=$(make_temp chipster-openshift_generate-passwords)
 echo -e "build dir is \033[33;1m$build_dir\033[0m"

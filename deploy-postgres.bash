@@ -27,6 +27,8 @@ function deploy_postgres {
     pvc_size="100Mi"
   fi
 
+  passwords="$(oc get secret passwords$subproject_postfix -o json)"
+
   # add different subproject label for databases, so that those can be kept or removed separately 
   echo "$template" \
   | jq ".labels.subproject=\"${subproject_label}\"" \
@@ -37,7 +39,7 @@ function deploy_postgres {
   | oc process -f - --local \
   -p POSTGRESQL_DATABASE=$db_name \
   -p DATABASE_SERVICE_NAME=$name-postgres$subproject_postfix \
-  -p POSTGRESQL_PASSWORD=$(get_db_password passwords$subproject_postfix $name) \
+  -p POSTGRESQL_PASSWORD=$(get_password_cached "$passwords" "$name-db-password") \
   -p POSTGRESQL_USER=user \
   -p NAMESPACE=openshift \
   -p VOLUME_CAPACITY=$pvc_size \

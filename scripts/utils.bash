@@ -31,16 +31,23 @@ function generate_password {
 	openssl rand -base64 15
 }
 
-function get_db_password {
-  secret="$1"
-  role="$2"
-  get_password $secret "$role-db-password"
-}
-
 function get_password {
+  >&2 echo "using get_password() funtion. Consider using get_password_cached()"
   secret="$1"
   key="$2"
-  oc get secret $secret -o json | jq -r .data[\"$key\"] | base64 --decode
+  oc get secret $secret -o json | jq -r .data[\"$key\"]
+}
+
+function get_password_cached {
+  passwords_json="$1"
+  key="$2"
+  password_base64="$(echo "$passwords_json" | jq -r .data[\"$key\"])"
+
+  if [ $password_base64 == "null" ]; then
+    >&2 echo "There is no password for $key. Run 'bash generate-passwords.bash' first."
+	  exit 1
+  fi
+  echo "$password_base64" | base64 --decode
 }
 
 # Find the object in the given file with given type (i.e. "kind") and name. 

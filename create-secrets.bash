@@ -111,16 +111,8 @@ passwords="$(oc get secret passwords$subproject_postfix -o json)"
 for service in $authenticated_services; do
 
   config_key=service-password-${service}
-
-  service_password_base64="$(echo "$passwords" | jq -r .data[\"$config_key\"])"
-
-  if [ $service_password_base64 == "null" ]; then
-    echo "There is no password for $config_key. Run 'bash generate-passwords.bash' first."
-	# TODO use exit trap
-	rm -rf $build_dir
-	exit 1
-  fi
-  service_password="$(echo "$service_password_base64" | base64 --decode)"
+  
+  service_password="$(get_password_cached "$passwords" "$config_key")"
   
   echo $config_key: $service_password | tee $build_dir/$service.yaml >> $build_dir/auth.yaml
 done
@@ -132,14 +124,11 @@ jws_private_key_session_db="$(echo "$passwords" | jq -r .data[\"jws-private-key-
 echo -e "jws-private-key-auth: |\n$jws_private_key_auth"             >> $build_dir/auth.yaml
 echo -e "jws-private-key-session-db: |\n$jws_private_key_session_db" >> $build_dir/session-db.yaml
 
-# variable isn't needed anymore, clear it
-passwords=""
-
 echo "get db passwords"
 
-auth_db_pass=$(get_db_password passwords$subproject_postfix auth)
-session_db_db_pass=$(get_db_password passwords$subproject_postfix session-db)
-job_history_db_pass=$(get_db_password passwords$subproject_postfix job-history)
+auth_db_pass=$(get_password_cached "$passwords" auth-db-password)
+session_db_db_pass=$(get_password_cached "$passwords" session-db-db-password)
+job_history_db_pass=$(get_password_cached "$passwords" job-history-db-password)
 
 echo db-url-auth: jdbc:postgresql://auth-postgres$subproject_postfix:5432/auth_db | tee -a $build_dir/backup.yaml >> $build_dir/auth.yaml
 echo db-pass-auth: $auth_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/auth.yaml
@@ -147,15 +136,16 @@ echo db-pass-auth: $auth_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/a
 echo db-url-job-history: jdbc:postgresql://job-history-postgres$subproject_postfix:5432/job_history_db | tee -a $build_dir/backup.yaml >> $build_dir/job-history.yaml
 echo db-pass-job-history: $job_history_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/job-history.yaml
 
-echo "create monitoring password"
+echo "configure monitoring password"
 
-# monitoring password
-monitoring_password=$(generate_password)
+monitoring_password="$(get_password_cached "$passwords" "monitoring-password")"
 echo auth-monitoring-password:  $monitoring_password >> $build_dir/auth.yaml
 secret_file="$configured_objects_dir/monitoring.json"
 get_secret monitoring$subproject_postfix $subproject > $secret_file
 add_literal_to_secret $secret_file password $monitoring_password
 
+# variable isn't needed anymore, clear it
+passwords=""
 
 echo db-url-session-db: jdbc:postgresql://session-db-postgres$subproject_postfix:5432/session_db_db | tee -a $build_dir/backup.yaml >> $build_dir/session-db.yaml
 echo db-pass-session-db: $session_db_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/session-db.yaml
