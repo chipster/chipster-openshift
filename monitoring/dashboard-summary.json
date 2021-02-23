@@ -46,7 +46,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1611056869367,
+  "iteration": 1613544939078,
   "links": [],
   "panels": [
     {
@@ -547,7 +547,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "runningJobCount",
+          "measurement": "runningSlotCount",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "C",
@@ -590,7 +590,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "scheduledJobCount",
+          "measurement": "scheduledSlotCount",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "D",
@@ -615,7 +615,7 @@
       "thresholds": [],
       "timeFrom": "30d",
       "timeShift": null,
-      "title": "Jobs",
+      "title": "Job slots",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -2334,7 +2334,7 @@
       ]
     }
   ],
-  "refresh": "10s",
+  "refresh": "30s",
   "schemaVersion": 16,
   "style": "dark",
   "tags": [],
@@ -2518,5 +2518,5 @@
   "timezone": "browser",
   "title": "Chipster summary",
   "uid": "rAeCewgmk",
-  "version": 30
+  "version": 32
 }
