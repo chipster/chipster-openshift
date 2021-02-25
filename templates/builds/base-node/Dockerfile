@@ -3,7 +3,7 @@ FROM base
 # installation of node-gyb npm package expects the program "make" from the build-essential package
 RUN apt-get update -y \
 	&& apt-get install -y build-essential \
-	&& curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+	&& curl -sL https://deb.nodesource.com/setup_12.x | bash - \
 	&& apt-get install -y nodejs \
 	&& apt-get clean
 
