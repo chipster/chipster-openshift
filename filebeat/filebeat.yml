@@ -8,7 +8,20 @@ filebeat.inputs:
     enabled: true
     paths:
       - /opt/chipster/logs/chipster.log
-      - /opt/chipster/logs/*.request.log
+    fields:
+      chipster_log_type: "log"      
+  - type: log
+    enabled: true
+    paths:
+      - /opt/chipster/logs/*.api.request.log
+    fields:
+      chipster_log_type: "api"
+  - type: log
+    enabled: true
+    paths:
+      - /opt/chipster/logs/*.admin.request.log
+    fields:
+      chipster_log_type: "admin"
 
 output.logstash:
   hosts: ["logstash:5044"]
