@@ -9,7 +9,7 @@ RUN cd /home/user/chipster-web/build \
 	&& chmod ugo+rwx -R /home/user/chipster-web/build \
 	&& npm ci \
 	&& rm -rf src/assets/manual \
-	&& npm run build -- --no-progress || true \
+	&& npm run build -- --no-progress \
 	&& cp -r dist/* ../ \
 	&& cd .. \
 	&& rm -rf build \
