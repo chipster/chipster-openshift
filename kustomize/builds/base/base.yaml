@@ -1,0 +1,27 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: base
+  name: base
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: base:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: ubuntu:16.04
+    type: Docker
+  triggers:
+  - type: ConfigChange
+  - imageChange:
+    type: ImageChange

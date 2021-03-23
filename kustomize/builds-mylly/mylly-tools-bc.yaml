@@ -1,0 +1,42 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: mylly-tools
+  name: mylly-tools
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: mylly-tools:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: |
+      FROM base
+
+      COPY tools /home/user/mylly-tools/tools
+      COPY manual /home/user/mylly-tools/manual
+
+      RUN ls -lah /home/user/mylly-tools \
+        && ls -lah /home/user/mylly-tools/tools \
+        && ls -lah /home/user/mylly-tools/manual
+
+      CMD ["sleep", "inf"]
+
+    git:
+      ref: master
+      uri: https://github.com/CSCfi/Kielipankki-mylly.git
+    type: Git
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: base:latest
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - type: ConfigChange
+  - imageChange:
+    type: ImageChange

@@ -1,0 +1,16 @@
+bases:
+  - ../builds
+resources:
+  - comp-mylly-bc.yaml
+  - comp-mylly-is.yaml
+  - mylly-tools-bc.yaml
+  - mylly-tools-is.yaml
+  - web-server-mylly-bc.yaml
+  - web-server-mylly-is.yaml
+patchesJson6902:
+  - target:
+      group: build.openshift.io
+      version: v1
+      kind: BuildConfig
+      name: toolbox
+    path: bc-toolbox-mylly.yaml

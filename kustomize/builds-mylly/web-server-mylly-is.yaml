@@ -1,0 +1,9 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    build: web-server-mylly
+  name: web-server-mylly
+spec:
+  lookupPolicy:
+    local: false
