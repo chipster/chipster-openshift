@@ -57,7 +57,16 @@ done
 # copy builds-mylly overlay to the build dir in case this deployment uses it
 cp -r kustomize/builds-mylly $build_dir
 
-private_kustomize_path="$private_config_path/$PROJECT.$DOMAIN/kustomize/builds"
+private_all_kustomize_path="$private_config_path/chipster-all/builds"
+private_kustomize_path="$private_config_path/$PROJECT.$DOMAIN/builds"
+
+if [ -z $private_all_kustomize_path ]; then
+  echo "chipster-all not found"
+else
+  echo "copy chipster-all"
+  mkdir -p $build_dir/chipster-all
+  cp -r $private_all_kustomize_path/* $build_dir/chipster-all
+fi
 
 if [ -f $private_kustomize_path/kustomization.yaml ]; then
   echo "create overlay from $private_kustomize_path"
