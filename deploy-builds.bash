@@ -29,9 +29,10 @@ base_dir="$build_dir/builds"
 
 mkdir -p $base_dir
 
-echo "create base BuildConfigs and ImageStreams"
+echo "copy Kustomize yaml files"
+cp kustomize/builds/*.yaml $base_dir
 
-echo "resources:" >> $base_dir/kustomization.yaml
+echo "create base BuildConfigs and ImageStreams"
 
 # use oc templates to put Dockerfiles to BuildConfigs and to copy ImageStreams for each build
 for build_template in kustomize/builds/*/*.yaml; do
@@ -48,8 +49,9 @@ for build_template in kustomize/builds/*/*.yaml; do
   oc process -f templates/imagestreams/imagestream.yaml --local -p NAME=$build \
   > $base_dir/$build-is.yaml
 
-  echo "  - $build-bc.yaml" >> $base_dir/kustomization.yaml
-  echo "  - $build-is.yaml" >> $base_dir/kustomization.yaml
+  # modify the object in memory in the write to the same file
+  echo "$(cat $base_dir/kustomization.yaml | yq r - --tojson | jq '.resources += ["'$build-bc.yaml'"]' | yq r - )" > $base_dir/kustomization.yaml
+  echo "$(cat $base_dir/kustomization.yaml | yq r - --tojson | jq '.resources += ["'$build-is.yaml'"]' | yq r - )" > $base_dir/kustomization.yaml  
 done
 
 # copy builds-mylly overlay to the build dir in case this deployment uses it

@@ -28,15 +28,8 @@ spec:
         kind: ImageStreamTag
         name: chipster-tools:latest
       paths:
-      - destinationDir: manual
+      - destinationDir: .
         sourcePath: /home/user/chipster-tools/manual
-    - as: null
-      from:
-        kind: ImageStreamTag
-        name: chipster-csc:latest
-      paths:
-      - destinationDir: chipster-csc
-        sourcePath: /home/user/chipster-csc
   strategy:
     dockerStrategy:
       from:

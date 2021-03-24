@@ -1,0 +1,7 @@
+# deploy-builds.bash will convert this directory to a Kustomize project
+resources:
+  - ubuntu-is.yaml
+  - logstash-bc.yaml
+  - logstash-is.yaml
+  - filebeat-bc.yaml
+  - filebeat-is.yaml

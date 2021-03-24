@@ -1,0 +1,14 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    build: logstash
+  name: logstash
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - from:
+        kind: DockerImage
+        name: 'docker.elastic.co/logstash/logstash:7.1.1'
+      name: 7.1.1
