@@ -26,9 +26,16 @@ spec:
     - as: null
       from:
         kind: ImageStreamTag
+        name: chipster-web:latest
+      paths:
+      - destinationDir: html
+        sourcePath: /home/user/chipster-web/assets/html
+    - as: null
+      from:
+        kind: ImageStreamTag
         name: chipster-tools:latest
       paths:
-      - destinationDir: .
+      - destinationDir: manual
         sourcePath: /home/user/chipster-tools/manual
   strategy:
     dockerStrategy:

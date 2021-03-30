@@ -1,14 +1,11 @@
 FROM chipster-web-server
 
-COPY . /home/user/build
+COPY chipster-web /opt/chipster
+# copy html separately so that the BuildConfig can be patched to take it from another image
+COPY html /opt/chipster/chipster-web/assets
+COPY manual /opt/chipster/chipster-web/assets
 
-# /home/user/build/html overrides default files if it's added in the BuildConfig
-RUN ls -lah /home/user/build || true \
-    && ls -lah /home/user/build/html || true \
-	&& mv /home/user/build/chipster-web/* /opt/chipster/web-root \
-	&& mv /home/user/build/manual /opt/chipster/web-root/assets \
-	&& cp -r /home/user/build/html /opt/chipster/web-root/assets || true \
-	&& rm -rf /home/user/build/html || true \
+RUN mv /opt/chipster/chipster-web /opt/chipster/web-root \	
 	&& chmod ugo+rwx -R /opt/chipster/web-root \
 	&& ls -lah /opt/chipster/web-root || true \
 	&& ls -lah /opt/chipster/web-root/assets || true \

@@ -11,7 +11,10 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-all_images=$(ls ../templates/builds/ | grep -v chipster-jenkins | grep -v mylly)
+# ls -d lists only directories
+# xargs removes paths
+# sort to order short words before long, i.e. "base" before "base-java", like plain ls used to do it
+all_images="$(ls -d ../kustomize/builds/*/ | xargs -n 1 basename | sort)"
 
 if [ $1 = "--list" ]; then
     echo "$all_images"
@@ -27,7 +30,7 @@ fi
 # this assumes that source images are built before images that depend on them in alphabetical order (provided by ls)
 while read -r build; do
     echo "** build $build"
-    cmd="$(bash scripts/buildconfig-to-docker.bash ../templates/builds/$build)"
+    cmd="$(bash scripts/buildconfig-to-docker.bash ../kustomize/builds/$build)"
     #echo "build command: $cmd"
     bash -c "$cmd"
 done <<< "$images"

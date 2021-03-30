@@ -34,18 +34,20 @@ build="$(basename $dir)"
 
 cmd="cat $dir/Dockerfile"
 
-uri=$(cat $dir/*.yaml | yq e .objects[0].spec.source.git.uri -)
+uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
 
-image_count=$(cat $dir/*.yaml | yq e .objects[0].spec.source.images - --tojson | jq '. | length')
+image_count=$(cat $dir/*.yaml | yq e .spec.source.images - --tojson | jq '. | length')
 
 if [[ $image_count != 0 ]]; then 
     last_index=$(($image_count - 1))
     for i in $(seq 0 $last_index); do
-        image=$(cat $dir/*.yaml | yq e .objects[0].spec.source.images[$i].from.name -)
-        destination=$(cat $dir/*.yaml | yq e .objects[0].spec.source.images[$i].paths[0].destinationDir -)
-        source=$(cat $dir/*.yaml | yq e .objects[0].spec.source.images[$i].paths[0].sourcePath -)
+        image=$(cat $dir/*.yaml | yq e .spec.source.images[$i].from.name -)
+        destination=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].destinationDir -)
+        source=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].sourcePath -)
         source_basename=$(basename $source)
-        copy_line="$(cat $dir/Dockerfile | grep "COPY $destination")"
+        if ! copy_line="$(cat $dir/Dockerfile | grep "COPY $destination")"; then 
+            copy_line=$(cat $dir/Dockerfile | grep "COPY . ")
+        fi
         copy_destination="$(echo "$copy_line" | cut -d " " -f 3)"
         docker_copy_line="COPY --from=$image $source $copy_destination/$source_basename"
 
