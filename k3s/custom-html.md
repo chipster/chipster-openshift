@@ -1,4 +1,5 @@
 # Customize html pages
+## Introduction
 
 [You can customize the front page][custom-html.md] and other html pages. It would be good to write at least 
 what kind of usage is allowed on your server, who is maintaining it and how to contact you in case there
@@ -12,13 +13,14 @@ You could follow the [image build instructions][build-image.md] to fork the [chi
 
 In the long run it's easier change the latter build `web-server`, which only combines files from other builds.
 
+## First time
+
 Let's clone a copy of the default files.
 
 ```
 cd ~/git
 git clone https://github.com/chipster/chipster-web.git
 cd chipster-web
-git checkout k3s
 ```
 
 Here you can find the default files:
@@ -49,88 +51,48 @@ RUN ls -lah /home/user
 CMD ["sleep", "inf"]
 ```
 
-The build will use an image called `base` as a base image. Let's pull it from a public image repository:
+The build will use an image called `base` as a base image. Let's pull all Chipster images from a public image repository:
 
 ```
-sudo docker pull docker-registry.rahti.csc.fi/chipster-images/base
+cd ~/git/chipster-openshift/k3s
+bash pull-images.bash
 ```
 
-Then we can build our image.
+Then we can build our `custom-html` image.
 
 ```
 sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/src/assets
 ```
 
-Next we are going to build the web-server image by using these files as an input.
+Next we are going to build the web-server image by using these files as an input. Take a look at the default BuildConfig:
 
 ```
-cd ~/git/chipster-openshift/k3s
+nano ../kustomize/builds/web-server/web-server.yaml 
 ```
 
-Let's take a look how the image is build normally:
+Find a section like this (there are a few similar sections, but only the corret one has `destinationDir: html`):
 
-```
-$ bash scripts/buildconfig-to-docker.bash ../kustomize/builds/web-server
-cat ../kustomize/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY html /opt/chipster/chipster-web/assets#COPY --from=chipster-web:latest /home/user/chipster-web/assets/html /opt/chipster/chipster-web/assets/html#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#" | sudo docker build -t web-server -
-```
-
-So the command takes our Dockerfile (written for another container platform called OpensShift) and adjusts the COPY commands to work in Docker. Remove the last command to see the end results:
-
-```bash
-$ cat ../kustomize/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY html /opt/chipster/chipster-web/assets#COPY --from=chipster-web:latest /home/user/chipster-web/assets/html /opt/chipster/chipster-web/assets/html#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#"
-FROM chipster-web-server
-
-COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web
-# copy html separately so that the BuildConfig can be patched to take it from another image
-COPY --from=chipster-web:latest /home/user/chipster-web/assets/html /opt/chipster/chipster-web/assets/html
-COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual
-
-RUN mv /opt/chipster/chipster-web /opt/chipster/web-root \	
-	&& chmod ugo+rwx -R /opt/chipster/web-root \
-	&& ls -lah /opt/chipster/web-root || true \
-	&& ls -lah /opt/chipster/web-root/assets || true \
-	&& ls -lah /opt/chipster/web-root/assets/manual | head || true \
-	&& ls -lah /opt/chipster/web-root/assets/html || true
-
-CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.web.WebServer"]
+```yaml
+    - as: null
+      from:
+        kind: ImageStreamTag
+        name: chipster-web:latest
+      paths:
+      - destinationDir: html
+        sourcePath: /home/user/chipster-web/assets/html
 ```
 
-The build requires a few other images. Let's pull them:
+Change the `chipster-web` to your own image `custom-html`. Press Ctrl+O, Enter, Ctrl+X to save and close the editor.
+
+Then we simply build and deploy the image again. I'll simply list the commands here. Please see the [image build instructions][build-image.md] for longer explanations.
+
+Build the image:
 
 ```
-sudo docker pull docker-registry.rahti.csc.fi/chipster-images/chipster-web-server
-sudo docker pull docker-registry.rahti.csc.fi/chipster-images/chipster-web
-sudo docker pull docker-registry.rahti.csc.fi/chipster-images/chipster-tools
+bash scripts/build-image.bash web-server
 ```
 
-Also, you can see that `html` directory is now taken from an `chipster-web` image, but we wan't to take it from our new image `custom-html` instead. Let's modify the command a bit and change that image:
-
-```
-$ cat ../kustomize/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY html /opt/chipster/chipster-web/assets#COPY --from=custom-html:latest /home/user/chipster-web/assets/html /opt/chipster/chipster-web/assets/html#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#"
-FROM chipster-web-server
-
-COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web
-# copy html separately so that the BuildConfig can be patched to take it from another image
-COPY --from=custom-html:latest /home/user/chipster-web/assets/html /opt/chipster/chipster-web/assets/html
-COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual
-
-RUN mv /opt/chipster/chipster-web /opt/chipster/web-root \	
-	&& chmod ugo+rwx -R /opt/chipster/web-root \
-	&& ls -lah /opt/chipster/web-root || true \
-	&& ls -lah /opt/chipster/web-root/assets || true \
-	&& ls -lah /opt/chipster/web-root/assets/manual | head || true \
-	&& ls -lah /opt/chipster/web-root/assets/html || true
-
-CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.web.WebServer"]
-```
-
-That looks good. Let's build it by putting back the `| sudo docker build -t web-server -` to the end and running it.
-
-```
-cat ../kustomize/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY html /opt/chipster/chipster-web/assets#COPY --from=custom-html:latest /home/user/chipster-web/assets/html /opt/chipster/chipster-web/assets/html#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#" | sudo docker build -t web-server -
-```
-
-Then we have to configure the Chipster to use this local image. Add the following to your ~/values.yaml file:
+Configure the Chipster to use this local image. Add the following to your ~/values.yaml file:
 
 ```
 deployments:
@@ -152,3 +114,24 @@ watch kubectl get pod
 ```
 
 Reload the browser page and you should see your customizations in place.
+
+## Next changes
+
+Make your changes to the html files.
+Build images and restart the pod:
+
+```
+sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/src/assets
+bash scripts/build-image.bash web-server
+kubectl rollout restart deployment/web-server
+watch kubectl get pod
+```
+
+## After the public image has changed
+
+```
+bash pull-images.bash
+bash scripts/build-image.bash web-server
+kubectl rollout restart deployment/web-server
+watch kubectl get pod
+```
