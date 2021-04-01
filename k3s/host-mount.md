@@ -59,6 +59,32 @@ Or directly from the container output.
 kubectl logs deployment/toolbox -f
 ```
 
+## Manual pages
+
+Clone the tool manuals to the host and symlink them from the correct directory.
+
+```bash
+pushd ~/git
+git clone https://github.com/chipster/chipster-tools.git
+popd
+```
+
+Change your `~/values.yaml` to mount tool scripts from the host.
+
+```yaml
+tools:
+  manualHostPath: /home/ubuntu/git/chipster-tools/manual
+```
+
+Deploy changes and wait until the pod has restarted.
+
+```bash
+bash deploy.bash -f ~/values.yaml
+watch kubectl get pod
+```
+
+When you have edited manual pages, simply reload the browser to see the changes.
+
 ## Tools-bin
 
 Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. Let's also symlink it to `/opt/chipster/tools` because our `R` installations are configured to run there.

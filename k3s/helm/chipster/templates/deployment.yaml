@@ -96,6 +96,14 @@ spec:
             - name: tool-scripts
               mountPath: /opt/chipster/toolbox/tools
             {{- end }}
+            {{- if and $.Values.tools.manualHostPath (eq $deployment.name "web-server") }}
+            - name: tool-manuals
+              mountPath: /opt/chipster/web-root/assets/manual
+            {{- end }}
+            {{- if and $.Values.html.hostPath (eq $deployment.name "web-server") }}
+            - name: html
+              mountPath: /opt/chipster/web-root/assets/html
+            {{- end }}
             {{- if eq $deployment.name "comp" }}
             - name: jobs-data
               mountPath: {{ $deployment.workDir }}/jobs-data
@@ -130,6 +138,20 @@ spec:
           hostPath:
             # directory location on host
             path: {{ $.Values.tools.hostPath }}
+            type: Directory
+        {{- end}}
+        {{- if and $.Values.tools.manualHostPath (eq $deployment.name "web-server") }}
+        - name: tool-manuals
+          hostPath:
+            # directory location on host
+            path: {{ $.Values.tools.manualHostPath }}
+            type: Directory
+        {{- end}}
+        {{- if and $.Values.html.hostPath (eq $deployment.name "web-server") }}
+        - name: html
+          hostPath:
+            # directory location on host
+            path: {{ $.Values.html.hostPath }}
             type: Directory
         {{- end}}
         {{- if eq $deployment.name "comp" }}
