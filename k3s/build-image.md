@@ -44,7 +44,14 @@ Change the GitHub url in the buildconfig file to point to your repository. This 
 nano ../templates/builds/chipster-tools/chipster-tools.yaml
 ```
 
-The current build script assumes that all source image are present locally. The easiest way to accomplish this is to build all images once. Building all images will take about half an hour. 
+The current build script assumes that all source image are present locally. You can either 
+pull the images from a public image repository:
+
+```
+bash pull-images.bash
+```
+
+Or you can build all images once which takes about half an hour:
 
 ```bash
 bash scripts/build-image.bash --all
