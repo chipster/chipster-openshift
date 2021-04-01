@@ -274,7 +274,7 @@ TODO Configure ReplayServer
 
 ### Customize front page, contact details and terms of use
 
-[You can customize the front page][custom-html.md] and other html pages. It would be good to write at least 
+[You can customize the front page](custom-html.md) and other html pages. It would be good to write at least 
 what kind of usage is allowed on your server, who is maintaining it and how to contact you in case there
 are any issues.
 
