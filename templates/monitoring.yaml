@@ -33,7 +33,8 @@ objects:
           name: influxdb${SUBPROJECT_POSTFIX}
       spec:
         containers:
-        - image: influxdb
+        # influxdb2 is very different
+        - image: 'influxdb:1.8'
           imagePullPolicy: Always
           name: influxdb
           ports:
