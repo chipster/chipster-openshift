@@ -11,4 +11,5 @@ repo="$(cat helm/chipster/values.yaml | yq e '.image.chipsterImageRepo' -)"
 for build in ../kustomize/builds/*/; do 
     image="$(basename $build)"
     sudo docker pull ${repo}$image
+    sudo docker image tag ${repo}$image $image
 done
