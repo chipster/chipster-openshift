@@ -4,6 +4,16 @@ set -e
 
 source scripts/utils.bash
 
+if ! kubectl --help > /dev/null 2>&1; then
+  echo "Error: command 'kubectl' not found"
+  exit 1
+fi
+
+if ! kubectl kustomize --help > /dev/null 2>&1; then
+  echo "Error: command 'kubectl kustomize' not found, please update your kubectl"
+  exit 1
+fi
+
 export PROJECT=$(get_project)
 export DOMAIN=$(get_domain)
 
