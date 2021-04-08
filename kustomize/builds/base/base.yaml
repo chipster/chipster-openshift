@@ -23,5 +23,6 @@ spec:
     type: Docker
   triggers:
   - type: ConfigChange
-  - imageChange:
-    type: ImageChange
+  # this seems to start an extra build when we have just run it
+  # - imageChange:
+  #   type: ImageChange

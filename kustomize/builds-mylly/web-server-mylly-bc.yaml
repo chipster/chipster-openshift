@@ -17,6 +17,8 @@
         FROM chipster-web-server
 
         COPY chipster-web /opt/chipster
+        # copy html separately so that the BuildConfig can be patched to take it from another image
+        COPY html /opt/chipster/chipster-web/assets
         COPY mylly-tools-manual /opt/chipster/chipster-web/assets
 
         RUN mv /opt/chipster/chipster-web /opt/chipster/web-root \
@@ -36,6 +38,13 @@
         paths:
         - destinationDir: chipster-web
           sourcePath: /home/user/chipster-web
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web:latest
+        paths:
+        - destinationDir: html
+          sourcePath: /home/user/chipster-web/assets/html
       - as: null
         from:
           kind: ImageStreamTag
@@ -64,3 +73,4 @@
           kind: ImageStreamTag
           name: mylly-tools:latest
       type: ImageChange
+
