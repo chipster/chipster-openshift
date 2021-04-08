@@ -1,6 +1,3 @@
-# access-path: assets/html/access.html
-# accessibility-path: assets/html/accessibility.html
-# contact-path: assets/html/app-contact.html
 modules:
 - Kielipankki
 manual-tool-postfix: .en.src.html
@@ -8,6 +5,7 @@ app-name: Mylly
 app-id: mylly
 home-header-path: assets/manual/app-home-header.html
 home-path: assets/manual/app-home.html
+contact-path: assets/manual/app-contact.html
 custom-css: assets/manual/app-mylly-styles.css
 favicon: assets/manual/app-mylly-favicon.png
 visualization-blacklist: ["phenodata"]
