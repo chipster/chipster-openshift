@@ -52,9 +52,9 @@ browser to see your changes in the browser.
 
 ## Image build
 
-If your plan to run Chipster in a multi-node cluster, you need some other way to store your custom html files. In a Kubernetes cluster, we can either store files in container images or on a volume. As the server isn't supposed to change these html pages and those are not huge in size, the container images are an obvious choice. 
+If you plan to run Chipster in a multi-node cluster, you need some other way to store your custom html files. In a Kubernetes cluster, we can either store files in container images or on a volume. As the server isn't supposed to change these html pages and those are not huge in size, the container images are an obvious choice. 
 
-These html files move from the code repository to the running container through two container images. The first image build, called [chipster-web](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/chipster-web/Dockerfile) simply takes the code repository and builds the whole Angular application. The second image build, [web-server](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/web-server/Dockerfile), collects file from many images: the app from the `chipster-web` image, the actual http server from the `chipster-web-server` image and manual pages from `chipster-tools` image. 
+These html files move from the code repository to the running container through two container images. The first image build, called [chipster-web](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/chipster-web/Dockerfile) simply takes the code repository and builds the whole Angular application. The second image build, [web-server](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/web-server/Dockerfile), collects files from multiple images: the app from the `chipster-web` image, the actual http server from the `chipster-web-server` image and manual pages from `chipster-tools` image. 
 
 You could follow the [image build instructions](build-image.md) to fork the [chipster-web](https://github.com/chipster/chipster-web/tree/kustomize-builds) repository and build it. However, building the whole app takes almost 10 minutes and merging future changes to your forked repository might become a bit cumbersome. 
 
@@ -92,7 +92,7 @@ Next we are going to build the web-server image by using these files as an input
 nano ../kustomize/builds/web-server/web-server.yaml 
 ```
 
-Find a section like this (there are a few similar sections, but only the corret one has `destinationDir: html`):
+Find a section like this (there are a few similar sections, but only the correct one has `destinationDir: html`):
 
 ```yaml
     - as: null
@@ -106,7 +106,7 @@ Find a section like this (there are a few similar sections, but only the corret 
 
 Change the `chipster-web` to your own image `custom-html`. Press Ctrl+O, Enter, Ctrl+X to save and close the editor.
 
-Then we build and deploy the image again just like shown in [image build instructions](build-image.md) too.
+Then we build and deploy the image again.
 
 Build the image:
 
