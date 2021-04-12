@@ -42,6 +42,8 @@ function configure_service {
   image=$3
   role=$4
   java_class=$5
+
+  #>&2 echo configure_service "'"$subproject_postfix"'" "'"$service"'" "'"$image"'" "'"$role"'" "'"$java_class"'"
     
   api_port=$(yq r $chipster_defaults_path url-bind-$role | cut -d : -f 3) || true
   admin_port=$(yq r $chipster_defaults_path url-admin-bind-$role | cut -d : -f 3) || true
@@ -185,7 +187,14 @@ fi
 
 image_project=$(get_image_project $private_config_path $PROJECT $DOMAIN)
 
-build_dir="build"
+# better to do this outside repo
+build_dir=$(make_temp chipster-openshift_deploy-builds)
+# build_dir="build_temp"
+# rm -rf build_temp
+# mkdir $build_dir
+
+echo -e "build dir is \033[33;1m$build_dir\033[0m"
+
 template_dir="$build_dir/parts"
 
 rm -rf $build_dir
@@ -195,28 +204,28 @@ mkdir -p $template_dir
 
 echo "generate server templates"
 
-configure_java_service "$subproject_postfix" auth fi.csc.chipster.auth.AuthenticationService &
-configure_java_service "$subproject_postfix" service-locator fi.csc.chipster.servicelocator.ServiceLocator &
-configure_java_service "$subproject_postfix" session-db fi.csc.chipster.sessiondb.SessionDb &
-configure_java_service "$subproject_postfix" file-broker fi.csc.chipster.filebroker.FileBroker &
-configure_java_service "$subproject_postfix" scheduler fi.csc.chipster.scheduler.Scheduler &
-configure_java_service "$subproject_postfix" session-worker fi.csc.chipster.sessionworker.SessionWorker &
-configure_java_service "$subproject_postfix" backup fi.csc.chipster.backup.Backup &
-configure_java_service "$subproject_postfix" job-history fi.csc.chipster.jobhistory.JobHistoryService &
+configure_java_service "$subproject_postfix" auth fi.csc.chipster.auth.AuthenticationService
+configure_java_service "$subproject_postfix" service-locator fi.csc.chipster.servicelocator.ServiceLocator
+configure_java_service "$subproject_postfix" session-db fi.csc.chipster.sessiondb.SessionDb
+configure_java_service "$subproject_postfix" file-broker fi.csc.chipster.filebroker.FileBroker
+configure_java_service "$subproject_postfix" scheduler fi.csc.chipster.scheduler.Scheduler
+configure_java_service "$subproject_postfix" session-worker fi.csc.chipster.sessionworker.SessionWorker
+configure_java_service "$subproject_postfix" backup fi.csc.chipster.backup.Backup
+configure_java_service "$subproject_postfix" job-history fi.csc.chipster.jobhistory.JobHistoryService
 
 
 # shared templates and custom image 
 
-configure_service "$subproject_postfix" toolbox toolbox toolbox &
-configure_service "$subproject_postfix" type-service chipster-web-server-js type-service &
-configure_service "$subproject_postfix" web-server web-server web-server &
-configure_service "$subproject_postfix" comp comp comp &
-configure_service "$subproject_postfix" comp-large comp comp &
+configure_service "$subproject_postfix" toolbox toolbox toolbox
+configure_service "$subproject_postfix" type-service chipster-web-server-js type-service
+configure_service "$subproject_postfix" web-server web-server web-server
+configure_service "$subproject_postfix" comp comp comp
+configure_service "$subproject_postfix" comp-large comp comp
 
 # configure_service "$subproject_postfix" file-storage-single chipster-web-server file-storage fi.csc.chipster.filestorage.FileStorage &
 
 if [ "$mylly" = true ]; then
-  configure_service "$subproject_postfix" comp-mylly comp-mylly comp &
+  configure_service "$subproject_postfix" comp-mylly comp-mylly comp
 else
   echo "skipping mylly"
 fi
