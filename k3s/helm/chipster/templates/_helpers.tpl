@@ -4,8 +4,12 @@
 Copy Chipster configuration key-value pairs
 */}}
 {{- define "chipster.listDeploymentConfigs" -}}
+# insert values as yaml text block without the last new line
+# backup encryption key requires a text block
+# and simple strings shouldn't have a new line character in the end (at least aws sdk didn't tolerate it in the S3 url)
 {{- range $configKey, $value := .configs }}
-{{ $configKey }}: {{ $value }}
+{{ $configKey }}: |-
+{{ $value | indent 2 }}
 {{- end }}
 {{- end -}}
 

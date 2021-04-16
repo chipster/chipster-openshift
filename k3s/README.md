@@ -246,19 +246,12 @@ TODO A similar jaas config should still work like in the old Chipster v3, but it
 #### File authentication
 
 There is a file `security/users` on `auth`, just like in the old Chipster v3, but it won't survive container restarts. The easiest way to add new users is through [values.yaml](#helm-chart-values).
-
 ### Backups
-#### Backup deployment configuration
 
-Take a copy of your `~/values.yaml`.
+Every disk will fail eventually, bugs may delete the data or administrators can make mistakes. Please make sure you take [backups](backup.md) of your server and check regurlarly that you can also restore the server and its data from these backups. 
 
-#### Backup databases
-
-TODO fi.csc.chispter.backup.Backup can take db dumps, encrypt and upload those to S3. BackupArchive can download those from S3 to a local disk on some other server.
-
-#### Backup files
-
-TODO FileBroker can encrypt and upload incremental file backups to S3. BackupArchive can download those from S3 to a local disk on some other server.
+Alternatively, make sure 
+your users understand that they may lose the files they have stored in Chipster.
 
 ### Logging
 

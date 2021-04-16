@@ -108,6 +108,10 @@ spec:
             - name: jobs-data
               mountPath: {{ $deployment.workDir }}/jobs-data
             {{- end }}
+            {{- if eq $deployment.name "backup" }}
+            - name: db-backups
+              mountPath: {{ $deployment.workDir }}/db-backups
+            {{- end }}
       volumes:
         - name: conf
           secret:
@@ -156,6 +160,10 @@ spec:
         {{- end}}
         {{- if eq $deployment.name "comp" }}
         - name: jobs-data
+          emptyDir: {}
+        {{- end}}
+        {{- if eq $deployment.name "backup" }}
+        - name: db-backups
           emptyDir: {}
         {{- end}}
 {{- end }}
