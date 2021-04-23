@@ -80,7 +80,7 @@ watch kubectl get pod
 kubectl logs deployment/backup --follow
 ```
 
-Open the admin view by logging to Chipster as username `admin`, click `Admin` from the top navigation bar. Select the `Maintenance` section from the left and click the button which start a new backup of the session-db. Check the logs of the backup service to see that it worked. The backup service will create a new database backup every night from now on.
+Select the `Maintenance` section of the in the [admin view](README.md#Admin-view) and click the button which start a new backup of the session-db. Check the logs of the backup service to see that it worked. The backup service will create a new database backup every night from now on.
 
 ## Backup file-storage files to S3
 
