@@ -1,13 +1,13 @@
-# Backup Chipster server to S3
+# Chipster's built-in backup feature
 ## Introduction
 
-The built-in backup functionality in Chipster is very much customised to our environment. We are using S3 compatible object storage to transfer the files and finally store a copy of the files on another archive server, which has a large NFS volume. 
+The built-in backup feature in Chipster is very much customised to our environment. We are using S3 compatible object storage to transfer the files and finally store a copy of the files on another archive server, which has a large storage volume. 
 
 Consider this only a temporary solution, because we may have to rely entirely on S3 in the future because of the growing data sizes. Unfortunately we don’t have a concrete plan how to do efficient incremental backups on S3 yet. 
 
-When configured properly, the Chipster's backup service dumps all three databases, compresses, encrypts and uploads the files to a S3 object storage. The file-storage service can do the same for the users’ files. 
+When configured properly, the Chipster's backup service dumps all three databases, compresses and uploads the files to a S3 object storage. Also an optional encryption can be configured. The file-storage service can do the same for the actual data files. 
 
-Then we have another standalone program `BackupArchive`, which we run on that remote archive server. It downloads the files from the S3 and stores them on the NFS volume. It will upload a list of successfully copied files back to S3, so that next time the file-storage service can upload only new files that have appeared after the first backup.
+Then we have another standalone program `BackupArchive`, which we run on a remote archive server.  it downloads the files from the S3 and stores them on a file system. This enables also incremental file backups. BackupArchive uploads a list of successfully copied files back to S3, so that next time the file-storage service can upload only new files that have appeared after the first backup.
 
 These instructions will talk about Kubernetes instead of K3s, because this same information applies both to the K3s and OpenShift. All those share the same Kubernetes API and in this context those terms are interchangeable.
 
@@ -16,13 +16,14 @@ These instructions will talk about Kubernetes instead of K3s, because this same 
 ### Databases and files
 
 We want to backup Chipster databases and files. All database backups of an installation are taken care by a service called "backup" running in Kubernetes together with the actual API services. The reason for this separate service is that we might want to have multiple instances of the actual API service (like auth), but want to create only one backup.
-At the moment file-broker stores users' files on a volume. 
 
-We want to store the files on a block device volumes, which usually are simpler and more reliable than shared file systems. Unfortunately, in a Kubernetes cluster that can be mounted only to one host at the time, so the backup-service doesn't have access to these files, but file-broker has to do backups itself.
+File-storage stores users' files on a volume. We want this volume to be a block device volume, which usually are simpler and more reliable than shared file systems. Unfortunately, a block device can be mounted only to one host at the time in a Kubernetes cluster, so the backup service doesn't have access to these files, but file-storage has to do the file backups itself.
 
-### Transfer to or through S3
+### Final backup storage in S3 or on a archive server
 
-There are two way to use this. You can configure only the upload part so that the S3 is your final backup storage. In this case you have to build your own system for cleaning up the old copies. Or you you can configure the whole system, where you need use a file system on the archive server for the main backup storage.
+There are two way to use this feature. You can configure only the upload part so that the S3 is your final backup storage. This will consume a lot of storage space in S3 and network bandwidth, because the file-storage will make a full backup every time. In this case you also have to build your own system for cleaning up the old copies. Alternatively, you you can configure the whole system with the archive server. In this case file backups are made incrementally. A file system on the archive server is used for the final backup storage.
+
+### Transfer through S3
 
 The file transfer is similar for the database dumps and for the files. The backups in Kubernetes and object storage are temporary and only needed to transfer the files to archive server. The final backups on the archive server are called `archives` to distinguish them from the earlier copies in this process.
 
@@ -41,44 +42,20 @@ In the archive server
 We take a full database backups every night, but we can't do the same for users' files, because that would consume too much space and often we couldn't even move them all in 24 hours. Let's assume the files are immutable. We'll do small changes to the above process to do incremental backups of files.
 
 In Kubernetes:
-- Get the list of files in the previous archive from the object storage and collect the list of all current files in file-broker. Backup only new files
+- Get the list of files in the previous archive from the object storage and collect the list of all current files in file-storage. Backup only new files
 - Upload also the list of all current files to the object storage
 
 In the archive server
 - Download the list of all current files from the object storage. Download the new files from the object storage and move the old files from the old archive version
 - Upload the list of files in the latest archive
-- Clean up old only oldest archives. Individual archive version wouldn't be usefull without an unbroken chain of archives between that version to the latest
+- Clean up only oldest archives. Individual archive version wouldn't be usefull without an unbroken chain of archives between that version to the latest
 
-Example
-
-There are two files `a` and `b` in the file-storage and no previous backups. When the file-storage server creates the backup:
-- There is no `archive_info` file in the object storage, so a full backup is needed
-- file-broker compresses, encrypts, packages and uploads files `a` and `b` to the object storage
-- file-broker uploads a `backup_info` file, which includes files `a` and `b` (and their sizes and checksum before and after compression and encryption) to the object storage
-
-On the next run the archiver:
-- Finds the backup from the object storage
-- Downloads and extracts (only the outermost tar, files remain compressed and encrypted) the file packages from the object storage, storing the files `a` and `b` to the `download` folder
-- Creates a dir with the backup's timestamp for this new archive
-- Goes through the `backup_info` file and moves the files `a` and `b` from the `download` folder to the latest archive folder
-- Uploads a `archive_info` file which declares that files `a` and `b` are archived
-
-Let's assume the file `a` is deleted and a new file `c` is added to the file-storage. On the next backup
-- file-storage finds the previous `archive_info` file
-- file-storage goes through its current files. The file `b` is found from the `archive_info`, so its information is simply copied to the `backup_info`. The new file `c` is compressed, encrypted, packaged and uploaded to the object storage and its information written to the `backup_info` too
-
-On the next run the archiver:
-- Finds the backup from the object storage
-- Downloads and extracts the file package from the object storage, storing the file `c` to the `download` folder
-- Creates a dir with the backup's timestamp for this new archive
-- Goes through the `backup_info` file and moves the file `b` from the previous archive folder and the file `d` from the `download` folder the latest archive folder. The file `a` remains in the previous folder, which will be deleted after 60 days
-- Uploads a `archive_info` file which declares that files `b` and `c` are now archived
 
 ## Backup databases to S3
 
-> Note! Our `chipster-web-server` image has `pg_dump` version 9 which refues to work with the PostgreSQL version 11 installed by our K3s instructions. We are unable to fix the this right now, so please use the backup to file system instructions to backup databases in K3s for now.
+> Note! Our `chipster-web-server` image has `pg_dump` version 9 which refues to work with the PostgreSQL version 11 installed by our K3s instructions. We are unable to fix the this right now, so please use the [backup with kubectl instructions](backup-to-file.md) to backup databases in K3s for now.
 
-Chipster's backup service can encrypt and upload database backups to S3.
+Chipster's backup service can compress and upload database backups to S3.
 
 Configure the endpoint, region, access key, secret key and bucket of your S3 object storage in your `~/values.yaml`. Only the most important options are shown here. Please see the [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/prod/src/main/resources/chipster-defaults.yaml) for all available backup settings.
 
@@ -105,9 +82,9 @@ kubectl logs deployment/backup --follow
 
 Open the admin view by logging to Chipster as username `admin`, click `Admin` from the top navigation bar. Select the `Maintenance` section from the left and click the button which start a new backup of the session-db. Check the logs of the backup service to see that it worked. The backup service will create a new database backup every night from now on.
 
-## Backup users' data files to S3
+## Backup file-storage files to S3
 
-Chipster's file-storage service can encrypt and upload backups of the users' data files to S3. If you have a archive server, these will be incremental copies.
+Chipster's file-storage service can compress and upload backups of the users' data files to S3. If you configure an archive server too, these will be incremental copies.
 
 Configure backups for `file-storage` just like shown for database in the previous chapter.
 
@@ -135,8 +112,9 @@ kubectl logs file-storage-0 --follow
 In the admin view, click the button `Start backup`. Check the logs of the file-storage service to see that it worked. 
 
 ## Archive server
+### Setup the archive server
 
-There is a little program `BackupArchive` which can download backups from S3 to a local disk on the archive server. These instructions are written for Ubuntu 16.04.
+There is a little program `BackupArchive` which can download backups from S3 to a server file system. This is ment to be run on a remote server, which is unlikely to be lost at the same time with the primary Chipster server. We'll call this `archive server`. This also enables incremental file backups. These instructions are written for Ubuntu 16.04.
 
 Install Java with `SDKMAN!`:
 
@@ -159,7 +137,9 @@ Install latest Java 11 version, e.g. from Amazon:
 sdk install java 11.0.10.9.1-amzn
 ```
 
-Create file `pull-and-build-code.bash`:
+Create file `pull-and-build-code.bash`. This will be used to build the code now and later when
+you want to update it.
+
 ```bash
 #!/bin/bash
 
@@ -175,6 +155,15 @@ pushd lib
 popd
 ```
 
+Create file `archive.bash`. This is useful for running BackupArchive program manually, because
+it shows the output directly on the screen.
+
+```bash
+#!/bin/bash
+date
+java -cp ../lib/*: fi.csc.chipster.archive.BackupArchive
+```
+
 Checkout and build code:
 
 ```bash
@@ -185,7 +174,8 @@ popd
 bash pull-and-build-code.bash
 ```
 
-Configure:
+Create folders for configuration and archives:
+
 ```bash
 mkdir conf backup-archive
 ```
@@ -200,27 +190,69 @@ backup-s3-secret-key: S3_SECRET_KEY
 backup-bucket: k3s-backup-test
 ```
 
+### Run BackupArchive program
+
 Run:
 
 ```bash
-java -cp lib/*: fi.csc.chipster.archive.BackupArchive
+bash archive.bash
 ```
 
-TODO schedule cron to run this daily.
+### Schedule BackupArchive to run every night
+
+Create file `cron-archive.bash`. This writes the program output to a file to allow you to see later what happened in the last run.
+
+```bash
+#!/bin/bash
+
+# for sdkman
+source ~/.bashrc
+
+# only latest here, other logs are in the logs directory
+rm -f cron.log
+
+bash archive.bash >> cron.log
+```
+
+Configure cron to run this every night at 06:12, or pick any other time:
+
+```bash
+echo "12 6 * * * $HOME/cron-archive.bash" | crontab
+```
+
+### Update archive server
+
+TODO Update Ubuntu
+
+Update `SDKMAN!` and Java:
+
+```bash
+sdk selfupdate
+sdk update
+# check if there are new minor Amazon Corretto 11 versions. Install if found
+sdk list java
+```
+
+Pull latest code from !GitHub and build it:
+
+```bash
+bash pull-and-build-code.bash
+```
 
 ## Encryption
 
 ### Introduction
 
-The built-in backup system can encrypt the backups if you generate and configure encryption keys.
+The built-in backup feature can encrypt the backups if you generate and configure encryption keys. It will encrypt both the database backups and file-storage file backups before those are uploaded to S3. It is designed on the assumption that the data in S3 is private, but encrypting the actual files adds an additional layer of protection, in case the S3 data is leakead. Note that the file checksums are not
+encrypted, so an adversary could still check whether a specific file is in the backup or not.
 
 ### Generate keys
 
-See https://help.github.com/en/articles/generating-a-new-gpg-key for more manual and verbose instructions. The key generation seems to get easily stuck in a virtual machine because the Linux kernel doesn't have enough entropy to generate good quality random numbers. 
+See https://help.github.com/en/articles/generating-a-new-gpg-key for more manual and more verbose instructions. The key generation seems to get easily stuck in a virtual machine because the Linux kernel doesn't have enough entropy to generate good quality random numbers. 
 
 Generate key (e.g. on your laptop):
 
-```
+```bash
 echo -e "Key-Type: rsa
      Key-Length: 4096
      Name-Real: chipster
@@ -231,23 +263,23 @@ echo -e "Key-Type: rsa
     
 Find out the key id
 
-```
+```bash
 gpg --list-secret-keys --keyid-format LONG | grep chipster@localhost -b2 | grep sec | cut -d "/" -f 2 | cut -d " " -f 1
 ```
 
 Export the public key
 
-```
+```bash
 gpg --armor --export KEY_ID
 ```
 
 Export the private key. Encode with base64 to make it easier to store in password managers because the key itself is binary.
 
-```
+```bash
 gpg --export-secret-keys KEY_ID | base64
 ```
 
-Store these keys safely. Well configure the public key to Chipster soon. The private key is needed only in the restore operation. The next chapter includes instructions for removing the keys from your local gpg. 
+Store these keys safely. Well configure the public key to Chipster soon. The private key is needed only in the restore operation. See a [later chapter](#How-to-manage-keys-in-gpg) includes instructions for removing the keys from your local gpg. 
 
 >If you change the key, make sure the file-storage creates a full backup next time (e.g. by deleting the old backups from the object storage). Otherwise even your new file-storage backups will include the old files encrypted with the old key!
 
@@ -279,7 +311,7 @@ deployments:
         -----END PGP PUBLIC KEY BLOCK-----
 ```
 
-Restart pods, wait until the old pade has disappeared and check the logs:
+Restart pods, wait until the old pod has disappeared and check the logs:
 
 ```bash
 kubectl rollout restart deployment/backup
@@ -291,7 +323,7 @@ kubectl logs file-storage-0 --follow
 
 Try to start a new backup in the admin view and follow the logs to see that it works.
 
-If you are doing incremental backups to the archive server, remove the backups from the object storage (or their `archive_info` files) to get full backup. This ensures that all backups from now have only encrypted files. 
+If you are doing incremental backups to the archive server, remove the backups from the object storage (or their `archive_info` files) to get a full backup. This ensures that all backups from now on have only encrypted files. 
 
 ### How to manage keys in gpg
 
@@ -317,7 +349,7 @@ gpg --list-keys
 
 ## Restore
 
-Copy a archived directory from the archive server to back to hour Chipster server. This example uses `awscli` command to transfer it throught the object storage. If you have a direct SSH access between these server, you can of course simply use standard command line tools like `rsync` to copy the directory.
+Copy a archived directory from the archive server to back to hour Chipster server. This example uses `awscli` command to transfer it throught the object storage. If you have a direct SSH access between these servers, you can of course simply use standard command line tools like `rsync` to copy the directory.
 
 TODO install `awscli` to the archive and Chipster servers.
 
@@ -355,7 +387,7 @@ cd storage/restore
 aws --endpoint-url https://a3s.fi s3 cp s3://restore-test/restore.tar .
 # extract
 tar -xf restore.tar
-cd file-broker-backup_2019-05-08T09\:26\:17.038Z/
+cd file-storage-backup_2012-05-08T09\:26\:17.038Z/
 
 # import private key like instructed above
 

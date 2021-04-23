@@ -3,36 +3,41 @@
 
 Things to consider when designin a backup system
 - How often to take backups? Longer the interval, more data will be lost in when the backups are needed
-- How many copies? One backup copy may be enough to restore the server after an admin accidentally removes something. On the other hand, protection against bugs that corrupt  data silently could require backups of several months or even years
+- How many copies? One backup copy may be enough to restore the server after an admin accidentally removes something. On the other hand, protection against bugs that corrupt data silently could require backups of several months or even years
 - How much resources to devote for the backup system?
-- Backups are useful only if they survive the accident that destroyed the primary data. On the other hand, more separation usually makes the backup copies harder. How much separation is needed: different volume, different server, different data center or different admin?
-- Practice. Check regularly that you can actually restore the server from your backups. On a complex server it's easy to miss some critical piece of information
+- Backups are useful only if they survive the accident that destroyed the primary data. On the other hand, more separation usually makes the backup copies harder to do. How much separation is needed: different volume, different server, different data center or different admin?
+- Practice. The only way to know whether backups really work is to try out your restore process regularly to check that you actually can restore the server from the backups
 
 ## Backup deployment configuration
 
-Take a copy of your `~/values.yaml`. That should be enough for setting up the system again. If you have made any other customizations to your server, copy those too.
+Take a copy of your `~/values.yaml`. That should be enough for setting up the system itself again. If you have made any other customizations to your server, copy those too.
 
-## Backup databases and data files
+## Backup databases and file-storage files
 
-In addition to settting up the system again, you want to be able to restore the users' data. For this you need backups of the databases and the actual data files.
+In addition to settting up the system again, you want to be able to restore the users' data. For this you need backups of the databases and the actual data from the file-storage files.
 
-## Backup to file system or to S3
+## Do backups with a kubectl command or with the Chipster's built-int backup feature
 
-Here are instructions for two different ways to make backups of the Chipster server. You can either copy the data to a [regular file system](backup-to-file.md) or to a [S3 compatible object storage](backup-to-S3). Backing up to the file system is done using basic command line and kubectl commands. It's simple to understand and easy to customize to your specific needs. Storing backups on the same virtual machine server usually isn't safe enough, but makes it easy for you to move those files forward to what ever backup system you happen to have.
+Here are instructions for two different ways to make backups of the Chipster server. You can either copy the data using a [kubectl commands](backup-to-file.md) or with Chipster's [built-in backup feature](backup-to-S3). 
 
-Chipster also has a built-in support for making backups to S3 compatible object storage. Please see its instructions to evaluate whether it's suitable in your environment. 
+Copying the backup data with kubectl commands is simple to understand and easy to customize to your specific needs. Storing backups on the same virtual machine server usually isn't safe enough, but makes it easy for you to move those files forward to what ever backup system you happen to have.
+
+Chipster's built-in backup feature can compress, encrypt and upload the backup data to a S3 compatible object storage and store incremental copies on another remote archive server. Please see its instructions to evaluate whether it's suitable in your environment. 
+
+You don't have to pick just one system. For example, you can use the kubectl command to backup databases which usually are relatively small and still use the built-in backup feature for the file-storage files.
 
 ## Which databases to backup
 
 There are three PostgreSQL databases in Chipster: `session-db`, `auth` and `job-history`. 
 
-You must have backup of the session-db database to be able to restore users' data files (in addition to the files themselves, of course). 
+You must have backup of the session-db database to be able to restore users' analysis sessions (in addition to the file-storage files, of course). 
 
 The other two databases aren't that critical. The auth database contains users’ names and email addresses and possibly the timestamp when he or she accepted the terms of use (if you have managed to configure this without instructions). You will get the name and email again when the user logs in next time, so it’s not that critical if you lose this database. The job history database is for generating statistics about the number of jobs and consumed resources.
 
+## Restore
 ### How to delete a database
 
-Here is the procedure for deleting everything in the database, for example when rehearsing the restore process.
+Here is the procedure for deleting everything in the database, for example when rehearsing the restore process on a test server.
 
 Shut down the database pod:
 
@@ -61,13 +66,13 @@ cat session-db.sql | kubectl exec -it chipster-session-db-postgresql-0 -- bash -
 ```
 
 
-### Delete users' files
+### Delete file-storage files
 
 ```bash
 kubectl exec file-storage-0 -- bash -c 'rm -rf storage/*'
 ```
 
-### Restore users' files from the file system
+### Restore file-storage files
 
 Simple command:
 
