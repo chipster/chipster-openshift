@@ -1,5 +1,7 @@
 # Build images
 
+## Introduction
+
 Building container images will accomplish the following tasks:
 
 * Checkout code repositories
@@ -36,13 +38,7 @@ rancher/klipper-lb                                                     v0.1.2   
 rancher/pause                                                          3.1                   da86e6ba6ca1        2 years ago         742kB
 ```
 
-If you want to change something in these images, you can build your own image. For example, let's assume that you have forked [our chipster-tools](https://github.com/chipster/chipster-tools) repository to make your own changes to these scripts. 
-
-Change the GitHub url in the buildconfig file to point to your repository. This same process would work also if you wanted to change the `Dockerfile` next to the buildconfig.
-
-```bash
-nano ../templates/builds/chipster-tools/chipster-tools.yaml
-```
+## Get current images
 
 The current build script assumes that all source image are present locally. You can either 
 pull the images from a public image repository:
@@ -57,6 +53,25 @@ Or you can build all images once which takes about half an hour:
 bash scripts/build-image.bash --all
 ```
 
+## Building your own images
+
+If you want to change something in these images, you can build your own image. The command is a bit different depending on whether the changes come from the GitHub or from the local directory. 
+
+On a production server you probabaly want that all changes are recorded in the version control. In this 
+case it makes sense to take the code directly from the version control repository.
+
+On a development server you want to test changes as quickly as possible, so it makes sense to build the new image directly from the local directory. This allows you to try new things without making commits all the time.
+
+### Option 1: Build from GitHub
+
+For example, let's assume that you have forked [our chipster-tools](https://github.com/chipster/chipster-tools) repository to make your own changes to these scripts. 
+
+Change the GitHub url in the buildconfig file to point to your repository. This same process would work also if you wanted to change the `Dockerfile` next to the buildconfig.
+
+```bash
+nano ../kustomize/builds/chipster-tools/chipster-tools.yaml
+```
+
 Now that Docker has local copies of the source images, you can build only the image that you changed and other images that are using it as their source. By looking at the `source` sections of the buildconfigs, you can see that this `chipster-tools` image is a source of two other images: `toolbox` and `web-server`. We have to build those too.
 
 ```bash
@@ -64,6 +79,38 @@ bash scripts/build-image.bash chipster-tools
 bash scripts/build-image.bash chipster-toolbox
 bash scripts/build-image.bash web-server
 ```
+
+### Option 2: Build from local directory
+
+This example assumes that you want to make a change to the Java code in chipster-web-server repository.
+
+Checkout the repository:
+
+```bash
+cd ~/git
+git clone https://github.com/chipster/chipster-web-server.git
+```
+
+After you have done your changes to this directory, you can build the image. Check out the command that our build script would use:
+
+```bash
+cd ~/git/chipster-openshift/k3s
+bash scripts/buildconfig-to-docker.bash ../kustomize/builds/chipster-web-server
+```
+
+It will print the docker build command:
+
+```bash
+cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f - https://github.com/chipster/chipster-web-server.git
+```
+
+Run the command, but replace the repository URL in the end with a path to your local directory:
+
+```bash
+cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f -  ~/git/chipster-web-server
+```
+
+## Start containers form the local image
 
 Then we have to change our deployment to use these new images. In practice we only have to disable use of the default image repository for those Chipster services in our `~/values.yaml`. After this the deployment will use your own local image.
 
@@ -80,3 +127,10 @@ Finally, deploy changes.
 ```bash
 bash deploy.bash -f ~/values.yaml
 ``` 
+
+Check if the relevant containers restarted automatically or restart those yourself, e.g.:
+
+```bash
+kubectl get pod
+kubectl rollout restart toolbox
+```
