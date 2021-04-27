@@ -110,7 +110,7 @@ Run the command, but replace the repository URL in the end with a path to your l
 cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f -  ~/git/chipster-web-server
 ```
 
-## Start containers form the local image
+## Start containers from the local image
 
 Then we have to change our deployment to use these new images. In practice we only have to disable use of the default image repository for those Chipster services in our `~/values.yaml`. After this the deployment will use your own local image.
 

@@ -14,6 +14,8 @@ Chipster v4 is under heavy development and is still a bit rough around the edges
 
 To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide [the critical pointers](migration.md), because we are migrating our own installations anyway. 
 
+These instructions will assume that you are running the latest version of deployment scripts and container images. If you have installed your Chipster server earlier, please [update](#Updates) it first to the latest version or find the old version of these insructions from the time when your server was installed.
+
 ## Why K3s
 
 K3s is a Lightweight Kubernetes, effectively a container cloud platform. Do we really need the cointainer cloud platform to run a few server processes on single host? Not really, you could checkout the code yourself and follow the Dockerfiles to see what operating system packages and what kind of folder structure is needed for each service, how to compile the code and how to start the processes. Add some form of reverse proxy to terminate HTTPS (e.g. Apache or nginx) and some process monitoring (Java Service Wrapper or systemd) and you are done.
@@ -248,10 +250,8 @@ TODO A similar jaas config should still work like in the old Chipster v3, but it
 There is a file `security/users` on `auth`, just like in the old Chipster v3, but it won't survive container restarts. The easiest way to add new users is through [values.yaml](#helm-chart-values).
 ### Backups
 
-Every disk will fail eventually, bugs may delete the data or administrators can make mistakes. Please make sure you take [backups](backup.md) of your server and check regurlarly that you can also restore the server and its data from these backups. 
-
-Alternatively, make sure 
-your users understand that they may lose the files they have stored in Chipster.
+Every disk will fail eventually, bugs may delete the data or administrators can make mistakes. Please make sure you take [backups](backup.md) from your server or make sure 
+your users understand that they may lose the files they have stored in your Chipster server.
 
 ### Logging
 

@@ -53,7 +53,7 @@ In the archive server
 
 ## Backup databases to S3
 
-> Note! Our `chipster-web-server` image has `pg_dump` version 9 which refues to work with the PostgreSQL version 11 installed by our K3s instructions. We are unable to fix the this right now, so please use the [backup with kubectl instructions](backup-to-file.md) to backup databases in K3s for now.
+> Note! Our `chipster-web-server` image has `pg_dump` version 9 which refuses to work with the PostgreSQL version 11 installed by our K3s instructions. We are unable to fix the this right now, so please use the [backup with kubectl instructions](backup-to-file.md) to backup databases in K3s for now.
 
 Chipster's backup service can compress and upload database backups to S3.
 
@@ -80,7 +80,7 @@ watch kubectl get pod
 kubectl logs deployment/backup --follow
 ```
 
-Select the `Maintenance` section of the in the [admin view](README.md#Admin-view) and click the button which start a new backup of the session-db. Check the logs of the backup service to see that it worked. The backup service will create a new database backup every night from now on.
+Select the `Maintenance` section in the [admin view](README.md#Admin-view) and click the button which starts a new backup of the session-db. Check the logs of the backup service to see that it worked. The backup service will create a new database backup every night from now on.
 
 ## Backup file-storage files to S3
 
@@ -122,8 +122,9 @@ Install Java with `SDKMAN!`:
 # required by sdkman installer
 sudo apt install -y unzip zip
 curl -s "https://get.sdkman.io" | bash
-# open a new terminal or run the "source" command printed by the script
 ```
+
+Open a new terminal or run the "source" command printed by the `SDKMAN!` installation script.
 
 List Java versions:
 
@@ -161,7 +162,7 @@ it shows the output directly on the screen.
 ```bash
 #!/bin/bash
 date
-java -cp ../lib/*: fi.csc.chipster.archive.BackupArchive
+java -cp lib/*: fi.csc.chipster.archive.BackupArchive
 ```
 
 Checkout and build code:
@@ -174,7 +175,7 @@ popd
 bash pull-and-build-code.bash
 ```
 
-Create folders for configuration and archives:
+Create folders for configuration and archives. Replace the second folder with a symlink, if you want to use another larger volume for storing the arhives.
 
 ```bash
 mkdir conf backup-archive
@@ -200,25 +201,28 @@ bash archive.bash
 
 ### Schedule BackupArchive to run every night
 
-Create file `cron-archive.bash`. This writes the program output to a file to allow you to see later what happened in the last run.
+Create file `cron-archive.bash`. This writes the program output to a file to allow you to see later what happened in the last scheduled run. 
 
 ```bash
 #!/bin/bash
 
-# for sdkman
-source ~/.bashrc
+# go to the script directory
+cd $(dirname "$0")
 
-# only latest here, other logs are in the logs directory
-rm -f cron.log
+# init SDKMAN! directly, because .bashrc refuses to run non-interactively in Ubuntu 
+source ~/.sdkman/bin/sdkman-init.sh
 
-bash archive.bash >> cron.log
+# run archive.bash, redirect stdout and stderr to a log file
+bash archive.bash > cron.log 2>&1
 ```
 
-Configure cron to run this every night at 06:12, or pick any other time:
+Configure cron to run this every night at 06:12, or pick any other time. Run `crontab -e` to edit your crontab and add the following text. Replace `FULL_PATH_TO` with a path where your `cron-archive.bash` script is.
 
-```bash
-echo "12 6 * * * $HOME/cron-archive.bash" | crontab
 ```
+12 6 * * * bash FULL_PATH_TO/cron-archive.bash
+```
+
+If this doesn't work, change cron to run it soon, use `sudo journalctl -u cron --follow` to see when it happens and then check the `cron.log` for possible error messages.
 
 ### Update archive server
 
@@ -285,7 +289,7 @@ Store these keys safely. Well configure the public key to Chipster soon. The pri
 
 ### Configure the public key
 
-Configure the public key in your `~/values.yaml` for the backup and file-storage services. The public key lines must be indented correctly to be recognized as a text block in the yaml format. Getting the indentation there is annoying. Usually code editors like [Visual Studio Code](https://code.visualstudio.com) can do this by selecting the text block and hitting the tab key a few times. Copy the whole key, even if this example is shortened to show only the first and last lines. Note that also the empty line must have correct number of indenting space characters.
+Configure the public key in your `~/values.yaml` for the backup and file-storage services. The public key lines must be indented correctly to be recognized as a text block in the yaml format. Getting the indentation there is annoying. Usually code editors like [Visual Studio Code](https://code.visualstudio.com) can do this by selecting the text block and hitting the tab key a few times. Copy the whole key, even if this example is shortened to show only the first and last lines. Note that also the empty line must have correct number of indenting space characters and that the vertical bar character `|` is necessary to start the multiline text block.
 
 ```yaml
 deployments:
@@ -325,7 +329,7 @@ Try to start a new backup in the admin view and follow the logs to see that it w
 
 If you are doing incremental backups to the archive server, remove the backups from the object storage (or their `archive_info` files) to get a full backup. This ensures that all backups from now on have only encrypted files. 
 
-### How to manage keys in gpg
+### How to manage gpg keys
 
 Import the private key to use it (-d and gpg2 in Ubuntu 16.04, -D and gpg in OSX)
 
@@ -336,27 +340,30 @@ echo -e PRIVATE_KEY | base64 -d | gpg2 --import
 When you are done, delete the key from the keystore
 
 ```
-gpg --delete-secret-keys chipster@localhost
-gpg --delete-keys chipster@localhost
+gpg2 --delete-secret-keys chipster@localhost
+gpg2 --delete-keys chipster@localhost
 ```
 
 Make sure the keystore is empty
 
 ```
-gpg --list-secret-keys
-gpg --list-keys
+gpg2 --list-secret-keys
+gpg2 --list-keys
 ```
 
 ## Restore
 
-Copy a archived directory from the archive server to back to hour Chipster server. This example uses `awscli` command to transfer it throught the object storage. If you have a direct SSH access between these servers, you can of course simply use standard command line tools like `rsync` to copy the directory.
+### Move files back to the Chipster server
 
-TODO install `awscli` to the archive and Chipster servers.
+Copy a archived directory from the archive server to back to hour Chipster server. If you have a direct SSH access between these servers, you can of course simply use standard command line tools like `rsync` to copy the directory. Otherwise, you can copy it through the object storage, for example using S3 client `awscli` directly available in the Ubuntu's `apt` repository.
 
-In the archive server:
+Quick command tips:
 
 ```bash
-# Login to object storage
+# install
+sudo apt install -y awscli
+
+# login
 aws configure set default.aws_access_key_id S3_ACCESS_KEY
 aws configure set default.aws_secret_access_key S3_SECRET_KEY
 
@@ -366,35 +373,26 @@ aws --endpoint-url https://a3s.fi s3 ls
 # make bucket
 aws --endpoint-url https://a3s.fi s3 mb s3://restore-test
 
-# package a backup directory
-tar -cvf restore.tar file-storage-backup_2019-05-08T09\:26\:17.038Z
+# upload file
+aws --endpoint-url https://a3s.fi s3 cp FILE s3://restore-test/
 
-# upload the package
-aws --endpoint-url https://a3s.fi s3 cp restore.tar s3://restore-test/
+# download file
+aws --endpoint-url https://a3s.fi s3 cp s3://restore-test/FILE .
 ```
 
+### Decrypt and extract
 
-In the Chipster server:
+[Import private key](#How-to-manage-gpg-keys) like instructed above. 
+
+If you want to decrypt just one file:
 
 ```bash
-# configure object storage credentials
-aws configure set default.aws_access_key_id S3_ACCESS_KEY
-aws configure set default.aws_secret_access_key S3_SECRET_KEY
-
-mkdir storage/restore
-cd storage/restore
-# download
-aws --endpoint-url https://a3s.fi s3 cp s3://restore-test/restore.tar .
-# extract
-tar -xf restore.tar
-cd file-storage-backup_2012-05-08T09\:26\:17.038Z/
-
-# import private key like instructed above
-
-# if you want to decrypt just one file
 gpg2 --decrypt FILE_ID.lz4.gpg | lz4 -d > FILE_ID
+```
 
-# or decrypt all
+Or decrypt all:
+
+```bash
 for f in $(find . | grep .lz4.gpg); do
   echo $f
   dir=$(dirname $f)
@@ -403,6 +401,8 @@ for f in $(find . | grep .lz4.gpg); do
   rm $f
 done
 ```
+
+Now you can continue with the general instructions for [restoring the database dump](backup.md#Restotre-database-dump) and [restoring file-storage files](backup.md#Restore-file-storage-files).
 
 ## Caveats
 

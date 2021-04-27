@@ -110,7 +110,9 @@ spec:
             {{- end }}
             {{- if eq $deployment.name "backup" }}
             - name: db-backups
-              mountPath: {{ $deployment.workDir }}/db-backups
+              mountPath: {{ $deployment.workDir }}/db-backups            
+            - name: home-gnupg
+              mountPath: /home/user/.gnupg
             {{- end }}
       volumes:
         - name: conf
@@ -164,6 +166,8 @@ spec:
         {{- end}}
         {{- if eq $deployment.name "backup" }}
         - name: db-backups
+          emptyDir: {}
+        - name: home-gnupg
           emptyDir: {}
         {{- end}}
 {{- end }}

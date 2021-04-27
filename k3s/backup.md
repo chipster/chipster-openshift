@@ -16,9 +16,9 @@ Take a copy of your `~/values.yaml`. That should be enough for setting up the sy
 
 In addition to settting up the system again, you want to be able to restore the users' data. For this you need backups of the databases and the actual data from the file-storage files.
 
-## Do backups with a kubectl command or with the Chipster's built-in backup feature
+## Do backups with kubectl command or with built-in backup feature
 
-Here are instructions for two different ways to make backups of the Chipster server. You can either copy the data using a [kubectl commands](backup-to-file.md) or with Chipster's [built-in backup feature](backup-to-S3). 
+Here are instructions for two different ways to make backups of the Chipster server. You can either copy the data using a [kubectl commands](backup-to-file.md) or with Chipster's [built-in backup feature](backup-to-s3.md). 
 
 Copying the backup data with kubectl commands is simple to understand and easy to customize to your specific needs. Storing backups on the same virtual machine server usually isn't safe enough, but makes it easy for you to move those files forward to what ever backup system you happen to have.
 
