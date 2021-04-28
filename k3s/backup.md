@@ -1,4 +1,4 @@
-# Backing up a Chipster server
+# Chipster server backups
 ## Backup considerations
 
 Things to consider when designin a backup system
@@ -20,7 +20,7 @@ In addition to settting up the system again, you want to be able to restore the 
 
 Here are instructions for two different ways to make backups of the Chipster server. You can either copy the data using a [kubectl commands](backup-to-file.md) or with Chipster's [built-in backup feature](backup-to-s3.md). 
 
-Copying the backup data with kubectl commands is simple to understand and easy to customize to your specific needs. Storing backups on the same virtual machine server usually isn't safe enough, but makes it easy for you to move those files forward to what ever backup system you happen to have.
+Copying the backup data with kubectl commands is simple to understand and easy to customize to your specific needs. Storing backups on the same virtual machine server usually isn't safe enough, but makes it easy for you to move those files forward to whatever backup system you happen to have.
 
 Chipster's built-in backup feature can compress, encrypt and upload the backup data to a S3 compatible object storage and store incremental copies on another remote archive server. Please see its instructions to evaluate whether it's suitable in your environment. 
 

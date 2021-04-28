@@ -19,22 +19,22 @@ We want to backup Chipster databases and files. All database backups of an insta
 
 File-storage stores users' files on a volume. We want this volume to be a block device volume, which usually are simpler and more reliable than shared file systems. Unfortunately, a block device can be mounted only to one host at the time in a Kubernetes cluster, so the backup service doesn't have access to these files, but file-storage has to do the file backups itself.
 
-### Final backup storage in S3 or on a archive server
+### Final backup storage in S3 or on archive server
 
-There are two way to use this feature. You can configure only the upload part so that the S3 is your final backup storage. This will consume a lot of storage space in S3 and network bandwidth, because the file-storage will make a full backup every time. In this case you also have to build your own system for cleaning up the old copies. Alternatively, you you can configure the whole system with the archive server. In this case file backups are made incrementally. A file system on the archive server is used for the final backup storage.
+There are two way to use this feature. You can configure only the upload part so that the S3 is your final backup storage. This will consume a lot of network bandwidth and storage space in S3, because the file-storage will make a full backup every time. In this case you also have to build your own system for cleaning up the old copies. Alternatively, you you can configure the whole system with the archive server. In this case file backups are made incrementally. A file system on the archive server is used for the final backup storage.
 
 ### Transfer through S3
 
 The file transfer is similar for the database dumps and for the files. The backups in Kubernetes and object storage are temporary and only needed to transfer the files to archive server. The final backups on the archive server are called `archives` to distinguish them from the earlier copies in this process.
 
 In Kubernetes:
-- Compress (lz4), encrypt (gpg) and package (tar) new files
+- Compress (lz4), optionally encrypt (gpg) and package (tar) new files
 - Upload the packages to the object storage
 
 In the archive server
 - Download packages from the object storage
 - Extract the tar package (called an `archive` now)
-- Clean up old archives from archive server (keep enough to be able to restore old versions)
+- Clean up old archives from the archive server (keep enough to be able to restore old versions)
 - Clean up old backups from the object storage (only latest kept)
 
 ### Incremental file backups
@@ -112,7 +112,7 @@ kubectl logs file-storage-0 --follow
 In the admin view, click the button `Start backup`. Check the logs of the file-storage service to see that it worked. 
 
 ## Archive server
-### Setup the archive server
+### Setup archive server
 
 There is a little program `BackupArchive` which can download backups from S3 to a server file system. This is ment to be run on a remote server, which is unlikely to be lost at the same time with the primary Chipster server. We'll call this `archive server`. This also enables incremental file backups. These instructions are written for Ubuntu 16.04.
 
@@ -156,15 +156,6 @@ pushd lib
 popd
 ```
 
-Create file `archive.bash`. This is useful for running BackupArchive program manually, because
-it shows the output directly on the screen.
-
-```bash
-#!/bin/bash
-date
-java -cp lib/*: fi.csc.chipster.archive.BackupArchive
-```
-
 Checkout and build code:
 
 ```bash
@@ -175,7 +166,16 @@ popd
 bash pull-and-build-code.bash
 ```
 
-Create folders for configuration and archives. Replace the second folder with a symlink, if you want to use another larger volume for storing the arhives.
+Create file `archive.bash`. This is useful for running BackupArchive program manually, because
+it shows the output directly on the screen.
+
+```bash
+#!/bin/bash
+date
+java -cp lib/*: fi.csc.chipster.archive.BackupArchive
+```
+
+Create folders for configuration and archives. Replace the second folder with a symlink, if you want to use another larger volume for storing the archives.
 
 ```bash
 mkdir conf backup-archive
@@ -222,7 +222,7 @@ Configure cron to run this every night at 06:12, or pick any other time. Run `cr
 12 6 * * * bash FULL_PATH_TO/cron-archive.bash
 ```
 
-If this doesn't work, change cron to run it soon, use `sudo journalctl -u cron --follow` to see when it happens and then check the `cron.log` for possible error messages.
+If this doesn't work, change crontab time to run soon, use `sudo journalctl -u cron --follow` to see when it happens and then check the `cron.log` for possible error messages.
 
 ### Update archive server
 
@@ -237,7 +237,7 @@ sdk update
 sdk list java
 ```
 
-Pull latest code from !GitHub and build it:
+Pull latest code from GitHub and build it:
 
 ```bash
 bash pull-and-build-code.bash
@@ -283,13 +283,13 @@ Export the private key. Encode with base64 to make it easier to store in passwor
 gpg --export-secret-keys KEY_ID | base64
 ```
 
-Store these keys safely. Well configure the public key to Chipster soon. The private key is needed only in the restore operation. See a [later chapter](#How-to-manage-keys-in-gpg) includes instructions for removing the keys from your local gpg. 
+Store these keys safely. Well configure the public key to Chipster soon. The private key is needed only in the restore operation. See a [later chapter](#How-to-manage-gpg-keys) includes instructions for removing the keys from your local gpg. 
 
->If you change the key, make sure the file-storage creates a full backup next time (e.g. by deleting the old backups from the object storage). Otherwise even your new file-storage backups will include the old files encrypted with the old key!
+> Note! If you change the key, make sure the file-storage creates a full backup next time (e.g. by deleting the old backups from the object storage). Otherwise even your new file-storage backups will include the old files encrypted with the old key!
 
-### Configure the public key
+### Configure public key
 
-Configure the public key in your `~/values.yaml` for the backup and file-storage services. The public key lines must be indented correctly to be recognized as a text block in the yaml format. Getting the indentation there is annoying. Usually code editors like [Visual Studio Code](https://code.visualstudio.com) can do this by selecting the text block and hitting the tab key a few times. Copy the whole key, even if this example is shortened to show only the first and last lines. Note that also the empty line must have correct number of indenting space characters and that the vertical bar character `|` is necessary to start the multiline text block.
+Configure the public key in your `~/values.yaml` for the backup and file-storage services. The public key lines must be indented correctly to be recognized as a text block in the yaml format. Getting the indentation there is annoying. Usually code editors like [Visual Studio Code](https://code.visualstudio.com) can do this by selecting the text block and hitting the tab key a few times. Copy the whole key, even if this example is shortened to show only the first and last lines. Note that also the empty line must have correct number of indenting space characters and don't forget the vertical bar character `|` in the beginning to start the multiline text block.
 
 ```yaml
 deployments:
@@ -297,7 +297,7 @@ deployments:
     configs:
       backup-gpg-public-key: |
         -----BEGIN PGP PUBLIC KEY BLOCK-----
-
+        
         mQINBGB5bcEBEADI4JcsIQ7E5NAWRya3byWWd3RYyD3GX3Ev2m7w+bf/nviF5gNC
         ...
         7mjkLUrfbtbPNOI4f/Q7tMiF5o7sgNDIbUhvScX8D+LPms5IyY8rr0TDbpgYqjD4
@@ -307,7 +307,7 @@ deployments:
     configs:
       backup-gpg-public-key: |
         -----BEGIN PGP PUBLIC KEY BLOCK-----
-
+        
         mQINBGB5bcEBEADI4JcsIQ7E5NAWRya3byWWd3RYyD3GX3Ev2m7w+bf/nviF5gNC
         ...
         7mjkLUrfbtbPNOI4f/Q7tMiF5o7sgNDIbUhvScX8D+LPms5IyY8rr0TDbpgYqjD4
@@ -331,7 +331,7 @@ If you are doing incremental backups to the archive server, remove the backups f
 
 ### How to manage gpg keys
 
-Import the private key to use it (-d and gpg2 in Ubuntu 16.04, -D and gpg in OSX)
+Import the private key to use it (-d and gpg2 in Ubuntu 16.04, -D and gpg in macOS)
 
 ```
 echo -e PRIVATE_KEY | base64 -d | gpg2 --import
@@ -353,11 +353,11 @@ gpg2 --list-keys
 
 ## Restore
 
-### Move files back to the Chipster server
+### Move files back to Chipster server
 
-Copy a archived directory from the archive server to back to hour Chipster server. If you have a direct SSH access between these servers, you can of course simply use standard command line tools like `rsync` to copy the directory. Otherwise, you can copy it through the object storage, for example using S3 client `awscli` directly available in the Ubuntu's `apt` repository.
+Copy an archived directory from the archive server to back to your Chipster server. If you have a direct SSH access between these servers, you can simply use standard command line tools like `rsync` to copy the directory. Otherwise, you can copy it through the object storage, for example using S3 client `awscli`.
 
-Quick command tips:
+Quick `awscli` tips:
 
 ```bash
 # install
@@ -384,13 +384,13 @@ aws --endpoint-url https://a3s.fi s3 cp s3://restore-test/FILE .
 
 [Import private key](#How-to-manage-gpg-keys) like instructed above. 
 
-If you want to decrypt just one file:
+If you want to decrypt and extract just one file:
 
 ```bash
 gpg2 --decrypt FILE_ID.lz4.gpg | lz4 -d > FILE_ID
 ```
 
-Or decrypt all:
+Or decrypt and extract all:
 
 ```bash
 for f in $(find . | grep .lz4.gpg); do
@@ -402,10 +402,10 @@ for f in $(find . | grep .lz4.gpg); do
 done
 ```
 
-Now you can continue with the general instructions for [restoring the database dump](backup.md#Restotre-database-dump) and [restoring file-storage files](backup.md#Restore-file-storage-files).
+Now you can continue with the general instructions for [restoring the database dump](backup.md#Restore-database-dump) and [restoring file-storage files](backup.md#Restore-file-storage-files) to copy the data from the Chipster virtual machine to the containers.
 
 ## Caveats
 
 - The clean up of full backup archives keeps only the first of each day. Initiating additional backups in admin view uploads the backup to S3, but the next archiving will delete it
-- Encryption after compression is generally a questionble practice because of the compression oracle attacks. However, this shouldn't be an issue in this case, because each file is compressed separately, so changing attackers own files can't reveal anything from the files of other users, even if the attacker would have an access to the backups over several backup cycles.
+- Encryption after compression is generally a questionable practice because of the compression oracle attacks. However, this shouldn't be an issue in this case, because each file is compressed separately, so changing attackers own files can't reveal anything from the files of other users, even if the attacker would have an access to the backups over several backup cycles.
 - File checksums are calculated before and after compression and encryption and stored in the backup_info and archive_info files. Those are not checked yet, but could be used later if file corruption is suspected. 

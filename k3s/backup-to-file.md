@@ -1,4 +1,4 @@
-# Backup Chipster with a kubectl command
+# Backup Chipster with kubectl command
 ## Dump databases with kubectl
 
 The examples here show only how to backup the `session-db` database. To do the same for two other databases, simply replace all instances of text `session-db` with `auth` or `job-history` in these examples. While doing this, stick to the same naming convention in the examples. So if the text in the example uses underscore `_` instead of dash `-`, then use that also the new value, like `job_history`.
@@ -21,13 +21,13 @@ Finally, store this file (in addition to two other files from `auth` and `job-hi
 
 ## Copy file-storage files with kubectl
 
-You should take a copy of all files in file-storage. Check the total size:
+The database backups alone are not useful without a copy of all file-storage files. Check the total size:
 
 ```bash
 kubectl exec file-storage-0 -- du -sh storage
 ```
 
-Copy the files. Set the BACKUP_DIR to some place on the Chispter virtual machien that has enough free space. This command makes it simple to copy small amount of files. If you have more files, you may want to use the next command instead.
+Copy the files. Set the BACKUP_DIR to some place on your Chipster virtual machine that has enough free space. This command makes it simple to copy small amount of files. If you have more files, you may want to use the next command instead.
 
 ```bash
 kubectl cp file-storage-0:storage BACKUP_DIR/storage
