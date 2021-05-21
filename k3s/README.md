@@ -112,11 +112,13 @@ All Chipster configuration options can be found from a file [chipster-defaults.y
 
 For example, edit your `~/values.yaml` to add the new setting.
 
+>Note! The Helm templates now assume that all Chipster configuration values are strings. For example the number 5 here must be enclosed in quotes.
+
 ```yaml
 deployments:
   comp:
     configs:
-      comp-max-jobs: 5
+      comp-max-jobs: "5"
 ```
 
 Then deploy Chipster again.
@@ -276,6 +278,8 @@ are any issues.
  * check the password of `example_session_owner` from the auth (see the [Admin view](#admin-view) topic above)
  * login with that account and create same sessions
  * share them as read-only to user ID `everyone`
+
+Check the latest example sessions version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version. 
 
 ### Support request sessions
 
