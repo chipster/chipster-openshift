@@ -130,7 +130,7 @@ bash deploy.bash -f ~/values.yaml
 If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value from your own or default `values.yaml`.
 
 ```bash
-bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-jobs=10
+bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-jobs=\"10\"
 ```
 
 You can check that configuration file was changed correctly.
