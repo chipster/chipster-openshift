@@ -27,6 +27,7 @@ objects:
       server: file-storage
     name: file-storage${SUBPROJECT_POSTFIX}
   spec:
+    podManagementPolicy: Parallel
     serviceName: file-storage${SUBPROJECT_POSTFIX}
     replicas: 1
     selector:
