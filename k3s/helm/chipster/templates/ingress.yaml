@@ -18,7 +18,11 @@ spec:
     secretName: chipster-tls-staging
     {{- end }}
   entryPoints:
-     - websecure
+    {{- if $.Values.tls.env }}
+    - websecure
+    {{- else }}
+    - web
+    {{- end }}
   routes:
     {{- range $deploymentKey, $deployment := .Values.deployments }}
     {{- if ne $deployment.name "file-storage" }}
@@ -50,6 +54,8 @@ spec:
       middlewares:
         - name: chipster-stripprefix
 
+
+{{- if $.Values.tls.env }}
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: TLSOption
@@ -72,6 +78,7 @@ spec:
     - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
     - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
   sniStrict: true
+{{- end }}
 
 ---
 apiVersion: traefik.containo.us/v1alpha1
@@ -90,6 +97,8 @@ spec:
     {{- end }}
     {{- end }}
 
+
+{{- if $.Values.tls.env }}
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -106,6 +115,7 @@ spec:
           port: 80
       middlewares:
         - name: chipster-https-redirect
+{{- end }}
 
 ---
 apiVersion: traefik.containo.us/v1alpha1
@@ -115,4 +125,4 @@ metadata:
 spec:
   redirectScheme:
     scheme: https
-    permanent: true
+    permanent: false
