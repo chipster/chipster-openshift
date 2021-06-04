@@ -166,6 +166,8 @@ sudo apt upgrade -y
 
 TODO How to update Helm, Docker and K3s?
 
+> 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster.
+
 Pull latest changes from the deployment repository.
 
 ```bash

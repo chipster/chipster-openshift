@@ -33,7 +33,7 @@ Now we only have to install cert-manager itself with Helm:
 helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v0.15.1
+  --version v1.3.1
 ```
 
 ## Rate limits
@@ -74,7 +74,7 @@ kubectl describe certificaterequest
 kubectl describe order
 ```
 
-Seeing that the certificate is ready is actually enough at this point. This certificate is only from the Let's encrypt staging environment, so browsers won't trust it anyway. Actually some Chipster services won't event start, because those don't trust it either. 
+Seeing that the certificate is ready is actually enough at this point. This certificate is only from the Let's encrypt staging environment, so browsers won't trust it anyway. 
 
 ## Get a production certificate
 
@@ -102,6 +102,12 @@ chipster-tls   True    chipster-tls   48s
 ```
 
 Now open the address https://HOST_ADDRESS in the browser. You should see a closed lock icon in the address bar. If you click on that icon, the browser should show you a valid certificate for you HOST_ADDRESS issued by Let's Encrypt.
+
+The TLS termination in K3s is done by a reverse proxy called Traefik. If the browser keeps showing Traefik's self-signed certificate or Let's Encrypt's staging certificate, try again in a new browser tab or try to restart Traefik:
+
+```bash
+kubectl rollout restart deployment/traefik -n kube-system
+```
 
 ## Certificate renewal behind a firewall
 

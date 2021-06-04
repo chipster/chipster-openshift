@@ -7,21 +7,7 @@
   become_user: "{{ user }}"
 
 - name: Install CustomResourceDefinitions
-  shell: kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.crds.yaml
+  shell: kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.crds.yaml
 
 - name: Create a namespace for cert-manager
   shell: kubectl create namespace cert-manager | true
-
-- name: Disable old TLS versions
-  lineinfile:
-    dest: /var/lib/rancher/k3s/server/manifests/traefik.yaml
-    insertafter: '^    ssl:'
-    regexp:      '^      tlsMinVersion: VersionTLS12'
-    line:         '      tlsMinVersion: VersionTLS12'
-
-- name: Disable the self-signed default Traefik certificate, when request is made without SNI, i.e. with the IP address
-  lineinfile:
-    dest: /var/lib/rancher/k3s/server/manifests/traefik.yaml
-    insertafter: '^    ssl:'
-    regexp:      '^      sniStrict: true'
-    line:         '      sniStrict: true'
