@@ -2,25 +2,21 @@ FROM base-java
 
 RUN apt-get update -y \ 
 && apt-get install -y \  
-#openjdk-8-jre \
-#openjdk-8-jdk \
+#fastx-toolkit \
+#python-numpy \
+#python-zsi \
+#libgfortran3 \
+#libpng12-0 \
+#libreadline6 \
 ghostscript \
-fastx-toolkit \
-python-pip \
-python-numpy \
-python-matplotlib \
-python-zsi \
+python3-pip \
+python3-matplotlib \
 cython \
-libgd2-noxpm-dev \
+libgd-dev \
 python3-yaml \
-libgfortran3 \
-libcurl3 \
+libcurl4 \
 libglib2.0-0 \
 libglu1-mesa \
-libgsl-dev \ 
-#libgsl0ldbl \
-libpng12-0 \
-libreadline6 \
 libxml2 \
 mesa-common-dev \
 tcl \
@@ -28,8 +24,6 @@ tk \
 xorg-dev \
 unixodbc \
 gawk \
-libnetcdf11 \ 
-#libnetcdf6 \
 build-essential \
 gfortran \
 libcurl4-openssl-dev \
@@ -46,8 +40,6 @@ xorg-dev \
 python-dev \
 unixodbc-dev \
 libnetcdf-dev \
-git \
-ant \
 libjson-perl \
 libcairo-perl \
 libtext-simpletable-perl \
@@ -55,28 +47,20 @@ libcontextual-return-perl \
 libwant-perl \
 libhttp-parser-perl \
 cpanminus \
-unzip \
-pigz \
 pbzip2 \
-dstat \
 xfsprogs \
-emacs24 \ 
-#emacs23 \
-tree \
-#nfs-common \
-python-pip \
-parallel \
-curl \
-rsync \
 #libssl-dev for compiling python
 libssl-dev \
 #libbz2-dev for R-3.3+
 libbz2-dev \
-htop \
 # libnlopt0 for Seurat
 libnlopt0 \
 #libnlopt-dev for Seurat
 libnlopt-dev \
 #liblzo2-devor rseqc 
-liblzo2-dev \
+#liblzo2-dev \
+#libnetcdf11 \ 
+#libgsl0ldbl \
+#libnetcdf6 \
+#libgsl-dev \ 
 && apt-get clean
