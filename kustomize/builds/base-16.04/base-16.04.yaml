@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: base
-  name: base
+    build: base-16.04
+  name: base-16.04
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: base:latest
+      name: base-16.04:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: ubuntu:20.04
+        name: ubuntu-16.04:16.04
     type: Docker
   triggers:
   - type: ConfigChange

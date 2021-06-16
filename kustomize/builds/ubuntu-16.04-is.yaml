@@ -2,13 +2,13 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   labels:
-    build: base
-  name: ubuntu
+    build: base-16.04
+  name: ubuntu-16.04
 spec:
   lookupPolicy:
     local: false
   tags:
     - from:
         kind: DockerImage
-        name: 'ubuntu:20.04'
-      name: '20.04'
+        name: 'ubuntu:16.04'
+      name: '16.04'
