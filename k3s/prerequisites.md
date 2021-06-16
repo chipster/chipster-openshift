@@ -1,7 +1,7 @@
 # Chipster in K3s prerequisites
 ## Operating system and remote connection
 
-Let's assume that we have a ssh access to an Ubuntu 16.04 server. It doesn't matter if it is a physical hardwware or a virtual server.
+Let's assume that we have a ssh access to an Ubuntu 20.04 server. It doesn't matter if it is a physical hardwware or a virtual server.
 
 The instructions assume that your account has passwordless sudo rights. TODO how to set it up?
 
@@ -77,6 +77,9 @@ TODO What is port 6443, is it important to protect that too?
 We'll use Ansible to install other required programs.
 
 ```bash
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install -y ansible
 ```
 
@@ -133,17 +136,17 @@ helm create nginx-test
 Deploy it. Replace `HOST_ADDRESS` with your server's DNS name or IP address.
 
 ```bash
-helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/" --set ingress.hosts[0].host="HOST_ADDRESS"
+helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0].path="/" --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific" --set ingress.hosts[0].host="HOST_ADDRESS"
 ```
 
 If you don't have a DNS name for your host, you can leave the `HOST_ADDRESS` parameter away. In this case the example won't be able to print the correct address for you to open
 in the next step, but just use the host's IP address there.
 
 ```bash
-helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"
+helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
 ```
 
-Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page `404 Not Found` and `nginx/` followed by the nginx version number. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before  starting to deploy Chipster.
+Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before starting to deploy Chipster.
 
 When you are done, uninstall the test project from K3s and delete the folder.
 

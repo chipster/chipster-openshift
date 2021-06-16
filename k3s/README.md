@@ -58,7 +58,7 @@ See when pod's are running (hit Ctrl + C to quit).
 watch kubectl get pod
 ```
 
-Many Chipster services can't start before some other Chipster service is running. It may take up to 10 minutes before all services are ready. If they don't start, follow the [Getting started with K3s](getting-started-with-k3s.md) to find out why.
+Many Chipster services can't start before some other Chipster service is running. It may take up to 15 minutes before all services are ready. If they don't start, follow the [Getting started with K3s](getting-started-with-k3s.md) to find out why.
 If many services don't work, check the services `auth`, `service-locator` and `session-db` first, in this order.
 
 The `deploy.bash` script above showed you the address of the Chipster web app, which you can open in your browser. It will also print the credentials of the `chipster` account that you can use to log in to the app. Run `helm status chipster` to see it again. Make sure the address starts with `http://` and not `https://`. Browsers are eager to use the latter, but then the app can't connect to the Rest APIs, that are using only `http://` for the time being.
@@ -151,7 +151,7 @@ Please note that two-word Chipster service names like `file-broker` are written 
 
 ### Updates
 
-If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-annoncements](https://chipster.csc.fi/contact.shtml) email list to get notifications about new features and critical vulnerabilities. Consider subscribing to the [chipster-tech](https://chipster.csc.fi/contact.shtml) list too to share your experiences and learn from others.
+If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-announcements](https://chipster.csc.fi/contact.shtml) email list to get notifications about new features and critical vulnerabilities. Consider subscribing to the [chipster-tech](https://chipster.csc.fi/contact.shtml) list too to share your experiences and learn from others.
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
@@ -281,7 +281,11 @@ are any issues.
  * login with that account and create same sessions
  * share them as read-only to user ID `everyone`
 
-Check the latest example sessions version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version. 
+Check the latest example sessions version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-example-sessions/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the example-sessions hasn't changed since that version.
+
+The page lists the current example sessions. Concatenate the address of the page and one of those lines to download individual sessions. Make sure you have `https` in front of the address, because the server doesn't repond to download requests in plain `http`.
+
+TODO write script for downloading, uploadin and sharing all example sessions
 
 ### Support request sessions
 
