@@ -1,7 +1,6 @@
 - name: Remove Traefik to update it (if Traefik 1 in K3s 1.20 and earlier)
   shell: "kubectl -n kube-system delete helmcharts.helm.cattle.io traefik"
-  args:
-    warn: no
+  ignore_errors: yes
 
 - name: Install K3s (with Docker container runtime)
   shell: "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=\"server --docker\" sh -"
