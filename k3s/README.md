@@ -157,21 +157,31 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 If you have just installed Chipster, you can simply skim through this chapter now and return here when it's time to update your installation.
 
-Update operating system packages on the host.
-
-```bash
-sudo apt update
-sudo apt upgrade -y
-```
-
-TODO How to update Helm, Docker and K3s?
-
 > 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster.
 
 Pull latest changes from the deployment repository.
 
 ```bash
 git pull
+```
+
+Install latest package repositories etc. This will also install the lates K3s and Helm.
+
+```bash
+ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami)
+```
+
+Update operating system packages on the host (including Docker and Ansible).
+
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+Restart the server to make sure all new packages are taken in use.
+
+```bash
+sudo shutdown -r 0
 ```
 
 Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. The second run puts back the default pull policy `IfNotPresent`, so that you can restart pods without pulling images in every restart. 
