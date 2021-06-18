@@ -29,6 +29,8 @@ deployments:
     useDefaultImageRepo: true
     # replicas is the number of containers that run this service
     replicas: ""
+    # enableAdminRoute decides whether an IngressRoute is created for the admin port/service, allowing requests from outside of the K3s. Set to "default", "enable" or "disable".
+    adminRoute: "default"
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -43,6 +45,7 @@ deployments:
     db-fallback: false
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -55,6 +58,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -69,6 +73,7 @@ deployments:
     db-fallback: false
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -81,6 +86,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -93,6 +99,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
@@ -107,6 +114,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   toolbox:
     name: toolbox
     class: ""
@@ -120,6 +128,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -132,6 +141,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   typeService:
     name: type-service
     class: ""
@@ -144,6 +154,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   comp:
     name: comp
     class: comp
@@ -156,6 +167,8 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    # disabled until the comp image is updated
+    adminRoute: "disable"
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -168,6 +181,7 @@ deployments:
     configs: {}
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -182,9 +196,11 @@ deployments:
     db-fallback-job-history: false
     useDefaultImageRepo: true
     replicas: ""
+    adminRoute: "default"
 
 deploymentDefault:
   replicas: 1
+  adminRoute: "enable"
 
 # databases is a section for Chipster scripts to know which databases exist
 # passwordKey is the YAML path where generate-passwords.bash will store the password

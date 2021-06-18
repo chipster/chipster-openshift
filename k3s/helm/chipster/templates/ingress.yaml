@@ -37,6 +37,9 @@ spec:
           port: 80
       middlewares:
         - name: chipster-stripprefix
+    # create admin route
+    # if enabled for this deployment or using default config and it's enabled
+    {{- if or (eq $deployment.adminRoute "enable") (and (eq $deployment.adminRoute "default") (eq $.Values.deploymentDefault.adminRoute "enable")) }}
     - match: PathPrefix(`/{{ $deployment.name }}-admin`)    
       kind: Rule
       services:
@@ -44,6 +47,7 @@ spec:
           port: 80
       middlewares:
         - name: chipster-stripprefix
+    {{- end }}
     {{- end }}
     {{- end }}
     - match: PathPrefix(`/session-db-events`)    
