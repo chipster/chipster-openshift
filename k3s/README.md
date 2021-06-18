@@ -10,8 +10,6 @@ The user interface in the v4 Chipster is a single-page-application (SPA) running
 
 ## Status
 
-Chipster v4 is under heavy development and is still a bit rough around the edges. Nevertheless, it should be nicely usable for the end users running real analysis jobs. We are running it ourselves for that purpose. Many architectural choices are based on the old tried-and-tested Chipster v3.
-
 To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide [the critical pointers](migration.md), because we are migrating our own installations anyway. 
 
 These instructions will assume that you are running the latest version of deployment scripts and container images. If you have installed your Chipster server earlier, please [update](#Updates) it first to the latest version or find the old version of these insructions from the time when your server was installed.
@@ -165,7 +163,7 @@ Pull latest changes from the deployment repository.
 git pull
 ```
 
-Install latest package repositories etc. This will also install the lates K3s and Helm.
+Install latest package repositories etc. This will also install the latest K3s and Helm.
 
 ```bash
 ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami)
