@@ -37,11 +37,10 @@ We did this for own installations in OpenShift, but we haven't gone through this
 
 ## Update to v4.4
 
-We have updated the [Chipster installation instructions](README.md). Those now start from Ubuntu 20.04 and install Chipster, where all Internet-facing containers are updated to Ubuntu 20.04. Only the comp-container, running the actual analysis tools, stays in Ubuntu 16.04. That shouldn’t pose significant security risks, because comp is well protected behind other Chipster services. 
-
+We have updated the [Chipster installation instructions](README.md). Those now start from Ubuntu 20.04 and install Chipster, where all internet-facing containers are updated to Ubuntu 20.04. Only the `comp` container, running the actual analysis tools, stays in Ubuntu 16.04. That shouldn’t pose significant security risks, because comp's admin API is now disabled by default and otherwise comp is well protected behind other Chipster services. 
 ### Option 1: Install New Server (recommended)
 
-You should update existing Chipster servers. Our recommended option is to install a new server and make sure that all necessary data is moved before removing the old server. The tools-bin package wasn’t updated at this point, so you can reuse your possible local copies of the latest tools-bin package (version chipster-3.17.0).
+You should update existing Chipster servers. Our recommended option is to install a new server and make sure that all necessary data is moved before removing the old server. The tools-bin package wasn’t updated at this point, so you can reuse your possible local copies of the latest tools-bin package (tools-bin version chipster-3.17.0).
 
 The sessions from the old server can be moved either by following the [backup instructions](backup.md) or users can do it themselves by downloading the sessions to zip files from the old server and upload those to the new server.
 ### Option 2: Update Existing Server
