@@ -165,7 +165,7 @@ Pull latest changes from the deployment repository.
 git pull
 ```
 
-Install latest package repositories etc. This will also install the lates K3s and Helm.
+Install latest package repositories etc. This will also install the latest K3s and Helm.
 
 ```bash
 ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami)
