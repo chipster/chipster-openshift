@@ -59,18 +59,10 @@ echo $token > $token_file
 
 post_data=""
 
-# Use here-string in the end of the loop to provide the data for the while loop to avoid a subshell.
-# Otherwise we can't modify the $post_data in the loop
-while read key; do
-
-  # use .["key"] notation to tolerate special characters like "="
-  value=$(echo "$status" | jq '.["'"$key"'"]')
-
-  db_key=$(echo ${key},role=${role},id=${HOSTNAME})
-            
-  post_data="${post_data}${db_key} value=$value $t0"$'\n'
-
-done <<< "$(echo "$status" | jq -r 'keys[]')"
+# convert json to influxdb request
+post_data="$(echo "$status" | jq -r ". | to_entries | map( \
+  \"\(.key),role=${role},id=${HOSTNAME} value=\(.value) ${t0}\" \
+  ) | .[]")"
 
 echo "** save $post_data"
 
