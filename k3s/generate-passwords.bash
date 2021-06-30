@@ -89,9 +89,21 @@ for key in $(yq e $default_values_yaml_path --tojson | jq '.tokens | keys[]' -r)
     fi
 done
 
+# # create kubeconfig
+ip=$(ip route get 1 | awk '{print $(NF-2);exit}')
+
+echo "Chipster will use ip address $ip to start jobs in K3s"
+kubeconfig_json=$(kubectl config view --raw -o json | jq .clusters[0].cluster.server=\"https://$ip:6443\" | jq -s -R .)
+
+values_json=$(echo $values_json | jq ".kubeconfig=$kubeconfig_json")
+
+# for debugging, delete kubeconfig
+#values_json=$(echo $values_json | jq 'del(.kubeconfig)')
+
 #echo "$values_json"
 
 echo "update to server"
 
 echo "$secret_json" | jq ".data.\"values.yaml\" = \"$(echo "$values_json" | base64)\"" \
     | kubectl apply -f -
+

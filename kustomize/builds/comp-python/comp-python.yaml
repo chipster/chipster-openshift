@@ -2,30 +2,32 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: chipster-web-server
-  name: chipster-web-server
+    build: comp-python
+  name: comp-python
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: chipster-web-server:latest
+      name: comp-python:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
   source:
     dockerfile: ""
-    git:
-      ref: bash-job-scheduler
-      uri: https://github.com/chipster/chipster-web-server.git
-    type: Git
+    type: Dockerfile
   strategy:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-java:latest
+        name: chipster-web-server:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
   - imageChange:
+      from:
+        kind: ImageStreamTag
+        name: chipster-web-server:latest
     type: ImageChange
   - type: ConfigChange
+  - imageChange:
+    type: ImageChange
