@@ -38,6 +38,8 @@ spec:
         name: file-storage
         server: file-storage
     spec:
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - securityContext:
           {{- toYaml $.Values.securityContext | nindent 12 }}            
@@ -78,6 +80,24 @@ spec:
               name: conf
             - mountPath: /opt/chipster/storage
               name: storage
+      initContainers:
+        - name: chown-storage-dir
+          {{- if $.Values.deployments.fileStorage.useDefaultImageRepo }}
+          image: {{$.Values.image.chipsterImageRepo}}{{ $.Values.deployments.fileStorage.image }}
+          {{- else }}
+          image: {{ $.Values.deployments.fileStorage.image }}
+          {{- end }}
+          command:
+          - chown
+          - -R
+          - 1000:1000
+          - /opt/chipster/storage
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+          - name: storage
+            mountPath: /opt/chipster/storage
       volumes:
         - emptyDir: {}
           name: logs
