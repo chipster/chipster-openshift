@@ -169,6 +169,11 @@ deployments:
     replicas: ""
     # disabled until the comp image is updated
     adminRoute: "disable"
+  singleShotComp:
+    name: single-shot-comp
+    apiPort: ""
+    adminPort: ""
+    password: ""
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup

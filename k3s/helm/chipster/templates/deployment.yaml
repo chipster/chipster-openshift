@@ -1,6 +1,6 @@
 # deployment for each Chipster service
 {{- range $deploymentKey, $deployment := .Values.deployments }}
-{{- if ne $deployment.name "file-storage" }}
+{{- if and (ne $deployment.name "file-storage") (ne $deployment.name "single-shot-comp") }}
 ---
 apiVersion: apps/v1
 kind: Deployment
