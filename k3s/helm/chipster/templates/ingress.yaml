@@ -26,6 +26,7 @@ spec:
   routes:
     {{- range $deploymentKey, $deployment := .Values.deployments }}
     {{- if ne $deployment.name "file-storage" }}
+    {{- if ne $deployment.name "single-shot-comp" }}
     {{- if eq $deployment.name "web-server" }}
     - match: PathPrefix(`/`)
     {{ else }}
@@ -47,6 +48,7 @@ spec:
           port: 80
       middlewares:
         - name: chipster-stripprefix
+    {{- end }}
     {{- end }}
     {{- end }}
     {{- end }}
@@ -96,8 +98,10 @@ spec:
       - /session-db-events
     {{- range $deploymentKey, $deployment := .Values.deployments }}
     {{- if ne $deployment.name "file-storage" }}
+    {{- if ne $deployment.name "single-shot-comp" }}
       - /{{ $deployment.name }}-admin
       - /{{ $deployment.name }}
+    {{- end }}
     {{- end }}
     {{- end }}
 
