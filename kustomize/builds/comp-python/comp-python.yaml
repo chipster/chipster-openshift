@@ -23,11 +23,6 @@ spec:
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
-  - imageChange:
-      from:
-        kind: ImageStreamTag
-        name: chipster-web-server:latest
-    type: ImageChange
   - type: ConfigChange
   - imageChange:
     type: ImageChange

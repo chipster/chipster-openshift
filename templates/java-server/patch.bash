@@ -122,3 +122,7 @@ patch_kind_and_name $template_dir/web-server.yaml Route web-server$subproject_po
   spec.host: $web_server_host
   metadata.annotations.\"console.alpha.openshift.io/overview-app-route\": \"true\"
 " false
+
+patch_kind_and_name $template_dir/scheduler.yaml DeploymentConfig scheduler$subproject_postfix "
+  spec.template.spec.serviceAccountName: bash-job-scheduler
+" false

@@ -3,6 +3,8 @@
 source scripts/utils.bash
 set -e
 
+PROJECT=$(get_project)
+
 subproject="$1"
 
 if [ -z $subproject ]; then
@@ -42,6 +44,30 @@ done
 
 add_literal_to_secret $secret_file "jws-private-key-auth" "$(openssl ecparam -genkey -name secp521r1 -noout)"
 add_literal_to_secret $secret_file "jws-private-key-session-db" "$(openssl ecparam -genkey -name secp521r1 -noout)"
+
+echo "creata serviceaccount for scheduler"
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bash-job-scheduler
+EOF
+
+kubectl apply -f - << EOF
+apiVersion: authorization.openshift.io/v1
+kind: RoleBinding
+metadata:
+  name: edit
+  namespace: $PROJECT
+roleRef:
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: bash-job-scheduler
+  namespace: $PROJECT
+userNames:
+- system:serviceaccount:$PROJECT:bash-job-scheduler
+EOF
 
 echo "apply changes"
 oc apply -f $secret_file

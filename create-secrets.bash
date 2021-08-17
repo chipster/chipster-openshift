@@ -79,6 +79,7 @@ fi
 
 # better to do this outside repo
 build_dir=$(make_temp chipster-openshift_create-secrets)
+#build_dir="build_DO_NOT_COMMIT"
 echo -e "build dir is \033[33;1m$build_dir\033[0m"
 
 configured_objects_dir="$build_dir/configured-objects"
@@ -98,7 +99,8 @@ services="session-db
 	type-service
 	haka
 	backup
-	job-history"
+	job-history
+	single-shot-comp"
 	
 	# file-storage-single
 
@@ -135,6 +137,9 @@ echo db-pass-auth: $auth_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/a
 
 echo db-url-job-history: jdbc:postgresql://job-history-postgres$subproject_postfix:5432/job_history_db | tee -a $build_dir/backup.yaml >> $build_dir/job-history.yaml
 echo db-pass-job-history: $job_history_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/job-history.yaml
+
+single_shot_comp_password="$(get_password_cached "$passwords" "service-password-single-shot-comp")"
+echo service-password-single-shot-comp: $single_shot_comp_password >> $build_dir/scheduler.yaml
 
 echo "configure monitoring password"
 
