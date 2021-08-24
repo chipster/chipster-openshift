@@ -8,14 +8,14 @@ Chipster v4 supports LDAP authentication through JAAS configuration just like th
 It's a good idea to get familiar with LDAP queries manually before doing the same in Chipster configuration. This example uses a command line tool `ldapsearch`.
 
 ```bash
-ldapsearch -x -H LDAP_SERVER/ -D BIND_DN -W -b BASE_DN
+ldapsearch -x -H LDAP_SERVER/ -D 'BIND_DN' -W -b 'BASE_DN'
 ```
 
 * The `LDAP_SERVER` is the address and port of our LDAP server, something like `ldaps://ldap.example.com:636`.
-* Your `BIND_DN` is something like: `'cn=USERNAME,ou=people,dc=example,dc=com'` and basically is your (horribly long) username for the LDAP server.
-* `BASE_DN` is the starting point of the search, for example: `'ou=people,dc=example,dc=com'`. This defines the group of users that you want to allow.
+* Your `BIND_DN` is something like: `cn={USERNAME},ou=people,dc=example,dc=com` and basically is your (horribly long) username for the LDAP server.
+* `BASE_DN` is the starting point of the search, for example: `ou=people,dc=example,dc=com`. This defines the group of users that you want to allow.
 
-Chipster tries to do a similar LDAP query, when an end-user wants to log in. The USERNAME here in the BIND_DN is end-user's short username, for example "jsmith". When you run the `ldapsearch` command above, it will ask user's password and then shows the search results, if the authentication was accepted.
+Chipster tries to do a similar LDAP query, when an end-user wants to log in. The `{USERNAME}` here in the BIND_DN is end-user's short username, for example "jsmith". When you run the `ldapsearch` command above, it will ask user's password and then shows the search results, if the authentication was accepted.
 
 ## LdapLoginModule
 
@@ -40,6 +40,16 @@ deployments:
             debug=true;
         };
 
+```
+
+After adding the values from the `ldapsearch` example, the LdapLoginModule part will look something like the following snippet. Don't replace the `{USERNAME}` this time yourself, because that LdapLoginModule has to replace it with the end-user's username.
+
+```yaml
+          com.sun.security.auth.module.LdapLoginModule sufficient
+            userProvider="ldaps://ldap.example.com:636/ou=people,dc=example,dc=com"
+            authIdentity="cn={USERNAME},ou=people,dc=example,dc=com"
+            useSSL=true
+            debug=true;
 ```
 
 The first part will add the option `auth-jaas-conf-path` to the `auth`'s configuration file in `conf/chipster.yaml`. It will make `auth` to load the jaas.config from the given file path instead of the default file in the jar pacakge.
