@@ -14,6 +14,17 @@ Copy Chipster configuration key-value pairs
 {{- end -}}
 
 {{/*
+Copy Chipster configuration files
+*/}}
+{{- define "chipster.listDeploymentConfigFiles" -}}
+# insert values as yaml text block without the last new line
+{{- range $filename, $contents := .conf }}
+{{ $filename }}: |-
+{{ $contents | indent 2 }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Check if TLS is configured and return a https or http string accordingly
 */}}
 {{- define "chipster.getHttpProtocol" -}}

@@ -31,6 +31,8 @@ deployments:
     replicas: ""
     # enableAdminRoute decides whether an IngressRoute is created for the admin port/service, allowing requests from outside of the K3s. Set to "default", "enable" or "disable".
     adminRoute: "default"
+    # conf is a YAML map where you can add new files to the conf directory
+    conf: {}
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -46,6 +48,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -59,6 +62,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -74,6 +78,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -87,6 +92,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -100,6 +106,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
@@ -115,6 +122,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   toolbox:
     name: toolbox
     class: ""
@@ -129,6 +137,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -142,6 +151,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   typeService:
     name: type-service
     class: ""
@@ -155,6 +165,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   comp:
     name: comp
     class: comp
@@ -169,6 +180,7 @@ deployments:
     replicas: ""
     # disabled until the comp image is updated
     adminRoute: "disable"
+    conf: {}
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -182,6 +194,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -197,6 +210,7 @@ deployments:
     useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
+    conf: {}
 
 deploymentDefault:
   replicas: 1
