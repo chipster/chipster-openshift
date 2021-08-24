@@ -46,8 +46,7 @@ sudo systemctl restart docker
 
 Now further installation did work until tools-bin package.
 
-The tools need to be installed manually according to
-https://github.com/chipster/chipster-openshift/blob/master/k3s/host-mount.md#tools-bin
+The tools need to be installed manually according to <host-mount.md#tools-bin>.
 
 Chipster 4 is now up and running.
 
@@ -55,8 +54,10 @@ Chipster 4 is now up and running.
 
 Configure proxy variables to Chipster containers in your ~/values.yaml:
 
+```yaml
 deploymentDefault:
   env:
     http_proxy: "http://your.proxy:3128"
     https_proxy: "http://your.proxy:3128"
     no_proxy: "localhost,127.0.0.0/8,0.0.0.0,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,chipstervm1,.your-domain.com,cattle-system.svc,.svc,.cluster.local"
+```
