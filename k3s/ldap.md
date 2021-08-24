@@ -42,7 +42,7 @@ deployments:
 
 ```
 
-The first part wil add the option `auth-jaas-conf-path` to the `auth`'s configuration file in `conf/chipster.yaml`. It will make `auth` to load the jaas.config from the given file path instead of the default file in the jar pacakge.
+The first part will add the option `auth-jaas-conf-path` to the `auth`'s configuration file in `conf/chipster.yaml`. It will make `auth` to load the jaas.config from the given file path instead of the default file in the jar pacakge.
 
 The second part will create that file to `conf/jaas.config` and define its contents. Yaml block style, started by the pipe character `|`, allows us to embed other file formats in this yaml file. Just make sure that you indent all the lines with a consistent number (or more) space characters. Indenting with tab charactes is not allowed in yaml. 
 
@@ -50,20 +50,20 @@ This example enabled the SimpleFileLogin, just like in the default configuration
 
 See [JAAS LdapLoginModule](https://docs.oracle.com/javase/8/docs/jre/api/security/jaas/spec/com/sun/security/auth/module/LdapLoginModule.html) for more information about configuring the LdapLoginModule.
 
-Deploy the configuration and restart `auth`.
+Deploy the configuration and restart `auth`:
 
 ```bash
 bash deploy.bash -f ~/values.yaml
 kubectl rollout restart deployment/auth
 ```
 
-See when new auth has started and the old has disappeared.
+See when new auth has started and the old has disappeared:
 
 ```bash
 kubectl get pod
 ```
 
-And check auth logs while you try to log in to Chipster:
+Finally, follow auth logs while you try to log in to Chipster:
 
 ```bash
 kubectl logs deployment/auth --follow
@@ -81,7 +81,7 @@ Every user with an account in our Active Directory Domain should be able to log 
 
 LdapExtLoginModule is part of [PicketBox library](https://picketbox.jboss.org), which is already included in the Chipster container images. The LdapLoginModule chapter above shows how to configure the jaas.config in Chipster. Just change the `LdapLoginModule` part in the jaas.config with this `LdapExtLoginModule` configuration.
 
-Loggging from LdapExtLoginModule is enabled on `debug` level by default. If this is too much information, please see the [logging instructions](logging.md) to rise the level for example to `info`.
+Loggging from LdapExtLoginModule is enabled on `debug` level by default. If this is too much information, please see the [logging instructions](logging.md) to change the level to `info`, for example.
 
 Example configuration provided by Oliver Heil:
 

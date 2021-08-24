@@ -255,7 +255,7 @@ A separate document has instructions for [authenticating Chipster users with Ope
 
 #### LDAP authentication
 
-Instructions for [LDAP authentication](ldap.md) are provided in a separte docuemnt.
+Instructions for [LDAP authentication](ldap.md) are provided in a separate document.
 #### File authentication
 
 There is a file `security/users` on `auth`, just like in the old Chipster v3, but it won't survive container restarts. The easiest way to add new users is through [values.yaml](#helm-chart-values).

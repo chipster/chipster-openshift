@@ -5,7 +5,7 @@ Chipster loggin levels can be configured in file `log4j2.xml`. The [default conf
 
 This example shows how to change a logging level of individual library. By default the logging level of LdapExtLoginModule (used in [LDAP instructions](ldap.md) is `debug`. In this example we'll change it to `trace`. 
 
-Open the default configuration from the link above. Click the `Raw` link. Copy the file to your `values.yaml` like shown below. Make sure to indent it with space characters correctly (for example select in VS Code and hit tab a few times). Here is the copy of the file when this page was written, but please copy the lates version from the GitHub in case there are changes. 
+Open the default configuration from the link above. Click the `Raw` link. Copy the file to your `values.yaml` like shown below. Make sure to indent it with space characters correctly (for example select the whole text in VS Code and hit tab a few times). The example below has the copy of the file when this page was written, but please copy the lates version from the GitHub in case there are changes. 
 
 If you keep a customized log config in your production setup, you may want to also check changes in the default file when updating your Chipster server.
 
@@ -133,20 +133,20 @@ deployments:
 
 Thist will create a file `conf/log4j2.xml`.
 
-Deploy the configuration and restart `auth`.
+Deploy the configuration and restart `auth`:
 
 ```bash
 bash deploy.bash -f ~/values.yaml
 kubectl rollout restart deployment/auth
 ```
 
-See when new auth has started and the old has disappeared.
+See when new auth has started and the old has disappeared:
 
 ```bash
 kubectl get pod
 ```
 
-And check auth logs while you try to log in to Chipster, provided you have the LdapExtLoginModule configured. This should now show also some `trace` level messages.
+And check auth logs while you try to log in to Chipster, provided you have the LdapExtLoginModule configured. This should now show also some `trace` level messages:
 
 ```bash
 kubectl logs deployment/auth --follow
