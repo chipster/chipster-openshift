@@ -25,6 +25,23 @@ Copy Chipster configuration files
 {{- end -}}
 
 {{/*
+Copy Chipster env definitions
+*/}}
+{{- define "chipster.listDeploymentEnv" -}}
+{{- if .deployment.env }}
+{{- range $key, $value := .deployment.env }}
+- name: {{ $key }}
+  value: {{ $value }}
+{{- end }}
+{{- else }}
+{{- range $key, $value := .deploymentDefault.env }}
+- name: {{ $key }}
+  value: {{ $value }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Check if TLS is configured and return a https or http string accordingly
 */}}
 {{- define "chipster.getHttpProtocol" -}}

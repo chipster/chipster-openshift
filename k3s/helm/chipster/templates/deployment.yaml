@@ -34,6 +34,7 @@ spec:
           env:
             - name: JAVA_CLASS
               value: {{ $deployment.class }}
+            {{- include "chipster.listDeploymentEnv" (dict "deployment" $deployment "deploymentDefault" $.Values.deploymentDefault) | nindent 12 }}
           {{- if $deployment.useDefaultImageRepo }}
           image: {{$.Values.image.chipsterImageRepo}}{{ $deployment.image }}
           {{- else }}

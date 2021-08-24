@@ -33,6 +33,8 @@ deployments:
     adminRoute: "default"
     # conf is a YAML map where you can add new files to the conf directory
     conf: {}
+    # env is a YAML map for setting environment variables
+    env: {}
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -49,6 +51,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -63,6 +66,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -79,6 +83,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -93,6 +98,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -107,6 +113,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
@@ -123,6 +130,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   toolbox:
     name: toolbox
     class: ""
@@ -138,6 +146,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -152,6 +161,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   typeService:
     name: type-service
     class: ""
@@ -166,6 +176,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   comp:
     name: comp
     class: comp
@@ -181,6 +192,7 @@ deployments:
     # disabled until the comp image is updated
     adminRoute: "disable"
     conf: {}
+    env: {}
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -195,6 +207,7 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -211,10 +224,12 @@ deployments:
     replicas: ""
     adminRoute: "default"
     conf: {}
+    env: {}
 
 deploymentDefault:
   replicas: 1
   adminRoute: "enable"
+  env: {}
 
 # databases is a section for Chipster scripts to know which databases exist
 # passwordKey is the YAML path where generate-passwords.bash will store the password
