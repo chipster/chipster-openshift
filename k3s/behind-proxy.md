@@ -46,7 +46,7 @@ sudo systemctl restart docker
 
 Now further installation did work until tools-bin package.
 
-The tools need to be installed manually according to <host-mount.md#tools-bin>.
+The tools need to be installed manually to a [hostMount volume](host-mount.md#tools-bin).
 
 Chipster 4 is now up and running.
 
