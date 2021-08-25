@@ -61,3 +61,47 @@ deploymentDefault:
     https_proxy: "http://your.proxy:3128"
     no_proxy: "localhost,127.0.0.0/8,0.0.0.0,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,chipstervm1,.your-domain.com,cattle-system.svc,.svc,.cluster.local"
 ```
+
+## Appendix 1: How to setup http proxy in OpenStack
+
+These instructions show how to setup a simple squid proxy to test Chipster installation. For any real use, you may want to setup more strict configuration and security group rules.
+
+* Let's assume there is a security group "default", which allows outbound connections
+* Create a new security group which allows Chipster to connect to the proxy. Let's call it "sg_proxy".Allow Egress and Ingress from and to the other machines in this same group, using any TCP port. 
+* Launch two virtual machines (VM), one for the proxy and one for Chipster
+   * Proxy VM's security groups should include "default", "sg_proxy" and allow your SSH access
+   * Chipster VM's security groups should include "sg_proxy" and allow your SSH and HTTP connections. Add the security group "default" for the first boot to allow the VM to fetch your SSH key. Then remove it, to force it use the proxy from now on
+   * You probably need to add a floating IP to the Chipster VM to access Chipster with your browser from your laptop
+
+Install squid:
+
+```bash
+sudo apt install squid
+```
+
+Preserve the original squid config:
+
+```bash
+cd /etc/squid/
+sudo cp squid.conf squid.conf.original
+sudo chmod a-w squid.conf.original
+```
+
+Allow anyone to use this proxy (but security groups allow only members of sg_proxy). Change `http_access deny all` to `http_access allow all`:
+
+```bash
+sudo nano squid.conf
+sudo systemctl restart squid
+```
+
+Test that outbound connections fail in the Chipster VM:
+
+```bash
+curl chipster.csc.fi
+```
+
+Configure proxy environment variables like shown above on this page. Check that the above `curl` command now works through the proxy. You can also check squid logs:
+
+```bash
+tail -f /var/log/squid/access.log 
+```
