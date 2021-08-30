@@ -26,6 +26,9 @@ spec:
     spec:
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      {{- if eq $deployment.name "scheduler" }}
+      serviceAccountName: bash-job-scheduler
+      {{- end }}
       containers:
         - name: {{ $deployment.name }}
           securityContext:

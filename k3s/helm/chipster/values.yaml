@@ -241,9 +241,6 @@ tokens:
   sessionDb:
     privateKey:
 
-# generate-paswords.bash will generate this
-kubeconfig: ""
-
 # Configure depenency subcharts
 
 # the key is the dependency alias in Chart.yaml
