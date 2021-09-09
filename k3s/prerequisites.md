@@ -17,7 +17,9 @@ Number of CPU cores is usually less critical, because nothing breaks if CPU is m
 
 ## Disk
 
-We need a lot of storage space to store all the reference genomes, indexes and users' files.
+Usually 20 GB is enough space for the root disk.
+
+We need a lot of additinal storage space to store all the reference genomes, indexes and users' files.
 
  * mount at least 1 TB volume to the server
  * create a filesystem to the volume (assuming it's `/dev/vdb`)
@@ -72,6 +74,7 @@ Especially make sure to protect the port 8472 that K3s would use for cummunicati
 
 TODO What is port 6443, is it important to protect that too?
 
+If you don't want the server to have unrestricted outbound access, it's possible to [install Chipster behind a HTTP proxy](behind-proxy.md).
 ## Install Ansible
 
 We'll use Ansible to install other required programs.

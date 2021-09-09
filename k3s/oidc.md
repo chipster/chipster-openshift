@@ -29,7 +29,7 @@ Setup an OAuth consent screen. Set at least
 
 ## Configure OpenID Connect in Chipster
 
-Configure Chispter in `~/values.yaml`. 
+Configure Chipster in `~/values.yaml`. 
 
 ```yaml
 deployments:

@@ -1,4 +1,4 @@
-FROM base-java
+FROM base-java-utils
 
 COPY . chipster-web-server
 
