@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base:latest
+        name: base-java:latest
     type: Docker
   triggers:
   - type: ConfigChange
