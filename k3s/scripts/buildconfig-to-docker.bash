@@ -35,6 +35,7 @@ build="$(basename $dir)"
 cmd="cat $dir/Dockerfile"
 
 uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
+branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
 
 image_count=$(cat $dir/*.yaml | yq e .spec.source.images - --tojson | jq '. | length')
 
@@ -76,7 +77,7 @@ fi
 if [ $uri = "null" ]; then
     cmd="$cmd | sudo docker build -t $build -"
 else
-    cmd="$cmd | sudo docker build -t $build -f - $uri"
+    cmd="$cmd | sudo docker build -t $build -f - $uri#$branch"
 fi
 
 echo $cmd
