@@ -123,7 +123,11 @@ patch_kind_and_name $template_dir/web-server.yaml Route web-server$subproject_po
   metadata.annotations.\"console.alpha.openshift.io/overview-app-route\": \"true\"
 " false
 
-# db backup monitoring is too slow
+# backup monitoring is too slow
 patch_kind_and_name $template_dir/backup.yaml Route backup-admin$subproject_postfix "
-  metadata.annotations.\"haproxy.router.openshift.io/timeout\": \"60s\"
+  metadata.annotations.\"haproxy.router.openshift.io/timeout\": \"120s\"
+" false
+
+patch_kind_and_name $template_dir/file-broker.yaml Route file-broker-admin$subproject_postfix "
+  metadata.annotations.\"haproxy.router.openshift.io/timeout\": \"120s\"
 " false
