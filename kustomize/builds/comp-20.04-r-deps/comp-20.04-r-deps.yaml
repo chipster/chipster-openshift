@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-20.04-r-base
-  name: comp-20.04-r-base
+    build: comp-20.04-r-deps
+  name: comp-20.04-r-deps
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-20.04-r-base:latest
+      name: comp-20.04-r-deps:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial

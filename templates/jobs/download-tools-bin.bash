@@ -53,4 +53,4 @@ rm -rf $temp/lost+found
 # delete old download temp files
 rm -f $temp/*
           
-curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 8 --halt 2 "download_file {}"
+curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 4 --halt 2 "download_file {}"
