@@ -53,21 +53,24 @@ metadata:
   name: bash-job-scheduler
 EOF
 
-kubectl apply -f - << EOF
-apiVersion: authorization.openshift.io/v1
-kind: RoleBinding
-metadata:
-  name: edit
-  namespace: $PROJECT
-roleRef:
-  name: edit
-subjects:
-- kind: ServiceAccount
-  name: bash-job-scheduler
-  namespace: $PROJECT
-userNames:
-- system:serviceaccount:$PROJECT:bash-job-scheduler
-EOF
+#TODO why to json doesn't work?
+oc adm policy add-role-to-user edit system:serviceaccount:chipster-beta:bash-job-scheduler
+
+# kubectl apply -f - <<EOF
+# apiVersion: authorization.openshift.io/v1'
+# kind: RoleBinding
+# metadata:
+#   name: edit
+#   namespace: $PROJECT
+# roleRef:
+#   name: edit
+# subjects:
+# - kind: ServiceAccount
+#   name: bash-job-scheduler
+#   namespace: $PROJECT
+# userNames:
+# - system:serviceaccount:$PROJECT:bash-job-scheduler
+# EOF
 
 echo "apply changes"
 oc apply -f $secret_file
