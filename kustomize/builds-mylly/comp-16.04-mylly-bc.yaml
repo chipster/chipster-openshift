@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-mylly
-  name: comp-mylly
+    build: comp-16.04-mylly
+  name: comp-16.04-mylly
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-mylly:latest
+      name: comp-16.04-mylly:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial

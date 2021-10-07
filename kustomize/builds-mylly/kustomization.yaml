@@ -1,8 +1,8 @@
 bases:
   - ../builds
 resources:
-  - comp-mylly-bc.yaml
-  - comp-mylly-is.yaml
+  - comp-16.04-mylly-bc.yaml
+  - comp-16.04-mylly-is.yaml
   - mylly-tools-bc.yaml
   - mylly-tools-is.yaml
   - web-server-mylly-bc.yaml
