@@ -54,7 +54,7 @@ metadata:
 EOF
 
 #TODO why to json doesn't work?
-oc adm policy add-role-to-user edit system:serviceaccount:chipster-beta:bash-job-scheduler
+oc adm policy add-role-to-user edit system:serviceaccount:$PROJECT:bash-job-scheduler
 
 # kubectl apply -f - <<EOF
 # apiVersion: authorization.openshift.io/v1'
