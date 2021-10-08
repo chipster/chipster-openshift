@@ -91,12 +91,16 @@ Every user with an account in our Active Directory Domain should be able to log 
 
 LdapExtLoginModule is part of [PicketBox library](https://picketbox.jboss.org), which is already included in the Chipster container images. The LdapLoginModule chapter above shows how to configure the jaas.config in Chipster. Just change the `LdapLoginModule` part in the jaas.config with this `LdapExtLoginModule` configuration.
 
-Loggging from LdapExtLoginModule is enabled on `debug` level by default. If this is too much information, please see the [logging instructions](logging.md) to change the level to `info`, for example.
+Logging from LdapExtLoginModule is enabled on `debug` level by default. If this is too much information, please see the [logging instructions](logging.md) to change the level to `info`, for example.
 
 Example configuration provided by Oliver Heil:
 
 ```
-          org.jboss.security.auth.spi.LdapExtLoginModule REQUIRED
+      jaas.config: |
+        /** Login Configuration for Chipster **/
+        Chipster {
+          fi.csc.chipster.auth.jaas.SimpleFileLoginModule sufficient passwdFile="security/users";
+          org.jboss.security.auth.spi.LdapExtLoginModule sufficient
             java.naming.provider.url="ldap://your.ldap.server:389"
             bindDN="your_active_directory_name\\your_ldap_search_user"
             bindCredential="your_ldap_search_user_password"
@@ -106,13 +110,18 @@ Example configuration provided by Oliver Heil:
             roleFilter="(&(objectClass=user)(cn={0}))"
             roleAttributeID="memberOf"
             allowEmptyPasswords="false";
+        };
 ```
 
 The above LDAP information is very specific. You need to know your information to access your LDAP service. To explore and learn about the required LDAP search strings and DNs the tool "LDAP Browser" from LDAPSOFT (http://www.ldapsoft.com) showed to be of great help.
 
-Here is another known ldap configuration for jass.config (thanks to Pavel Fibich):
+Here is another known ldap configuration for jass.config (thanks to Pavel Fibich). This example does not
+have `SimpleFileLoginModule`, but you should probably add it, like shown in the previous examples, to use the local admin accounts.
 
 ```
+      jaas.config: |
+        /** Login Configuration for Chipster **/
+        Chipster {
           org.jboss.security.auth.spi.LdapExtLoginModule REQUIRED
             java.naming.provider.url="ldap://your.ldap.server.cz:389"
             baseCtxDN="ou=People,dc=perun,dc=cesnet,dc=cz"
@@ -123,6 +132,7 @@ Here is another known ldap configuration for jass.config (thanks to Pavel Fibich
             roleFilter="(&(memberOfPerunVo=21)(login;x-ns-einfra={0}))"
             roleAttributeID="memberOf"
             allowEmptyPasswords="false";
+        };
 ```
 
 ## Troubleshooting

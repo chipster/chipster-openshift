@@ -126,3 +126,12 @@ patch_kind_and_name $template_dir/web-server.yaml Route web-server$subproject_po
 patch_kind_and_name $template_dir/scheduler.yaml DeploymentConfig scheduler$subproject_postfix "
   spec.template.spec.serviceAccountName: bash-job-scheduler
 " false
+
+# backup monitoring is too slow
+patch_kind_and_name $template_dir/backup.yaml Route backup-admin$subproject_postfix "
+  metadata.annotations.\"haproxy.router.openshift.io/timeout\": \"120s\"
+" false
+
+patch_kind_and_name $template_dir/file-broker.yaml Route file-broker-admin$subproject_postfix "
+  metadata.annotations.\"haproxy.router.openshift.io/timeout\": \"120s\"
+" false
