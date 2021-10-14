@@ -135,3 +135,11 @@ patch_kind_and_name $template_dir/backup.yaml Route backup-admin$subproject_post
 patch_kind_and_name $template_dir/file-broker.yaml Route file-broker-admin$subproject_postfix "
   metadata.annotations.\"haproxy.router.openshift.io/timeout\": \"120s\"
 " false
+
+patch_kind_and_name $template_dir/comp.yaml DeploymentConfig comp "
+  spec.replicas: 0
+" false
+
+patch_kind_and_name $template_dir/comp-large.yaml DeploymentConfig comp-large "
+  spec.replicas: 0
+" false
