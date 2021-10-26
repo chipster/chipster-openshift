@@ -15,7 +15,7 @@ spec:
   source:
     dockerfile: ""
     git:
-      ref: bash-job-scheduler
+      ref: master
       uri: https://github.com/chipster/chipster-web-server.git
     type: Git
   strategy:
