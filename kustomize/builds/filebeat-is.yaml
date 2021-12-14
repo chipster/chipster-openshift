@@ -10,5 +10,5 @@ spec:
   tags:
     - from:
         kind: DockerImage
-        name: 'docker.elastic.co/beats/filebeat:7.1.1'
-      name: 7.1.1
+        name: 'docker.elastic.co/beats/filebeat:7.16.1'
+      name: 7.16.1
