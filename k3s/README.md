@@ -149,7 +149,9 @@ Please note that two-word Chipster service names like `file-broker` are written 
 
 ### Updates
 
-If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-announcements](https://chipster.csc.fi/contact.shtml) email list to get notifications about new features and critical vulnerabilities. Consider subscribing to the [chipster-tech](https://chipster.csc.fi/contact.shtml) list too to share your experiences and learn from others.
+If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
+
+Before starting the update, please make sure you have the necessary [backups](#backups) in case something goes wrong in this process.
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
@@ -182,10 +184,21 @@ Restart the server to make sure all new packages are taken in use.
 sudo shutdown -r 0
 ```
 
-Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. The second run puts back the default pull policy `IfNotPresent`, so that you can restart pods without pulling images in every restart. 
+Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. 
 
 ```bash
 bash deploy.bash -f ~/values.yaml --set image.localPullPolicy=Always
+```
+
+Wait until all deployments have tried to start at least once, which triggers the pull of the latest image.
+
+```bash
+watch kubectl get pod
+```
+
+Put back the default pull policy `IfNotPresent`, so that you can restart pods without pulling images in every restart. 
+
+```bash
 bash deploy.bash -f ~/values.yaml
 ```
 
