@@ -136,17 +136,17 @@ Generate an example project to a folder `nginx-test`.
 helm create nginx-test
 ```
 
-Deploy it. Replace `HOST_ADDRESS` with your server's DNS name or IP address.
+Deploy it. Replace `HOST_ADDRESS` with your server's DNS name.
 
 ```bash
 helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0].path="/" --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific" --set ingress.hosts[0].host="HOST_ADDRESS"
 ```
 
-If you don't have a DNS name for your host, you can leave the `HOST_ADDRESS` parameter away. In this case the example won't be able to print the correct address for you to open
+If you don't have a DNS name for your host, you can set the `HOST_ADDRESS` parameter to an empty string `""`. In this case the example won't be able to print the correct address for you to open
 in the next step, but just use the host's IP address there.
 
 ```bash
-helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific"
+helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific" --set ingress.hosts[0].host=""
 ```
 
 Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before starting to deploy Chipster.
