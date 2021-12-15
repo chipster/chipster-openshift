@@ -40,8 +40,8 @@ default_values_yaml_path="helm/chipster/values.yaml"
 
 #echo "$values_json"
 
-for key in $(yq e $default_values_yaml_path --tojson | jq '.deployments | keys[]' -r); do
-    name=$(yq e $default_values_yaml_path --tojson | jq .deployments.$key.name -r)
+for key in $(yq e $default_values_yaml_path -o=json | jq '.deployments | keys[]' -r); do
+    name=$(yq e $default_values_yaml_path -o=json | jq .deployments.$key.name -r)
     old_password=$(echo "$values_json" | jq '.deployments."'$key'".password' -r)
     if [[ $old_password != "null" ]]; then
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
@@ -52,9 +52,9 @@ for key in $(yq e $default_values_yaml_path --tojson | jq '.deployments | keys[]
     fi
 done
 
-for key in $(yq e $default_values_yaml_path --tojson | jq '.databases | keys[]' -r); do
+for key in $(yq e $default_values_yaml_path -o=json | jq '.databases | keys[]' -r); do
     name="$key"
-    passwordKey=$(yq e $default_values_yaml_path --tojson | jq .databases.$key.passwordKey -r)
+    passwordKey=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.passwordKey -r)
     old_password=$(echo "$values_json" | jq .$passwordKey -r)
     if [[ $old_password != "null" ]]; then
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
@@ -65,7 +65,7 @@ for key in $(yq e $default_values_yaml_path --tojson | jq '.databases | keys[]' 
     fi
 done
 
-for key in $(yq e $default_values_yaml_path --tojson | jq '.users | keys[]' -r); do
+for key in $(yq e $default_values_yaml_path -o=json | jq '.users | keys[]' -r); do
     name="$key"
     old_password=$(echo "$values_json" | jq '.users."'$key'".password' -r)
     if [[ $old_password != "null" ]]; then
@@ -77,7 +77,7 @@ for key in $(yq e $default_values_yaml_path --tojson | jq '.users | keys[]' -r);
     fi
 done
 
-for key in $(yq e $default_values_yaml_path --tojson | jq '.tokens | keys[]' -r); do
+for key in $(yq e $default_values_yaml_path -o=json | jq '.tokens | keys[]' -r); do
     name="$key"    
     old_password=$(echo "$values_json" | jq '.tokens."'$key'".privateKey' -r)
     if [[ $old_password != "null" ]]; then
@@ -89,13 +89,9 @@ for key in $(yq e $default_values_yaml_path --tojson | jq '.tokens | keys[]' -r)
     fi
 done
 
-# for debugging, delete kubeconfig
-#values_json=$(echo $values_json | jq 'del(.kubeconfig)')
-
 #echo "$values_json"
 
 echo "update to server"
 
 echo "$secret_json" | jq ".data.\"values.yaml\" = \"$(echo "$values_json" | base64)\"" \
     | kubectl apply -f -
-
