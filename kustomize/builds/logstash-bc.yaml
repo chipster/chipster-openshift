@@ -14,7 +14,7 @@ spec:
   runPolicy: Serial
   source:
     dockerfile: |
-      FROM docker.elastic.co/logstash/logstash:7.16.1
+      FROM docker.elastic.co/logstash/logstash:7.16.2
       COPY logstash/logstash.yml /usr/share/logstash/config/logstash.yml
       COPY logstash/logstash.conf /usr/share/logstash/pipeline/logstash.conf 
       USER root
@@ -30,7 +30,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: logstash:7.16.1
+        name: logstash:7.16.2
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
