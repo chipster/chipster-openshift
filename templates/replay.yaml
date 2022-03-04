@@ -42,7 +42,7 @@ objects:
           - --influxdb
           - http://influxdb:8086/write?db=db
           - --schedule
-          - '*/5 * * * *:availability:1:120'          
+          - '*/5 * * * *:availability:1:300'          
           image: docker-registry.default.svc:5000/${PROJECT}/cli-client
           imagePullPolicy: Always
           name: replay
