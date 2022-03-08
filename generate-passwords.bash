@@ -43,7 +43,6 @@ for key in $keys; do
 done
 
 add_literal_to_secret $secret_file "jws-private-key-auth" "$(openssl ecparam -genkey -name secp521r1 -noout)"
-add_literal_to_secret $secret_file "jws-private-key-session-db" "$(openssl ecparam -genkey -name secp521r1 -noout)"
 
 echo "creata serviceaccount for scheduler"
 kubectl apply -f - <<EOF

@@ -121,10 +121,8 @@ done
 
 # get the (multiline) private key from the passwords, and prefix each line with a space character to make it a yaml block 
 jws_private_key_auth="$(      echo "$passwords" | jq -r .data[\"jws-private-key-auth\"]       | base64 --decode | sed -e 's/^/ /')"
-jws_private_key_session_db="$(echo "$passwords" | jq -r .data[\"jws-private-key-session-db\"] | base64 --decode | sed -e 's/^/ /')"
 
-echo -e "jws-private-key-auth: |\n$jws_private_key_auth"             >> $build_dir/auth.yaml
-echo -e "jws-private-key-session-db: |\n$jws_private_key_session_db" >> $build_dir/session-db.yaml
+echo -e "jws-private-key-auth: |\n$jws_private_key_auth" >> $build_dir/auth.yaml
 
 echo "get db passwords"
 
@@ -137,9 +135,6 @@ echo db-pass-auth: $auth_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/a
 
 echo db-url-job-history: jdbc:postgresql://job-history-postgres$subproject_postfix:5432/job_history_db | tee -a $build_dir/backup.yaml >> $build_dir/job-history.yaml
 echo db-pass-job-history: $job_history_db_pass | tee -a $build_dir/backup.yaml >> $build_dir/job-history.yaml
-
-single_shot_comp_password="$(get_password_cached "$passwords" "service-password-single-shot-comp")"
-echo service-password-single-shot-comp: $single_shot_comp_password >> $build_dir/scheduler.yaml
 
 echo "configure monitoring password"
 

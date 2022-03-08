@@ -28,7 +28,7 @@ function retry {
 }
 
 function generate_password {
-	openssl rand -base64 15
+	openssl rand -base64 30
 }
 
 function get_password {
