@@ -154,6 +154,20 @@ echo "generate urls"
 
 bash scripts/generate-urls.bash $PROJECT $DOMAIN $subproject >> $build_dir/service-locator.yaml
 
+echo "configure tools-bin version"
+
+private_config_path="../chipster-private/confs"
+tools_bin=$(get_deploy_config $private_config_path tools-bin $PROJECT $DOMAIN)
+if [ -z "$tools_bin" ]; then  
+  echo "Tools-bin version is not configured in deploy.yaml"
+  echo "- Run 'bash download-tools-bin.bash'"
+  echo "- Configure the version in deploy.yaml"
+  echo "- Run create-secrets.bash and deploy-servers.bash again"
+  tools_bin="empty"   
+fi
+
+echo "toolbox-runtime-tools-bin-volume: tools-bin-$tools_bin" >> $build_dir/toolbox.yaml
+
 echo "generate secret for each service"
 
 for service in $services; do	

@@ -181,7 +181,7 @@ if [ -z "$tools_bin" ]; then
   echo "Tools-bin version is not configured in deploy.yaml"
   echo "- Run 'bash download-tools-bin.bash'"
   echo "- Configure the version in deploy.yaml"
-  echo "- Run this script again"
+  echo "- Run create-secrets.bash and deploy-servers.bash again"
   tools_bin="empty"   
 fi
 
