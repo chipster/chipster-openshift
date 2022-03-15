@@ -42,6 +42,12 @@ default_values_yaml_path="helm/chipster/values.yaml"
 
 for key in $(yq e $default_values_yaml_path -o=json | jq '.deployments | keys[]' -r); do
     name=$(yq e $default_values_yaml_path -o=json | jq .deployments.$key.name -r)
+
+    if [[ $name == "single-shot-comp" ]]; then
+        echo "skip single-shot-comp"
+        continue
+    fi
+
     old_password=$(echo "$values_json" | jq '.deployments."'$key'".password' -r)
     if [[ $old_password != "null" ]]; then
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."

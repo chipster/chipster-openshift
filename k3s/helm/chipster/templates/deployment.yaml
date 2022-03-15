@@ -90,8 +90,8 @@ spec:
               mountPath: {{ $deployment.workDir }}/web-root/assets/conf
               readOnly: true
             {{- end }}
-            # tools-bin for toolbox and comp
-            {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
+            # tools-bin for toolbox
+            {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (eq $deployment.name "toolbox") }}
             - name: tools-bin
               mountPath: /mnt/tools
               readOnly: {{ $.Values.toolsBin.readOnly }}
@@ -107,10 +107,6 @@ spec:
             {{- if and $.Values.html.hostPath (eq $deployment.name "web-server") }}
             - name: html
               mountPath: /opt/chipster/web-root/assets/html
-            {{- end }}
-            {{- if eq $deployment.name "comp" }}
-            - name: jobs-data
-              mountPath: {{ $deployment.workDir }}/jobs-data
             {{- end }}
             {{- if eq $deployment.name "backup" }}
             - name: db-backups
@@ -132,7 +128,7 @@ spec:
           secret:
             secretName: web-server-app
         {{- end}}
-        {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (or (eq $deployment.name "comp") (eq $deployment.name "toolbox")) }}
+        {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (eq $deployment.name "toolbox") }}
         - name: tools-bin
         {{- if $.Values.toolsBin.hostPath }}
           hostPath:
@@ -163,10 +159,6 @@ spec:
             # directory location on host
             path: {{ $.Values.html.hostPath }}
             type: Directory
-        {{- end}}
-        {{- if eq $deployment.name "comp" }}
-        - name: jobs-data
-          emptyDir: {}
         {{- end}}
         {{- if eq $deployment.name "backup" }}
         - name: db-backups

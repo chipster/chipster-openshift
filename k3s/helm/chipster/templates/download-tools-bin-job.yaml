@@ -1,6 +1,6 @@
 # job for downloding the tools-bin package
 # created only when the version is set to allow deployment without this
-{{ if $.Values.toolsBin.version }}
+{{ if and $.Values.toolsBin.version (not $.Values.toolsBin.hostPath)}}
 apiVersion: batch/v1
 kind: Job
 metadata:

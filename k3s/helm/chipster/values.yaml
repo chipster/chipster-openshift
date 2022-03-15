@@ -177,20 +177,6 @@ deployments:
     adminRoute: "default"
     conf: {}
     env: {}
-  comp:
-    name: comp
-    class: comp
-    image: comp
-    apiPort: ""
-    adminPort: 8111
-    eventsPort: ""
-    workDir: /opt/chipster/comp
-    password: ""
-    configs: {}
-    useDefaultImageRepo: true
-    replicas: ""
-    # disabled until the comp image is updated
-    adminRoute: "disable"
   singleShotComp:
     name: single-shot-comp
     apiPort: ""
@@ -266,8 +252,6 @@ users:
 # generate-passwords.bash will generate all tokens.*.privateKey fields
 tokens:
   auth:
-    privateKey:
-  sessionDb:
     privateKey:
 
 # Configure depenency subcharts
