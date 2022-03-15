@@ -95,7 +95,13 @@ for key in $(yq e $default_values_yaml_path -o=json | jq '.tokens | keys[]' -r);
     fi
 done
 
-#echo "$values_json"
+echo "delete old obsolete passwords"
+# session-db doesn't need key pair, because only auth signs tokens now
+# singleShotComp doesn't need password, because it uses only SessionToken
+# comp is not used anymore
+values_json=$(echo $values_json |  jq 'del( .tokens.sessionDb, .deployments.singleShotComp, .deployments.comp)')
+
+# echo "$values_json"
 
 echo "update to server"
 
