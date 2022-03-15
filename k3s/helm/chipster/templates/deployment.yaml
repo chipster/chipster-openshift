@@ -136,7 +136,7 @@ spec:
         - name: tools-bin
         {{- if $.Values.toolsBin.hostPath }}
           hostPath:
-            path: {{ $.Values.toolsBin.hostPath }}
+            path: {{ $.Values.toolsBin.hostPath }}/{{ $.Values.toolsBin.version }}
             type: Directory
         {{- else }}
           persistentVolumeClaim:
