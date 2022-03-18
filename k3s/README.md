@@ -184,6 +184,13 @@ Restart the server to make sure all new packages are taken in use.
 sudo shutdown -r 0
 ```
 
+Check if new passwords need to be generated:
+
+```bash
+cd git/chipster-openshift/k3s
+bash generate-passwords.bash
+```
+
 Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. 
 
 ```bash
