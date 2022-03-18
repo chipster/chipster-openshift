@@ -77,7 +77,7 @@ TODO What is port 6443, is it important to protect that too?
 If you don't want the server to have unrestricted outbound access, it's possible to [install Chipster behind a HTTP proxy](behind-proxy.md).
 ## Install Ansible
 
-We'll use Ansible to install other required programs.
+We'll install Ansible. It will be used to install other required programs.
 
 ```bash
 sudo apt update

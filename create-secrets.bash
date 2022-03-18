@@ -166,7 +166,7 @@ if [ -z "$tools_bin" ]; then
   tools_bin="empty"   
 fi
 
-echo "toolbox-runtime-tools-bin-volume: tools-bin-$tools_bin" >> $build_dir/toolbox.yaml
+echo "toolbox-runtime-tools-bin-name: $tools_bin" >> $build_dir/toolbox.yaml
 
 echo "generate secret for each service"
 

@@ -18,7 +18,7 @@ These instructions will assume that you are running the latest version of deploy
 
 K3s is a Lightweight Kubernetes, effectively a container cloud platform. Do we really need the cointainer cloud platform to run a few server processes on single host? Not really, you could checkout the code yourself and follow the Dockerfiles to see what operating system packages and what kind of folder structure is needed for each service, how to compile the code and how to start the processes. Add some form of reverse proxy to terminate HTTPS (e.g. Apache or nginx) and some process monitoring (Java Service Wrapper or systemd) and you are done.
 
-However, K3s offers standardized way of doing all that and we don't want to implement ourselves functionalities that are already offered in the standard container cloud platforms, like HTTPS termination. K3s allows us to run small-scale Chipster in very similar environment, that we know well from our larger production installations. We aim to rely even more on the Kubernetes features in the future. For example, it would be nice to run each Chipster job in its own container. This would make it easier to manage tool dependencies and improve security. This kind of changes are probably a lot easier in the future, if the Chipster is already running in the container platform.
+However, K3s offers standardized way of doing all that and we don't want to implement ourselves functionalities that are already offered in the standard container cloud platforms, like HTTPS termination. K3s allows us to run small-scale Chipster in very similar environment, that we know well from our larger production installations. Also the current Chipster analysis tools assume to be run with specific container images, which would be difficult to arrange without some kind of container system.
 
 ## Installation
 
@@ -63,7 +63,7 @@ The `deploy.bash` script above showed you the address of the Chipster web app, w
 
 If something goes wrong in the deployment and you want to start from scratch, see the chapter [Uninstall Chipster](#uninstall-chipster).
 
-Most tools wont work yet, because we haven't downloaded the tools-bin package. But let's make a small test first to make sure that the most essential parts of the Chipster work. Upload some file to Chipster and run a tool `Misc` -> `Tests` -> `Test data input and output in Python`. If the result file appears in the Workflow view after few seconds, you can continue to the next chapter. If you encounter any errors, please try to solve them before continuing, because it's a lot easier and faster to change the deployment before you start the hefty tools-bin download.
+Most tools wont work yet, because we haven't downloaded the tools-bin package. But let's make a small test first to make sure that the most essential parts of the Chipster work. Upload some file to Chipster and run a tool `Misc` -> `Tests` -> `Test data input and output without tools-bin`. If the result file appears in the Workflow view after few seconds, you can continue to the next chapter. If you encounter any errors, please try to solve them before continuing, because it's a lot easier and faster to change the deployment before you start the hefty tools-bin download.
 
 We'll get to the tools-bin download soon, but let's take a quick look to the configuration system and updates first.
 
@@ -77,7 +77,7 @@ Please see [Getting started with K3s](getting-started-with-k3s.md) for K3s basic
 
 Deployment settings are defined in the `helm/chipster/values.yaml` file. You can override any of these values by passing `--set KEY=VALUE` arguments to the `deploy.bash` script (in addition to all the previous arguments), just like you have already done with the host name.
 
-For example, to create a new user account `john` with a password `verysecretpassword`, you would check the file `values.yaml` to see which object needs to modified. 
+For example, to create a new user account `john` with a password `verysecretpassword`, you would check the file `helm/chipster/values.yaml` to see which object needs to modified. 
 You would run the `deploy.bash` scripte then again with an additional argument:
 
 ```bash
@@ -106,7 +106,7 @@ If you need to debug this process, you can run the above command with `--debug -
 
 ### Chipster settings
 
-All Chipster configuration options can be found from a file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs. 
+All Chipster configuration options can be found from a file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `helm/chipster/values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs. 
 
 For example, edit your `~/values.yaml` to add the new setting.
 
@@ -157,7 +157,7 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 If you have just installed Chipster, you can simply skim through this chapter now and return here when it's time to update your installation.
 
-> 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster.
+> 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster. The instructinos below do these updates in the correct order, just be careful not to skip those steps.
 
 Pull latest changes from the deployment repository.
 
@@ -210,7 +210,7 @@ bash restart.bash
 
 ### Download the tools-bin package
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. There are two ways to do it. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](host-mount.md#tools-bin) and then do the download manually.
+When you have checked that the Chipster itself works, you can start the tools-bin download. There are two ways to do it. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
 
 To let the deployment scripts do the download, simply run the deployment again, but set the tools-bin version this time. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version.
 
@@ -218,7 +218,7 @@ Set the tools-bin version in your `~/values.yaml`.
 
 ```yaml
 toolsBin:
-  version: chipster-3.15.6
+  version: chipster-4.5.2
 ```
 
 And deploy Chipster again.
@@ -258,7 +258,7 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 ### Authentication
 ### JWT keys
 
-Chipster services `auth` and `session-db` create authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
+Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
 
 TODO How to generate new keys if the old keys have leaked?
 
@@ -307,7 +307,7 @@ Check the latest example sessions version from the [file list](https://a3s.fi/sw
 
 The page lists the current example sessions. Concatenate the address of the page and one of those lines to download individual sessions. Make sure you have `https` in front of the address, because the server doesn't repond to download requests in plain `http`.
 
-TODO write script for downloading, uploadin and sharing all example sessions
+TODO write script for downloading, uploading and sharing all example sessions
 
 ### Support request sessions
 
@@ -328,13 +328,12 @@ TODO
  * How to scale the cluster up and down?
  * How to scale Chipster inside the cluster?
 
+ See also the page [Chipster cluster](chipster-cluster.md) for the instructions about the number of replicas for each Chipster service.
+
 ### Tool development
 
-[Building a new container image](build-image.md) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work. There many ways to edit files faster:
-
-1. Open a shell with `kubectl exec` to the container and edit files directly in the container.
-2. Edit files on the host or on your laptop and copy files with with `kubectl cp` to the container.
-3. [Mount a directory of the host to the container](host-mount.md). Edit the files on the host or copy them from your laptop to the host.
+The page [Tool script development](tool-script-dev.md) provides instructions for changin and and adding new tools to your Chipster
+server.
 
 ### Container images
 
