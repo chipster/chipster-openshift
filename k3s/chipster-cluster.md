@@ -4,7 +4,7 @@ TODO Write complete instructions for setting up a K3s and Chipster cluster.
 
 Here are some guidelines for the number of pods for each Chipster service.
 
-## Stateless heavy services
+## Scalable heavy services
 
 - file-broker
 - file-storage
@@ -12,7 +12,7 @@ Here are some guidelines for the number of pods for each Chipster service.
 
 You need at least one replica for each of these services and you could add more replicas according to your load and high-availability (HA) needs.
 
-## Stateless light services
+## Scalable light services
 
 - service-locator
 - auth
@@ -24,7 +24,7 @@ You need at least one replica and you could add a few more for HA. There could b
 
 (*) each type-service pod has its own in-memory cache. Adding many type-service replicas doesn't increase the performance that much, because the cache usage becomes less efficient.
 
-## Non-replicated mandatory services
+## Mandatory non-scalable services
 
 - session-db 
 
