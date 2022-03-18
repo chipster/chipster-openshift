@@ -9,11 +9,11 @@ report your use case and your custom solutions for example on the [chipster-tech
 
 [Building a new container image](build-image.md) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work. 
 
-To allow faster development cycle, these instructinos show how to clone the chipster-tools repository to the host and then mount that directory to the toolbox container. This way you can easily edit the files on the host with your preferred editor. We use [Visual Studio Code](https://code.visualstudio.com/) [Remote Explorer](https://code.visualstudio.com/docs/remote/ssh) for our daily tool development work.
+To allow faster development cycle, these instructions show how to clone the chipster-tools repository to the host and then mount that directory to the toolbox container. This way you can easily edit the files on the host with your preferred editor. We use [Visual Studio Code](https://code.visualstudio.com/) [Remote Explorer](https://code.visualstudio.com/docs/remote/ssh) for our daily tool development work.
 
 If you need changes to the tools-bin, you should also [mount tools-bin from the host](tools-bin-host-mount.md).
 
-## Mount tools scripts from the host
+## Mount tool scripts from the host
 
 Clone the tool scripts to the host and symlink them from the correct directory.
 

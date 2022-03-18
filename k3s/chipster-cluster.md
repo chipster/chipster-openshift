@@ -4,7 +4,7 @@ TODO Write complete instructions for setting up a K3s and Chipster cluster.
 
 Here are some guidelines for the number of pods for each Chipster service.
 
-### Stateless heavy services
+## Stateless heavy services
 
 - file-broker
 - file-storage
@@ -28,7 +28,7 @@ You need at least one replica and you could add a few more for HA. There could b
 
 - session-db 
 
-At the moment, session-db serves as a websocket server. It doesn't support clustering. Increase the pod resource limits, if there are performance issues.
+At the moment, session-db serves as a websocket server and doesn't support clustering. Increase the pod resource limits, if there are performance issues.
 
 - scheduler
 

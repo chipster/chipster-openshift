@@ -332,7 +332,7 @@ TODO
 
 ### Tool development
 
-The page [Tool script development](tool-script-dev.md) provides instructions for changin and and adding new tools to your Chipster
+The page [Tool script development](tool-script-dev.md) provides instructions for changing and and adding new tools to your Chipster
 server.
 
 ### Container images
