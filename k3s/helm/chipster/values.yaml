@@ -238,6 +238,11 @@ databases:
     passwordKey: "\"job-history-postgresql\".postgresqlPassword"
     enabled: true
 
+# generate-passwords.bash will generate all serviceAccounts.*.password fields
+serviceAccounts:
+  monitoring:
+    password: ""
+
 # generate-passwords.bash will generate all users.*.password fields
 users:
   chipster:

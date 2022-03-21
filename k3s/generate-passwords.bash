@@ -58,6 +58,20 @@ for key in $(yq e $default_values_yaml_path -o=json | jq '.deployments | keys[]'
     fi
 done
 
+# generate password for the monitoring account to replace default password
+for key in "monitoring"; do
+    name="$key"
+
+    old_password=$(echo "$values_json" | jq '.serviceAccounts."'$key'".password' -r)
+    if [[ $old_password != "null" ]]; then
+        echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
+    else
+        echo "generate password for $name"
+        password=$(openssl rand -base64 30)
+        values_json=$(echo $values_json | jq ".serviceAccounts.\"$key\".password = \"$password\"")
+    fi
+done
+
 for key in $(yq e $default_values_yaml_path -o=json | jq '.databases | keys[]' -r); do
     name="$key"
     passwordKey=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.passwordKey -r)
