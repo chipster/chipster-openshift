@@ -90,8 +90,8 @@ collection of program binaries and reference data is a so called `tools-bin` dir
 large tools-bin directory and this configuration option is used to switch between
 different versions when the Chipster is updated. Additional configuration option `toolbox-runtime-tools-bin-path` defines the path where the tools-bin directory is mounted.
 
-Third and easiest way to provide code for the tool is the tool script itself. The tool scripts are text files that need an interpreter program to be run. Tool scripts
-are written in R or Python language and the corresponding interpreter program is set with a configuration option `toolbox-runtime-command`. In the example above, you can notice that in this case the interpreter program comes from the tools-bin directory, because the path points under the tools-bin mount `/opt/chipster/tools`. If the interpreter program requires additional parameters, those can be given with `toolbox-runtime-parameters`. 
+Third and easiest way to provide code for the tool is the tool script itself. The tool script is a text file which needs an interpreter program to be run. Tool scripts
+are written in R or Python language and the corresponding interpreter program is set with a configuration option `toolbox-runtime-command`. In the example above, in this case the interpreter program comes from the tools-bin directory, because the path points under the tools-bin mount `/opt/chipster/tools`. If the interpreter program requires additional parameters, those can be given with `toolbox-runtime-parameters`. 
 
 Finally, each script language needs its own way of injecting that parameter variables and recognising errors. These functionalities are provided for the supported languages with a JobFactory, selected by configuration option `toolbox-runtime-job-factory`.
 
