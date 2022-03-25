@@ -64,6 +64,63 @@ cd ~/git/chipster-tools/
 bash comp-shell.bash
 ```
 
+## Runtimes
+
+The `runtime` configures the environment where the tool should be run. You can find the default runtime configuration among all other
+[default chipster configuration](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml) by searching for a string `toolbox-runtime-`.
+
+The default configuration may look something like this:
+
+```yaml
+toolbox-runtime-image: comp-16.04
+toolbox-runtime-tools-bin-name: chipster-4.5.2
+toolbox-runtime-tools-bin-path: /opt/chipster/tools
+toolbox-runtime-command: /opt/chipster/tools/R-3.2.3/bin/R
+toolbox-runtime-parameters: "--vanilla --quiet"
+toolbox-runtime-job-factory: fi.csc.chipster.comp.r.RJobFactory
+```
+
+Let's go through these configuration options one by one.
+
+There are many ways to provide code and files for a Chipster tool. First of all, you can select the container image with configuration option `toolbox-runtime-image`. This decides 
+the operating sytem where the tool will be run. Also packages from operating sytem package manager (e.g. `apt` in Ubuntu) is easiest to install directly to this container image. At the moment the container image must include also the program `SingleShotComp` which takes care of communication with Chipster APIs. The image repository is set in scheduler with `scheduler-bash-image-repository`.
+
+Container images are not suited for large data files. Chipster's way to provide larger
+collection of program binaries and reference data is a so called `tools-bin` directory. The appropriate tools-bin can be selected with a configuration option `toolbox-runtime-tools-bin-name`. At the moment all Chipster tools are provided in one
+large tools-bin directory and this configuration option is used to switch between
+different versions when the Chipster is updated. Additional configuration option `toolbox-runtime-tools-bin-path` defines the path where the tools-bin directory is mounted.
+
+Third and easiest way to provide code for the tool is the tool script itself. The tool scripts are text files that need an interpreter program to be run. Tool scripts
+are written in R or Python language and the corresponding interpreter program is set with a configuration option `toolbox-runtime-command`. In the example above, you can notice that in this case the interpreter program comes from the tools-bin directory, because the path points under the tools-bin mount `/opt/chipster/tools`. If the interpreter program requires additional parameters, those can be given with `toolbox-runtime-parameters`. 
+
+Finally, each script language needs its own way of injecting that parameter variables and recognising errors. These functionalities are provided for the supported languages with a JobFactory, selected by configuration option `toolbox-runtime-job-factory`.
+
+Sometimes a group of tools require their own environment. It's easy to create an own runtime for those tools. Simply invent a name for the new runtime (e.g. `R-4.1.1`) and append a dash "`-`" and that name to the end of all configuration options that you want to override. This is how it would look in your `~/values.yaml`:
+
+```yaml
+deployments:
+  toolbox:
+    configs:
+      toolbox-runtime-command-R-4.1.1: /opt/chipster/tools/R-4.1.1/bin/R
+      toolbox-runtime-image-R-4.1.1: comp-20.04-r-deps
+```
+
+You don't have to override all configuration options, because Chipster will automatically fall back to the default options. For example, this runtime `R-4.1.1` would use the container image set in `toolbox-runtime-image`, because it's not ovverriden here. If you want to remove some default value in your own runtime, simply set it to an empty string `""`.
+
+Deploy the configuration, restart toolbox and check the logs:
+
+```bash
+bash deploy.bash -f ~/values.yaml 
+kubectl rollout restart deployment/toolbox
+kubectl logs deployment/toolbox --follow
+```
+
+A custom runtime is enabled in a tool script simply by referencing its name:
+
+```
+# RUNTIME R-4.1.1
+```
+
 ## Manual pages
 
 Clone the tool manuals to the host and symlink them from the correct directory.
