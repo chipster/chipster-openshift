@@ -89,7 +89,6 @@ mkdir -p $configured_objects_dir
 services="session-db 
 	service-locator
 	scheduler
-	comp
 	file-broker
 	file-storage
 	session-worker
@@ -97,7 +96,6 @@ services="session-db
 	toolbox
 	web-server
 	type-service
-	haka
 	backup
 	job-history
 	single-shot-comp"
@@ -175,15 +173,6 @@ for service in $services; do
 	
 	create_secret_for_service $service $subproject $subproject_postfix
 done
-
-# Mylly
-# this should be in the project specific configuration, but it doesn't support custom scripts yet
-cp $build_dir/comp.yaml $build_dir/comp-mylly.yaml
-create_secret_for_service comp-mylly $subproject $subproject_postfix
-
-# comp-large
-cp $build_dir/comp.yaml $build_dir/comp-large.yaml
-create_secret_for_service comp-large $subproject $subproject_postfix
 
 echo "configure app"
 

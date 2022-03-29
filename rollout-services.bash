@@ -11,12 +11,12 @@ else
   subproject_postfix="-$subproject"
 fi
    
-for d in auth service-locator session-db file-broker scheduler comp session-worker type-service web-server toolbox backup job-history; do 
+for d in auth service-locator session-db file-broker scheduler session-worker type-service web-server toolbox backup job-history; do 
 	echo $d
 	oc rollout cancel dc/$d$subproject_postfix
 done
 
-for d in auth service-locator session-db file-broker scheduler comp session-worker type-service web-server toolbox backup job-history; do 
+for d in auth service-locator session-db file-broker scheduler session-worker type-service web-server toolbox backup job-history; do 
 	echo $d
 	oc rollout latest $d$subproject_postfix
 done
