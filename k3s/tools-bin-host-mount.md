@@ -7,16 +7,16 @@ These instructions show how to mount a tools-bin directory of the host to the co
 Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. Let's also symlink it to `/opt/chipster/tools` because our `R` installations are configured to run there.
 
 ```bash
-sudo mkdir /mnt/data/tools-bin
-sudo chown $(whoami) /mnt/data/tools-bin 
-ln -s /mnt/data/tools-bin /opt/chipster/tools
+sudo mkdir /mnt/data/tools-bin/chipster-4.5.2
+sudo chown $(whoami) /mnt/data/tools-bin/chipster-4.5.2
 ```
 
-Change your `~/values.yaml` to mount tools-bin from this host directory.
+Change your `~/values.yaml` to mount tools-bin from this host directory. The tools-bin version number in the configuration file must match with the directory name above.
 
 ```yaml
 toolsBin:
-  hostPath: /opt/chipster/tools
+  version: chipster-4.5.2
+  hostPath: /mnt/data/tools-bin
 ```
 
 Deploy changes.
@@ -25,7 +25,7 @@ Deploy changes.
 bash deploy.bash -f ~/values.yaml
 ```
 
-Now you would have to download and extract the tools-bin packages. 
+Now you would have to download and extract the tools-bin packages. Replace all occurrances of "chipster-4.5.2" with your tools-bin version.
 
 ```
 # make a temporary directory for the download packages
@@ -35,7 +35,7 @@ sudo chown $(whoami) temp
 cd temp
 
 # get a list of packages
-curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-3.16.4 | grep .tar.lz4$ > files.txt
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.5.2 | grep .tar.lz4$ > files.txt
 # download packages
 for f in $(cat files.txt); do wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$f; done
 cd ..
@@ -44,7 +44,7 @@ cd ..
 sudo apt install -y liblz4-tool
 
 # extract packages 
-for f in temp/*.tar.lz4; do lz4 -d $f | tar -x -C tools-bin; done
+for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
 
 # remove packages
 rm -rf temp

@@ -57,7 +57,8 @@ kubectl rollout latest deployment toolbox
 
 ## Try things in shell
 
-TODO fix the tools-bin mount of the script
+Sometimes it's easier to develop or debug tools by running commands manually in a shell. Use the `comp-shell.bash` script to start the same container image which will
+be used to run the Chipster tool. It will also mount the tools-bin directory.
 
 ```bash
 cd ~/git/chipster-tools/

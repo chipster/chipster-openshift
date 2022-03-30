@@ -219,16 +219,6 @@ configure_java_service "$subproject_postfix" job-history fi.csc.chipster.jobhist
 configure_service "$subproject_postfix" toolbox toolbox toolbox
 configure_service "$subproject_postfix" type-service chipster-web-server-js type-service
 configure_service "$subproject_postfix" web-server web-server web-server
-configure_service "$subproject_postfix" comp comp comp
-configure_service "$subproject_postfix" comp-large comp comp
-
-# configure_service "$subproject_postfix" file-storage-single chipster-web-server file-storage fi.csc.chipster.filestorage.FileStorage &
-
-if [ "$mylly" = true ]; then
-  configure_service "$subproject_postfix" comp-mylly comp-mylly comp
-else
-  echo "skipping mylly"
-fi
 
 wait
 
@@ -270,8 +260,14 @@ oc process -f templates/logging.yaml --local \
     -p SUBPROJECT_POSTFIX=$subproject_postfix \
     > $template_dir/logging.yaml
 
-# has to be a simple variable assignment to fail on errors
-replay_password=$(vault_view ../chipster-private/confs/$PROJECT.$DOMAIN/users | grep replay_test | cut -d ":" -f 2)
+if oc get pod | grep auth | grep -v postgres | grep Running; then
+  echo "try to get replay_password from the server"
+  replay_password=$(oc rsh -c auth dc/auth cat security/users | grep replay_test | cut -d ":" -f 2)
+else
+  echo "get replay_password from the vault"
+  # has to be a simple variable assignment to fail on errors
+  replay_password=$(vault_view ../chipster-private/confs/$PROJECT.$DOMAIN/users | grep replay_test | cut -d ":" -f 2)
+fi
 
 oc process -f templates/replay.yaml --local \
     -p PROJECT=$PROJECT \
