@@ -38,7 +38,7 @@ Deploy changes.
 ```bash
 bash deploy.bash -f ~/values.yaml
 ```
-## Reaload toolbox after tool script changes
+## Reload toolbox after tool script changes
 
 
 When you have edited tool scirpts you have the trigger a tool reload in the toolbox. 
