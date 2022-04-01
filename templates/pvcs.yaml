@@ -30,21 +30,7 @@ objects:
       resources:
         requests:
           storage: 100Mi
-
-  # - apiVersion: v1
-  #   kind: PersistentVolumeClaim
-  #   metadata:
-  #     labels:
-  #       app: chipster${SUBPROJECT_POSTFIX}
-  #       subproject: ${{SUBPROJECT}}
-  #     name: file-broker-storage${SUBPROJECT_POSTFIX}
-  #   spec:
-  #     accessModes:
-  #       - ReadWriteMany
-  #     resources:
-  #       requests:
-  #         storage: 10Gi
-
+          
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
