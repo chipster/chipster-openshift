@@ -9,13 +9,14 @@ metadata:
     app: chipster
 spec:
   tls:
-    # # Let's Encrypt production certificate
     {{- if eq $.Values.tls.env "prod" }}
+    # Let's Encrypt production certificate
     secretName: chipster-tls
-    {{- end }}  
-    {{- if eq $.Values.tls.env "staging" }}
+    {{- else if eq $.Values.tls.env "staging" }}
     # Let's Encrypt staging certificate
     secretName: chipster-tls-staging
+    {{- else }}
+    {}
     {{- end }}
   entryPoints:
     {{- if $.Values.tls.env }}
