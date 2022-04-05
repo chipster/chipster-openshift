@@ -215,9 +215,15 @@ Restart all pods.
 bash restart.bash
 ```
 
+See also the next chapter for instructions how to update the tools-bin package.
+
 ### Download the tools-bin package
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. There are two ways to do it. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
+The tools-bin package contains most of the Chipster analysis tool program binaries and all reference data. Its size is about 500 GB and it has hundreds of thousands files. Its download can be challenging if the internet connection is less than perfect and also simply creating so many files may take hours on some high-latency file systems.
+
+When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest  tools-bin version. 
+
+There are two ways to download the tools-bin. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
 
 To let the deployment scripts do the download, simply run the deployment again, but set the tools-bin version this time. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version.
 
@@ -235,6 +241,18 @@ bash deploy.bash -f ~/values.yaml
 ```
 
 That will also will print you insctructions for how to follow the progress of the download and how to restart pods when it completes.
+
+If you updated the tools-bin version, you can free disk space by removing the old version. Check the name of the old tools-bin volume:
+
+```bash
+kubectl get pvc
+```
+
+End remove it:
+
+```bash
+kubectl delete pvc NAME_OF_OLD_TOOLS_BIN_VOLUME
+```
 
 ### Admin view
 

@@ -21,7 +21,7 @@ Usually 20 GB is enough space for the root disk.
 
 We need a lot of additinal storage space to store all the reference genomes, indexes and users' files.
 
- * mount at least 1 TB volume to the server
+ * mount at least 1 TB volume to the server (or 2 TB if you want to update to new tools-bin versions before deleting the old one)
  * create a filesystem to the volume (assuming it's `/dev/vdb`)
 
  ```bash
