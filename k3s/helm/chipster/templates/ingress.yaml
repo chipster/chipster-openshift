@@ -8,6 +8,7 @@ metadata:
   labels:
     app: chipster
 spec:
+  {{- if or (eq $.Values.tls.env "prod") (eq $.Values.tls.env "staging") }}
   tls:
     {{- if eq $.Values.tls.env "prod" }}
     # Let's Encrypt production certificate
@@ -15,9 +16,8 @@ spec:
     {{- else if eq $.Values.tls.env "staging" }}
     # Let's Encrypt staging certificate
     secretName: chipster-tls-staging
-    {{- else }}
-    {}
     {{- end }}
+  {{- end }}
   entryPoints:
     {{- if $.Values.tls.env }}
     - websecure
