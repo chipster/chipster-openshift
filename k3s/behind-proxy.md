@@ -59,7 +59,6 @@ Configure proxy variables to Chipster  job containers in your ~/values.yaml. You
 deployments:
   scheduler:
     configs:
-      scheduler-bash-enable-resource-limits: "false"
       scheduler-bash-env-name-1: "http_proxy"
       scheduler-bash-env-value-1: "http://your.proxy:3128"
       scheduler-bash-env-name-2: "https_proxy"
