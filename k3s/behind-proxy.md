@@ -31,14 +31,15 @@ with content like:
 
 ```ini
 [Service]
-Environment="HTTP_PROXY=http://your.proxy:3128/";
-Environment="HTTPS_PROXY=http://your.proxy:3128/";
+Environment="HTTP_PROXY=http://your.proxy:3128/"
+Environment="HTTPS_PROXY=http://your.proxy:3128/"
 Environment="NO_PROXY=localhost,127.0.0.0/8,0.0.0.0,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,chipstervm1,.your-domain.com,cattle-system.svc,.svc,.cluster.local"
 ```
 
-Restart docker with
+Reload configuration and restart docker:
 
 ```bash
+sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
@@ -52,14 +53,20 @@ Chipster 4 is now up and running.
 
 ## Environment variables for tools
 
-Configure proxy variables to Chipster containers in your ~/values.yaml:
+Configure proxy variables to Chipster  job containers in your ~/values.yaml. You probably want change also the image pull policy to "IfNotPresent". By default the image pull policy is "Always", which seems to cause about 1 minute delay to each job container start.
 
 ```yaml
-deploymentDefault:
-  env:
-    http_proxy: "http://your.proxy:3128"
-    https_proxy: "http://your.proxy:3128"
-    no_proxy: "localhost,127.0.0.0/8,0.0.0.0,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,chipstervm1,.your-domain.com,cattle-system.svc,.svc,.cluster.local"
+deployments:
+  scheduler:
+    configs:
+      scheduler-bash-enable-resource-limits: "false"
+      scheduler-bash-env-name-1: "http_proxy"
+      scheduler-bash-env-value-1: "http://your.proxy:3128"
+      scheduler-bash-env-name-2: "https_proxy"
+      scheduler-bash-env-value-2: "http://your.proxy:3128"
+      scheduler-bash-env-name-3: "no_proxy"
+      scheduler-bash-env-value-3: "localhost,127.0.0.0/8,0.0.0.0,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,chipstervm1,.your-domain.com,cattle-system.svc,.svc,.cluster.local"
+      scheduler-bash-image-pull-policy: "IfNotPresent"
 ```
 
 ## Appendix 1: How to setup http proxy in OpenStack

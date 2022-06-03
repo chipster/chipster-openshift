@@ -4,10 +4,10 @@
 These instructions show how to mount a tools-bin directory of the host to the container.
 ## Tools-bin
 
-Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. Let's also symlink it to `/opt/chipster/tools` because our `R` installations are configured to run there.
+Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. 
 
 ```bash
-sudo mkdir /mnt/data/tools-bin/chipster-4.5.2
+sudo mkdir -p /mnt/data/tools-bin/chipster-4.5.2
 sudo chown $(whoami) /mnt/data/tools-bin/chipster-4.5.2
 ```
 
