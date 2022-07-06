@@ -222,6 +222,9 @@ deploymentDefault:
   replicas: 1
   adminRoute: "enable"
   env: {}
+  livenessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
 
 # databases is a section for Chipster scripts to know which databases exist
 # passwordKey is the YAML path where generate-passwords.bash will store the password

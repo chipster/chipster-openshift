@@ -66,6 +66,8 @@ spec:
               path: /admin/alive
               port: admin
             initialDelaySeconds: 30
+            periodSeconds: {{ $.Values.deploymentDefault.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ $.Values.deploymentDefault.livenessProbe.timeoutSeconds }}
           # dead lock between auth and service-locator
           # readinessProbe:
           #   httpGet:
