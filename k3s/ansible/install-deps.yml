@@ -4,7 +4,6 @@
   become: yes
 
   roles:
-  - install-docker
   - install-k3s
   - install-utils
   - install-helm
