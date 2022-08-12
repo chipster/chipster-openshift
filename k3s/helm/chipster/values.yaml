@@ -25,8 +25,6 @@ deployments:
     password: ""
     # configs is a YAML map to pass configuration key-value pairs to the Chipster service
     configs: {}
-    # useDefaultImageRepo decides whether image value above should be prefixed with a value of images.chipsterImageRepo
-    useDefaultImageRepo: true
     # replicas is the number of containers that run this service
     replicas: ""
     # enableAdminRoute decides whether an IngressRoute is created for the admin port/service, allowing requests from outside of the K3s. Set to "default", "enable" or "disable".
@@ -47,7 +45,6 @@ deployments:
     configs:
       # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback: false
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -62,7 +59,6 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -79,7 +75,6 @@ deployments:
     configs: 
     # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback: false
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -94,7 +89,6 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -109,7 +103,6 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -126,7 +119,6 @@ deployments:
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -142,7 +134,6 @@ deployments:
     workDir: /opt/chipster/toolbox
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -157,7 +148,6 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -172,7 +162,6 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -195,7 +184,6 @@ deployments:
     workDir: /opt/chipster
     password: ""
     configs: {}
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -212,7 +200,6 @@ deployments:
     configs:
     # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback-job-history: false
-    useDefaultImageRepo: true
     replicas: ""
     adminRoute: "default"
     conf: {}
@@ -279,9 +266,7 @@ job-history-postgresql:
 
 # image is a section for defining how to get the images
 image:
-  # pullPolicy defines how to pull images from public repositories
-  pullPolicy: IfNotPresent
-  # localPullPolicy defines how to pull our own Chipster images
+  # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
   localPullPolicy: IfNotPresent
   #localPullPolicy: Never
   chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images/
