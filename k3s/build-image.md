@@ -8,49 +8,56 @@ Building container images will accomplish the following tasks:
 * Compile code
 * Install operating system packages
 
-In effect we are executing commands defined in Dockerfiles. Most services will run with a minimal image with only Java and Chipster installed on top of Ubuntu, whereas the comp (i.e. analysis) service requires a huge number of operating system
-packages.
+In effect we are executing commands defined in Dockerfiles. Most services will run with a minimal image with only Java and Chipster installed on top of Ubuntu, whereas some analysis tool containers require a huge number of operating system packages.
 
-Let's check our current images:
+
+## Install Docker
+
+We'll use Docker to build the images. Let's install it first.
+
+```bash
+
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+
+## Two local image registries
+
+There will be two local image registries involved in this process, one for K3s and one for Docker. The K3s image registry is used for running the containers and the Docker image registry is used for building the images. To use the new image, we have to copy it from the Docker registry to K3s registry. In this example we'll run the builds on the same Chipster host, but you could run the builds on different host if you don't want to install Docker on your production server.
+
+Let's first check the images in K3s image registry:
+
+```bash
+$ sudo k3s crictl images
+IMAGE                                                                 TAG                    IMAGE ID            SIZE
+docker-registry.rahti.csc.fi/chipster-images/chipster-web-server-js   latest                 ba6b8e4832b16       280MB
+docker-registry.rahti.csc.fi/chipster-images/chipster-web-server      latest                 d308fcb91521f       903MB
+docker-registry.rahti.csc.fi/chipster-images/toolbox                  latest                 7f94300d1e138       904MB
+docker-registry.rahti.csc.fi/chipster-images/web-server               latest                 e8c8edaaf2417       989MB
+docker.io/bitnami/minideb                                             stretch                e398a222dbd61       22.2MB
+docker.io/bitnami/postgresql                                          11.6.0-debian-9-r48    6db6971e4c89c       81.2MB
+docker.io/rancher/klipper-helm                                        v0.7.3-build20220613   38b3b9ad736af       83MB
+docker.io/rancher/klipper-lb                                          v0.3.5                 dbd43b6716a08       3.33MB
+docker.io/rancher/local-path-provisioner                              v0.0.21                fb9b574e03c34       11.4MB
+docker.io/rancher/mirrored-coredns-coredns                            1.9.1                  99376d8f35e0a       14.1MB
+docker.io/rancher/mirrored-library-busybox                            1.34.1                 7a80323521ccd       777kB
+docker.io/rancher/mirrored-library-traefik                            2.6.2                  72463d8000a35       30.3MB
+docker.io/rancher/mirrored-metrics-server                             v0.5.2                 f73640fb50619       26MB
+docker.io/rancher/mirrored-pause                                      3.6                    6270bb605e12e       301kB
+```
+
+At this point the Docker registry is still empty:
 
 ```bash
 $ sudo docker images
-REPOSITORY                                                             TAG                   IMAGE ID            CREATED             SIZE
-docker-registry.rahti.csc.fi/chipster-jenkins/web-server               latest                cacf01c1a492        23 minutes ago      1.72GB
-docker-registry.rahti.csc.fi/chipster-jenkins/toolbox                  latest                3339746c88c1        28 minutes ago      1.57GB
-docker-registry.rahti.csc.fi/chipster-images/chipster-web-server       latest                cb9257dac46e        32 minutes ago      1.5GB
-docker-registry.rahti.csc.fi/chipster-images/chipster-web-server-js    latest                2a73dd624962        34 minutes ago      766MB
-docker-registry.rahti.csc.fi/chipster-jenkins/comp                     latest                471fecae8202        2 weeks ago         2.11GB
-docker-registry.rahti.csc.fi/chipster-jenkins/chipster-web-server-js   latest                fb7d0c3fb87f        2 weeks ago         819MB
-docker-registry.rahti.csc.fi/chipster-jenkins/web-server               <none>                e8e4fdca93d5        2 weeks ago         1.72GB
-docker-registry.rahti.csc.fi/chipster-jenkins/toolbox                  <none>                3c992e1de945        2 weeks ago         1.57GB
-docker-registry.rahti.csc.fi/chipster-jenkins/chipster-web-server      latest                9c88753a944c        2 weeks ago         1.56GB
-docker-registry.rahti.csc.fi/chipster-jenkins/base                     latest                98a49405eabc        2 weeks ago         298MB
-bitnami/minideb                                                        stretch               ed288f60eff7        3 weeks ago         53.7MB
-bitnami/postgresql                                                     11.6.0-debian-9-r48   6db6971e4c89        7 weeks ago         225MB
-busybox                                                                latest                6d5fcfe5ff17        2 months ago        1.22MB
-traefik                                                                1.7.19                aa764f7db305        4 months ago        85.7MB
-rancher/metrics-server                                                 v0.3.6                9dd718864ce6        4 months ago        39.9MB
-rancher/local-path-provisioner                                         v0.0.11               9d12f9848b99        5 months ago        36.2MB
-coredns/coredns                                                        1.6.3                 c4d3d16fe508        6 months ago        44.3MB
-nginx                                                                  1.16.0                ae893c58d83f        6 months ago        109MB
-rancher/klipper-lb                                                     v0.1.2                897ce3c5fc8f        9 months ago        6.1MB
-rancher/pause                                                          3.1                   da86e6ba6ca1        2 years ago         742kB
-```
-
-## Get current images
-
-The current build script assumes that all source image are present locally. You can either 
-pull the images from a public image repository:
-
-```
-bash pull-images.bash
-```
-
-Or you can build all images once which takes about half an hour:
-
-```bash
-bash scripts/build-image.bash --all
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
 ```
 
 ## Building your own images
@@ -72,7 +79,7 @@ Change the GitHub url in the buildconfig file to point to your repository. This 
 nano ../kustomize/builds/chipster-tools/chipster-tools.yaml
 ```
 
-Now that Docker has local copies of the source images, you can build only the image that you changed and other images that are using it as their source. By looking at the `source` sections of the buildconfigs, you can see that this `chipster-tools` image is a source of two other images: `toolbox` and `web-server`. We have to build those too.
+Now you can build the image that you changed and other images that are using it as their source. By looking at the `source` sections of the buildconfigs, you can see that this `chipster-tools` image is a source of two other images: `toolbox` and `web-server`. We should build those too.
 
 ```bash
 bash scripts/build-image.bash chipster-tools
@@ -110,27 +117,42 @@ Run the command, but replace the repository URL in the end with a path to your l
 cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f -  ~/git/chipster-web-server
 ```
 
-## Start containers from the local image
+## Copy image from Docker registry to K3s registry
 
-Then we have to change our deployment to use these new images. In practice we only have to disable use of the default image repository for those Chipster services in our `~/values.yaml`. After this the deployment will use your own local image.
+Export the image (as a tar file) from Docker and import it to K3s.
 
-```yaml
-deployments:
-  toolbox:
-    useDefaultImageRepo: false
-  webServer:
-    useDefaultImageRepo: false
+```bash
+sudo docker save IMAGE | sudo k3s ctr -n k8s.io images import -
 ```
 
-Finally, deploy changes.
+For example, to copy the chipster-web-server image from Docker to K3s registry:
 
 ```bash
-bash deploy.bash -f ~/values.yaml
-``` 
+sudo docker save docker-registry.rahti.csc.fi/chipster-images/chipster-web-server | sudo k3s ctr -n k8s.io images import -
+```
 
-Check if the relevant containers restarted automatically or restart those yourself, e.g.:
+The K3s image registry requires us to use the long image names like `docker-registry.rahti.csc.fi/chipster-images/chipster-web-server`. It assumes that short names like `chipster-web-server` would refer to its default registry `docker.io/library/`.
+
+You can also save the image to a file in between, if you wan't to use the same image on different Chipster server.
 
 ```bash
-kubectl get pod
+sudo docker save IMAGE -o image.tar
+# after copied to another server
+sudo k3s ctr -n k8s.io images import image.tar
+```
+
+## Start containers from the local image
+
+The latest image in K3s image repository is now the locally build image. Simply restart a pod to take it in use. For example, to restart `toolbox`: 
+
+```bash
 kubectl rollout restart toolbox
+```
+
+## Build all images locally
+
+There is a small helper script, in case you wan't to build all Chipster images yourself. It takes about half an hour. Remember to copy the built images to K3s registry like shown above.
+
+```bash
+bash scripts/build-image.bash --all
 ```

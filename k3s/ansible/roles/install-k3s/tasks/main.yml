@@ -2,7 +2,7 @@
   shell: "kubectl -n kube-system delete helmcharts.helm.cattle.io traefik"
   ignore_errors: yes
 
-- name: Install K3s (with Docker container runtime)
+- name: Install K3s
   shell: "curl -sfL https://get.k3s.io | sh -"
   args:
     warn: no

@@ -32,12 +32,14 @@ fi
 
 build="$(basename $dir)"
 
-cmd="cat $dir/Dockerfile"
+image_repository="docker-registry.rahti.csc.fi/chipster-images/"
+
+cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\""
 
 uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
 branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
 
-image_count=$(cat $dir/*.yaml | yq e .spec.source.images - --tojson | jq '. | length')
+image_count=$(cat $dir/*.yaml | yq e .spec.source.images - -o=json | jq '. | length')
 
 if [[ $image_count != 0 ]]; then 
     last_index=$(($image_count - 1))
@@ -50,7 +52,7 @@ if [[ $image_count != 0 ]]; then
             copy_line=$(cat $dir/Dockerfile | grep "COPY . ")
         fi
         copy_destination="$(echo "$copy_line" | cut -d " " -f 3)"
-        docker_copy_line="COPY --from=$image $source $copy_destination/$source_basename"
+        docker_copy_line="COPY --from=$image_repository$image $source $copy_destination/$source_basename"
 
         >&2 echo "copy from image:                      $image"
         >&2 echo "path:                                 $source"
@@ -59,13 +61,7 @@ if [[ $image_count != 0 ]]; then
         >&2 echo "copy destination:                     $copy_destination"
         >&2 echo "dockerized COPY line:                 $docker_copy_line"
         
-
-        if [[ $source == *"mylly"* ]]; then
-            >&2 echo "skip mylly"
-            cmd="$cmd | sed \"s#$copy_line##\""
-        else
-            cmd="$cmd | sed \"s#$copy_line#$docker_copy_line#\""
-        fi
+        cmd="$cmd | sed \"s#$copy_line#$docker_copy_line#\""
     done
 
     # >&2 echo "modified Dockerfile:"
@@ -75,9 +71,9 @@ fi
 # cmd="$cmd | tee /dev/tty"
 
 if [ $uri = "null" ]; then
-    cmd="$cmd | sudo docker build -t $build -"
+    cmd="$cmd | sudo docker build -t $image_repository$build -"
 else
-    cmd="$cmd | sudo docker build -t $build -f - $uri#$branch"
+    cmd="$cmd | sudo docker build -t $image_repository$build -f - $uri#$branch"
 fi
 
 echo $cmd
