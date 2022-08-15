@@ -14,7 +14,7 @@
     recurse: yes
     owner: "{{ user }}"
 
-- name: Copy kubctl config
+- name: Copy kubectl config
   shell: "bash -c \"kubectl config view --raw\" > /home/{{ user }}/.kube/config"
 
 - name: Change config file ownership and permissions

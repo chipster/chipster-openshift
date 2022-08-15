@@ -62,6 +62,8 @@ In the long run it's easier change the latter build `web-server`, which only com
 
 ### First image build
 
+Install Docker like shown in [image build instructions](build-image.md). After that you can continue from here.
+
 After getting a copy of the html files, we'll build an image to use these files in Chipster. Before that you might want to make some change to `app-home.html` so that you can see if the files really changed in Chipster.
 
 To build an image, we need a Dockerfile. Create a file ~/custom-html/Dockerfile and add the following content:
@@ -73,16 +75,11 @@ RUN ls -lah /home/user
 CMD ["sleep", "inf"]
 ```
 
-The build will use an image called `base` as a base image. Let's pull all Chipster images from a public image repository:
+
+Now we can build our `custom-html` image.
 
 ```
 cd ~/git/chipster-openshift/k3s
-bash pull-images.bash
-```
-
-Then we can build our `custom-html` image.
-
-```
 sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/src/assets
 ```
 
@@ -114,18 +111,10 @@ Build the image:
 bash scripts/build-image.bash web-server
 ```
 
-Configure the Chipster to use this local image. Add the following to your ~/values.yaml file:
-
-```yaml
-deployments:
-  webServer:
-    useDefaultImageRepo: false
-```
-
-Deploy it.
+Copy the new image to K3s.
 
 ```bash
-bash deploy.bash -f ~/values.yaml
+sudo docker save docker-registry.rahti.csc.fi/chipster-images/web-server | sudo k3s ctr -n k8s.io images import -
 ```
 
 Restart the pod and wait until it starts:
@@ -140,11 +129,12 @@ Reload the browser page and you should see your customizations in place.
 ### Next changes
 
 Make your changes to the html files.
-Build images and restart the pod:
+Build image, copy it and restart the pod:
 
 ```bash
 sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/src/assets
 bash scripts/build-image.bash web-server
+sudo docker save docker-registry.rahti.csc.fi/chipster-images/web-server | sudo k3s ctr -n k8s.io images import -
 kubectl rollout restart deployment/web-server
 watch kubectl get pod
 ```
@@ -154,6 +144,7 @@ watch kubectl get pod
 ```
 bash pull-images.bash
 bash scripts/build-image.bash web-server
+sudo docker save docker-registry.rahti.csc.fi/chipster-images/web-server | sudo k3s ctr -n k8s.io images import -
 kubectl rollout restart deployment/web-server
 watch kubectl get pod
 ```

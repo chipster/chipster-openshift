@@ -38,11 +38,7 @@ spec:
             - name: JAVA_CLASS
               value: {{ $deployment.class }}
             {{- include "chipster.listDeploymentEnv" (dict "deployment" $deployment "deploymentDefault" $.Values.deploymentDefault) | nindent 12 }}
-          {{- if $deployment.useDefaultImageRepo }}
           image: {{$.Values.image.chipsterImageRepo}}{{ $deployment.image }}
-          {{- else }}
-          image: {{ $deployment.image }}
-          {{- end }}
           # pull policy for Chipster images
           imagePullPolicy: {{ $.Values.image.localPullPolicy }}
           ports:
@@ -66,6 +62,8 @@ spec:
               path: /admin/alive
               port: admin
             initialDelaySeconds: 30
+            periodSeconds: {{ $.Values.deploymentDefault.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ $.Values.deploymentDefault.livenessProbe.timeoutSeconds }}
           # dead lock between auth and service-locator
           # readinessProbe:
           #   httpGet:
