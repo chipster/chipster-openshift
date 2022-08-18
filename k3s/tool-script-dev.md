@@ -103,7 +103,6 @@ deployments:
   toolbox:
     configs:
       toolbox-runtime-command-R-4.1.1: /opt/chipster/tools/R-4.1.1/bin/R
-      toolbox-runtime-image-R-4.1.1: comp-20.04-r-deps
 ```
 
 You don't have to override all configuration options, because Chipster will automatically fall back to the default options. For example, this runtime `R-4.1.1` would use the container image set in `toolbox-runtime-image`, because it's not ovverriden here. If you want to remove some default value in your own runtime, simply set it to an empty string `""`.
@@ -121,6 +120,19 @@ A custom runtime is enabled in a tool script simply by referencing its name:
 ```
 # RUNTIME R-4.1.1
 ```
+
+## Runtime with local image
+
+By default scheduler will start new job containers with `imagePullPolicy: Always` to make sure your server will pull new images when they are updated. However, this will cause an error if you try to use your own local image, which does not exists on our remote image registry. In this case you have to change the `imagePullPolicy` and restart also `deployment/scheduler`.
+
+deployments:
+  scheduler:
+    configs:
+      scheduler-bash-image-pull-policy: "IfNotPresent"
+  toolbox:
+    configs:
+      toolbox-runtime-command-R-4.1.1-asv: /opt/chipster/tools/R-4.1.1-asv/bin/R
+      toolbox-runtime-image-R-4.1.1-asv: comp-20.04-asv
 
 ## Manual pages
 
