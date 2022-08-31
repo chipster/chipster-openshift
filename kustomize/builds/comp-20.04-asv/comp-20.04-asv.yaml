@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-20.04-single-cell
-  name: comp-20.04-single-cell
+    build: comp-20.04-asv
+  name: comp-20.04-asv
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-20.04-single-cell:latest
+      name: comp-20.04-asv:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
