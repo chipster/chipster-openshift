@@ -32,6 +32,27 @@ function download_file {
 			echo "$url/$file $size, try $i extraction failed"
 			continue
 		fi
+
+		echo "verify checksums"
+		cat $temp/$file | lz4 -d | tar -t | while read -r extracted_file; do
+
+    		file_checksum=$(md5sum "$extracted_file")
+			correct_checksum=$(cat $temp/checksums.md5 | grep " $extracted_file$")
+
+			if [ "$file_checksum" == "$correct_checksum" ]; then
+				# nothing to do
+				:
+			else
+				echo "incorrect checksum of file "$extracted_file" ($file_checksum vs. $correct_checksum)"				
+				fail=1
+				break
+			fi
+		done
+
+		if [ $fail != 0 ]; then
+			# try again after incorrect checksum
+			continue
+		fi
 		
 		rm $temp/$file
 		break
@@ -52,5 +73,7 @@ rm -rf $temp/lost+found
 
 # delete old download temp files
 rm -f $temp/*
+
+wget $url/checksums.md5 -O $temp/checksums.md5
           
 curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}"
