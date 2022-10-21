@@ -36,16 +36,22 @@ function download_file {
 		echo "verify checksums"
 		cat $temp/$file | lz4 -d | tar -t | while read -r extracted_file; do
 
-    		file_checksum=$(md5sum "$extracted_file")
-			correct_checksum=$(cat $temp/checksums.md5 | grep " $extracted_file$")
+    		file_checksum="$(md5sum "$extracted_file")"
+			# we have to use regexp in grep to match the end of the line
+			# escape dots, because otherwise those will match any character
+			escaped_file="$(echo $extracted_file | sed 's/\./\\./g')"
+			correct_checksum="$(cat $temp/checksums.md5 | grep " $escaped_file$")"
 
-			if [ "$file_checksum" == "$correct_checksum" ]; then
+			if [ -z "$correct_checksum" ]; then
+				echo "file extracted, but checksum not found: $extracted_file"
+
+			elif [ "$file_checksum" == "$correct_checksum" ]; then
 				# nothing to do
 				:
 			else
 				echo "incorrect checksum of file "$extracted_file" ($file_checksum vs. $correct_checksum)"				
-				fail=1
-				break
+				# next iteration of outer loop
+				continue 2
 			fi
 		done
 
@@ -74,6 +80,6 @@ rm -rf $temp/lost+found
 # delete old download temp files
 rm -f $temp/*
 
-wget $url/checksums.md5 -O $temp/checksums.md5
+wget --no-verbose $url/checksums.md5 -O $temp/checksums.md5
           
 curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}"
