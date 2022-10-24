@@ -36,6 +36,11 @@ function download_file {
 		echo "verify checksums"
 		cat $temp/$file | lz4 -d | tar -t | while read -r extracted_file; do
 
+			# if symlink, just continue to the next file
+			if [[ -L $extracted_file ]]; then
+				continue
+			fi
+
     		file_checksum="$(md5sum "$extracted_file")"
 			# we have to use regexp in grep to match the end of the line
 			# escape dots, because otherwise those will match any character
