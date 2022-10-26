@@ -32,19 +32,26 @@ oc process -f templates/jobs/pvc.yaml --local \
   -p STORAGE_CLASS="glusterfs-storage" \
 	| oc create -f - --validate
 	
-temp_pvc="${pvc_name}-temp"
-while oc get pvc $temp_pvc; do
-  oc delete pvc $temp_pvc
-  sleep 1
-done
+# temp_pvc="${pvc_name}-temp"
+# while oc get pvc $temp_pvc; do
+#   oc delete pvc $temp_pvc
+#   sleep 1
+# done
 
-oc process -f templates/jobs/pvc.yaml --local \
-	-p NAME=$temp_pvc \
-	-p SIZE=400Gi \
-  -p STORAGE_CLASS="standard-rwo" \
-	| oc create -f - --validate
+# oc process -f templates/jobs/pvc.yaml --local \
+# 	-p NAME=$temp_pvc \
+# 	-p SIZE=400Gi \
+#   -p STORAGE_CLASS="standard-rwo" \
+# 	| oc create -f - --validate
 
-bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version" "$temp_pvc"
+# oc process -f templates/jobs/pvc.yaml --local \
+# 	-p NAME=$temp_pvc \
+# 	-p SIZE=400Gi \
+#   -p STORAGE_CLASS="glusterfs-storage" \
+# 	| oc create -f - --validate
+
+# bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version" "$temp_pvc"
+bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version"
 
 #TODO how to run this after the job has finished?
 #oc delete pvc $temp_pvc

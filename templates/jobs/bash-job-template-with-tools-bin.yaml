@@ -38,9 +38,9 @@ objects:
           persistentVolumeClaim:
             claimName: tools-bin-${TOOLS_BIN_VERSION}
         - name: temp
-          persistentVolumeClaim:
-            claimName: ${{TEMP_PVC}}
-          #emptyDir: {}
+          # persistentVolumeClaim:
+          #   claimName: ${{TEMP_PVC}}
+          emptyDir: {}
         restartPolicy: OnFailure
 parameters:
 - name: IMAGE_PROJECT
