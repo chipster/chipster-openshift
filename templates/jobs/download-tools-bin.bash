@@ -46,7 +46,9 @@ function download_file {
 
 			# sleep little bit after each file, because glusterfs seems to have problems when too many files
 			# are created too fast: https://bugzilla.redhat.com/show_bug.cgi?id=1701736
-			cp $temp_dir/$extracted_file /mnt/tools
+
+			mkdir -p /mnt/tools/$(dirname $extracted_file)
+			cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
 			sleep 0.1
 
 			# # if symlink, just continue to the next file
@@ -101,6 +103,6 @@ rm -rf $temp/lost+found
 # delete old download temp files
 rm -f $temp/*
 
-wget --no-verbose $url/checksums.md5 -O $temp/checksums.md5
+# wget --no-verbose $url/checksums.md5 -O $temp/checksums.md5
           
-curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}"
+curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}" 2>&1 | tee /mnt/tools/download.log
