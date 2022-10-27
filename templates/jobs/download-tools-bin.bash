@@ -48,7 +48,14 @@ function download_file {
 			# are created too fast: https://bugzilla.redhat.com/show_bug.cgi?id=1701736
 
 			mkdir -p /mnt/tools/$(dirname $extracted_file)
-			cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+
+			# if symlink
+			if [[ -L $temp/$extracted_file ]]; then
+				cp --no-dereference "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			else
+				cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			fi
+			
 			sleep 0.1
 
 			# # if symlink, just continue to the next file
