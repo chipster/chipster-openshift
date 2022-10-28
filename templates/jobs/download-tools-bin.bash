@@ -50,7 +50,7 @@ function download_file {
 			mkdir -p /mnt/tools/$(dirname $extracted_file)
 
 			# if symlink
-			if [[ -L $temp/$extracted_file ]]; then
+			if [[ -L "$temp_dir/$extracted_file" ]]; then
 				cp --no-dereference "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
 			else
 				cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
