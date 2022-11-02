@@ -47,7 +47,7 @@ function download_file {
 			# sleep little bit after each file, because glusterfs seems to have problems when too many files
 			# are created too fast: https://bugzilla.redhat.com/show_bug.cgi?id=1701736
 
-			mkdir -p /mnt/tools/$(dirname $extracted_file)
+			mkdir -p "/mnt/tools/$(dirname "$extracted_file")"
 
 			# if symlink
 			if [[ -L "$temp_dir/$extracted_file" ]]; then
