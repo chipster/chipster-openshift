@@ -20,6 +20,10 @@
         # copy html separately so that the BuildConfig can be patched to take it from another image
         COPY html /opt/chipster/chipster-web/assets
         COPY mylly-tools-manual /opt/chipster/chipster-web/assets
+        
+        RUN cp /opt/chipster/chipster-web/assets/manual/app-mylly-favicon.png /opt/chipster/chipster-web/assets/favicon.png \
+          && rm /opt/chipster/chipster-web/assets/favicon.svg \
+          && rm /opt/chipster/chipster-web/assets/apple-touch-icon.png
 
         RUN mv /opt/chipster/chipster-web /opt/chipster/web-root \
           && chmod ugo+rwx -R /opt/chipster/web-root \
