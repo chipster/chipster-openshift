@@ -47,8 +47,15 @@ function download_file {
 			# sleep little bit after each file, because glusterfs seems to have problems when too many files
 			# are created too fast: https://bugzilla.redhat.com/show_bug.cgi?id=1701736
 
-			mkdir -p /mnt/tools/$(dirname $extracted_file)
-			cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			mkdir -p "/mnt/tools/$(dirname "$extracted_file")"
+
+			# if symlink
+			if [[ -L "$temp_dir/$extracted_file" ]]; then
+				cp --no-dereference "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			else
+				cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			fi
+			
 			sleep 0.1
 
 			# # if symlink, just continue to the next file
