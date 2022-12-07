@@ -281,7 +281,7 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 [Configure Chipster to use TLS](tls.md) (https) to encrypt and validate the network traffic between the browser and the server.
 
 ### Authentication
-### JWT keys
+#### JWT keys
 
 Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
 
