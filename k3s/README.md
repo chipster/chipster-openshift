@@ -285,7 +285,31 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 
 Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
 
-TODO How to generate new keys if the old keys have leaked?
+You can generate a new private key if you wan't invalidate all current authentication tokens. First take copy of the current secret `passwords`:
+
+```bash
+kubectl get secret passwords -o json > ~/passwords-backup.json
+```
+
+Use this one-liner to remove the old key from the secret:
+
+```bash
+kubectl get secret passwords -o json | jq '.data."values.yaml"="'"$(kubectl get secret passwords -o json | jq '.data."values.yaml"' -r | base64 -d | jq  'del(.tokens)' | base64)"'"' | kubectl apply -f -
+```
+
+Generate new key:
+
+```bash
+bash generate-passwords.bash 
+```
+
+Generate new configuration secrets for each service, restart all services and wait until old pods have disappeared:
+
+```bash
+bash deploy.bash -f ~/values.yaml 
+bash restart.bash 
+watch kubectl get pod
+```
 
 #### OpenID Connect
 
