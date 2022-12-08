@@ -317,7 +317,7 @@ If all services started properly and you are able to log in to Chipster, you can
 rm ~/passwords-backup.json
 ```
 
-If something goes wrong, you can revert to your old passwords. Note! Make sure that you have your original database passwords in `~/passwords-backup.json`, because those are the most difficult to change. If the database passwords are there, you can delete the current secret, apply the old version and deploy the changes:
+If something goes wrong, you can restore your old passwords. Note! Make sure that you have your original database passwords in `~/passwords-backup.json`, because those are the most difficult to change. If the database passwords are there, you can delete the current secret, apply the old version and deploy the changes:
 
 ```
 # Only for reverting to the old passwords!
