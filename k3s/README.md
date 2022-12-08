@@ -281,11 +281,52 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 [Configure Chipster to use TLS](tls.md) (https) to encrypt and validate the network traffic between the browser and the server.
 
 ### Authentication
-### JWT keys
+#### JWT keys
 
 Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
 
-TODO How to generate new keys if the old keys have leaked?
+You can generate a new private key if you want invalidate all current authentication tokens. First take a copy of the current secret `passwords`:
+
+```bash
+kubectl get secret passwords -o json > ~/passwords-backup.json
+```
+
+Use this one-liner to remove the old key from the secret:
+
+```bash
+kubectl get secret passwords -o json | jq '.data."values.yaml"="'"$(kubectl get secret passwords -o json | jq '.data."values.yaml"' -r | base64 -d | jq  'del(.tokens)' | base64)"'"' | kubectl apply -f -
+```
+
+Generate a new key:
+
+```bash
+bash generate-passwords.bash
+```
+
+Generate new configuration secrets for each service, restart all services and wait until old pods have disappeared:
+
+```bash
+bash deploy.bash -f ~/values.yaml
+bash restart.bash 
+watch kubectl get pod
+```
+
+If all services started properly and you are able to log in to Chipster, you can remove the copy of the passwords secret:
+
+```bash
+rm ~/passwords-backup.json
+```
+
+If something goes wrong, you can revert to your old passwords. Note! Make sure that you have your original database passwords in `~/passwords-backup.json`, because those are the most difficult to change. If the database passwords are there, you can delete the current secret, apply the old version and deploy the changes:
+
+```
+# Only for reverting to the old passwords!
+kubectl delete secret passwords
+kubectl apply -f ~/passwords-backup.json
+bash deploy.bash -f ~/values.yaml
+bash restart.bash 
+watch kubectl get pod
+```
 
 #### OpenID Connect
 
