@@ -300,13 +300,13 @@ kubectl get secret passwords -o json | jq '.data."values.yaml"="'"$(kubectl get 
 Generate a new key:
 
 ```bash
-bash generate-passwords.bash 
+bash generate-passwords.bash
 ```
 
 Generate new configuration secrets for each service, restart all services and wait until old pods have disappeared:
 
 ```bash
-bash deploy.bash -f ~/values.yaml 
+bash deploy.bash -f ~/values.yaml
 bash restart.bash 
 watch kubectl get pod
 ```
@@ -315,6 +315,17 @@ If all services started properly and you are able to log in to Chipster, you can
 
 ```bash
 rm ~/passwords-backup.json
+```
+
+If something goes wrong, you can revert to your old passwords. Note! Make sure that you have your original database passwords in `~/passwords-backup.json`, because those are the most difficult to change. If the database passwords are there, you can delete the current secret, apply the old version and deploy the changes:
+
+```
+# Only for reverting to the old passwords!
+kubectl delete secret passwords
+kubectl apply -f ~/passwords-backup.json
+bash deploy.bash -f ~/values.yaml
+bash restart.bash 
+watch kubectl get pod
 ```
 
 #### OpenID Connect
