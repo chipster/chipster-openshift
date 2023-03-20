@@ -217,15 +217,10 @@ deploymentDefault:
 # passwordKey is the YAML path where generate-passwords.bash will store the password
 # we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
 # names with dashes have to be quoted to work in jq
+# TODO we could probably just hard code this now when there is only one database
 databases:
-  auth:
-    passwordKey: "\"auth-postgresql\".postgresqlPassword"
-    enabled: true
-  sessionDb:
-    passwordKey: "\"session-db-postgresql\".postgresqlPassword"
-    enabled: true
-  jobHistory:
-    passwordKey: "\"job-history-postgresql\".postgresqlPassword"
+  postgres:
+    passwordKey: "postgresql.auth.postgresPassword"
     enabled: true
 
 # generate-passwords.bash will generate all serviceAccounts.*.password fields
@@ -251,21 +246,11 @@ tokens:
 
 # Configure depenency subcharts
 
-# the key is the dependency alias in Chart.yaml
-# aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
-auth-postgresql:
-  # postgresqlDatabase is the name of the database
-  postgresqlDatabase: auth_db
+# DB configuration
+postgresql:
   # postgresqlPassword is the database password, see the comment of "databases" section 
-  postgresqlPassword: ""  
-
-session-db-postgresql:
-  postgresqlDatabase: session_db_db
-  postgresqlPassword: ""
-
-job-history-postgresql:
-  postgresqlDatabase: job_history_db
-  postgresqlPassword: ""
+  auth:
+    postgresPassword: ""  
 
 # image is a section for defining how to get the images
 image:
