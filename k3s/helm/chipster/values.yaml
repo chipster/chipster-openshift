@@ -248,9 +248,16 @@ tokens:
 
 # DB configuration
 postgresql:
-  # postgresqlPassword is the database password, see the comment of "databases" section 
+  # postgresPassword is the database password, see the comment of "databases" section 
   auth:
-    postgresPassword: ""  
+    postgresPassword: ""
+  primary:
+    initdb:
+      scripts:
+        "init.sql": |
+          CREATE DATABASE auth_db;
+          CREATE DATABASE session_db_db;
+          CREATE DATABASE job_history_db;
 
 # image is a section for defining how to get the images
 image:
