@@ -100,7 +100,7 @@ cd chipster-openshift/k3s
 
 From now on, please run all commands in this `k3s` directory unless told otherwise.
 
-## Install Docker, K3s, Helm and other utils
+## Install K3s, Helm and other utils
 
 We'll use Docker to build container images. K3s will be configured to also run images with Docker so the images are readily available in Docker after each build.
 
@@ -109,20 +109,6 @@ ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(who
 ```
 
 Soon we'll use `kubectl` command, which requires an environment variable initialised in the `.bashrc` file. Logout and open a new ssh connection to initialise it now.
-
-TODO Replace Docker with a userspace build system, e.g. [Kaniko](https://github.com/GoogleContainerTools/kaniko), and some image repository.
-
-## Test Docker
-
-Check that Docker is running.
-
-```bash
-$ sudo systemctl status docker
-● docker.service - Docker Application Container Engine
-   Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
-   Active: active (running) since Wed 2020-02-12 14:33:24 UTC; 4min 46s ago
----
-```
 
 ## Test `kubectl`
 
