@@ -1,0 +1,87 @@
+{{- if $.Values.databases.auth.hostPath }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-postgresql-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  hostPath:
+    path: /mnt/auth-posgresql
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: auth-pvc-volume-postgres
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-pvc-volume-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: auth-postgresql-pv
+{{- end }}
+{{- if $.Values.databases.sessionDb.hostPath }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: session-db-postgresql-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  hostPath:
+    path: /mnt/session-db-posgresql
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: session-db-pvc-volume-postgres
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: session-db-pvc-volume-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: session-db-postgresql-pv
+{{- end }}
+{{- if $.Values.databases.jobHistory.hostPath }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: job-history-postgresql-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  hostPath:
+    path: /mnt/job-history-posgresql
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: job-history-pvc-volume-postgres
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: job-history-pvc-volume-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: job-history-postgresql-pv
+{{- end }}

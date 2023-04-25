@@ -97,6 +97,13 @@ spec:
           secret:
             defaultMode: 420
             secretName: file-storage
+        {{- if $.Values.deployments.fileStorage.storageHostPath }}
+        - name: storage
+          hostPath:
+            path: {{ $.Values.deployments.fileStorage.storageHostPath }}
+            type: Directory
+        {{- end}}
+  {{- if not $.Values.deployments.fileStorage.storageHostPath }}
   volumeClaimTemplates:
   - metadata:
       labels:
@@ -107,3 +114,4 @@ spec:
       resources:
         requests:
           storage: {{ $.Values.deployments.fileStorage.storageVolumeSize }}
+  {{- end}}

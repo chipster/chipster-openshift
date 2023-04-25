@@ -116,6 +116,8 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    # storageHostPath is the hostPath to store users' files. PVC is used when this is not set.
+    storageHostPath: ""
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
     configs: {}
@@ -218,15 +220,18 @@ deploymentDefault:
 # we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
 # names with dashes have to be quoted to work in jq
 databases:
-  auth:
+  auth:    
     passwordKey: "\"auth-postgresql\".postgresqlPassword"
     enabled: true
+    hostPath: ""
   sessionDb:
     passwordKey: "\"session-db-postgresql\".postgresqlPassword"
     enabled: true
+    hostPath: ""
   jobHistory:
     passwordKey: "\"job-history-postgresql\".postgresqlPassword"
     enabled: true
+    hostPath: ""
 
 # generate-passwords.bash will generate all serviceAccounts.*.password fields
 serviceAccounts:
@@ -257,7 +262,7 @@ auth-postgresql:
   # postgresqlDatabase is the name of the database
   postgresqlDatabase: auth_db
   # postgresqlPassword is the database password, see the comment of "databases" section 
-  postgresqlPassword: ""  
+  postgresqlPassword: ""
 
 session-db-postgresql:
   postgresqlDatabase: session_db_db
