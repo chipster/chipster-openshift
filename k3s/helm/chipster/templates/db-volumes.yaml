@@ -10,7 +10,7 @@ spec:
   capacity:
     storage: 10Gi
   hostPath:
-    path: /mnt/auth-posgresql
+    path: {{ $.Values.databases.auth.hostPath }}
   claimRef:
     namespace: {{ .Release.Namespace }}
     name: auth-pvc-volume-postgres
@@ -39,7 +39,7 @@ spec:
   capacity:
     storage: 10Gi
   hostPath:
-    path: /mnt/session-db-posgresql
+    path: {{ $.Values.databases.sessionDb.hostPath }}
   claimRef:
     namespace: {{ .Release.Namespace }}
     name: session-db-pvc-volume-postgres
@@ -68,7 +68,7 @@ spec:
   capacity:
     storage: 10Gi
   hostPath:
-    path: /mnt/job-history-posgresql
+    path: {{ $.Values.databases.jobHistory.hostPath }}
   claimRef:
     namespace: {{ .Release.Namespace }}
     name: job-history-pvc-volume-postgres

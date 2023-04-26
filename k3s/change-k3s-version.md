@@ -1,14 +1,14 @@
 # Change K3s version
 ## Host path volumes
 
-By default Chipster's Helm templates create Kubernetes volumes (PersistenVolumeClaim, PVC) to store persistent data of databases and file-storage. If you run Chipster on a single node K3s, you may
-want to keep the data directly on the `hostPath` volumes. This allows you to uninstall and reinstall K3s and Chipster without losing the data.
+By default Chipster's storage volumes (PersistenVolumeClaim, PVC) are managed by the K3s. If you would uninstall and reinstall K3s, the new installation wouldn't find the data on your old volumes. When running Chipster on a single node K3s, you may
+want to keep the data directly on the `hostPath` volumes instead. In this case the data is stored in plain directories on the host. This allows you to uninstall and reinstall K3s and Chipster without losing the data.
 
 NOTE! There is no easy way to revert some of these changes if something goes wrong. Make sure you have working backups before starting!
 
 ## Migration, part 1
 
-Take copy of the current passwords:
+Take copy of the current passwords. We will need the database passwords when we later want to connect to current databases.
 
 ```bash
 kubectl get secret passwords -o yaml > ~/chipster-passwords.yaml
@@ -31,7 +31,7 @@ sudo chown ubuntu:ubuntu auth-postgresql session-db-postgresql job-history-postg
 popd
 ```
 
-Configure Chipster to store data in these directories. Unfortunately there are to different configuration paths for the database: one for Chipster to create a hostPath volume (e.g. `databases.auth.hostPath`), and another for the database to use that volume (e.g. 'auth-postgresql.persistence.existingClaim`):
+Configure Chipster to store data in these directories. Unfortunately there are to separate configuration sections for each database: one for Chipster to create a hostPath volume (e.g. `databases.auth.hostPath`), and another for the database itself to use that volume (e.g. 'auth-postgresql.persistence.existingClaim`):
 
 ```yaml
 deployments:
@@ -59,16 +59,9 @@ job-history-postgresql:
     existingClaim: "job-history-pvc-volume-postgres"
 ```
 
-Deploy the new configuration and wait until the old pods have disappeared:
-
-```bash
-bash deploy.bash -f ~/values.yaml
-watch kubectl get pod
-```
-
 ## Migration, part 2
 
-We have to move the old data from the old volume directories in `/mnt/data/k3s/storage/` to the new hostPath directories in `/mnt/data`.
+We have to move the data from the old volume directories in `/mnt/data/k3s/storage/` to the new hostPath directories in `/mnt/data`.
 Unfortunately each old volume directory has an unieque VOLUME_ID in its name. Check the directory names and adjust the `mv` commands accordingly:
 
 ```bash
@@ -83,20 +76,19 @@ sudo mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-auth-postgresql-0/* auth
 popd
 ```
 
-Restart statefulsets (sts, databases and file-storage) and other Chipster deployments. Wait until old pods have disappeared.
+Deploy the new configuration and wait until the all pods have started:
 
 ```bash
-kubectl rollout restart sts
-bash restart.bash
+bash deploy.bash -f ~/values.yaml
 watch kubectl get pod
 ```
 
 Open Chipster and verify that you can see and open the old sessions.
 
-Maybe it would be a good idea to remove the old unused volumes. Make sure once more that folders in `/mnt/data/k3s/storage/` are empty and then delete those:
+It would probably be a good idea to remove the old unused volumes for the sake of clarity. Make sure once again that all folders in `/mnt/data/k3s/storage/` are empty and then delete the volumes:
 
 ```bash
-# WARNING: this will remove your data volumes
+# WARNING: this will remove your data volumes, make sure you have moved your data!
 kubectl delete pvc data-chipster-auth-postgresql-0
 kubectl delete pvc data-chipster-session-db-postgresql-0
 kubectl delete pvc data-chipster-job-history-postgresql-0
@@ -111,16 +103,16 @@ If you have done all the previous steps on this page, you can uninstall K3s:
 /usr/local/bin/k3s-uninstall.sh
 ```
 
+Install the K3s version you want. The default version is defined in the [Ansible playbook](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/ansible/install-deps.yml). For example:
+
+```bash
+ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami) -e k3s_version=v1.26.3+k3s1
+```
+
 Restore the old passwords:
 
 ```bash
 kubectl apply -f ~/chipster-passwords.yaml
-```
-
-Install K3s: TODO how to install different versions?
-
-```bash
-curl -sfL https://get.k3s.io | sh -
 ```
 
 Deploy Chipster (assuming you have settings in `~/values.yaml`):
