@@ -1,12 +1,14 @@
 # Change K3s version
 ## Host path volumes
 
-By default Chipster's storage volumes (PersistenVolumeClaim, PVC) are managed by the K3s. If you would uninstall and reinstall K3s, the new installation wouldn't find the data on your old volumes. When running Chipster on a single node K3s, you may
-want to keep the data directly on the `hostPath` volumes instead. In this case the data is stored in plain directories on the host. This allows you to uninstall and reinstall K3s and Chipster without losing the data.
+By default Chipster's storage volumes (PersistenVolumeClaim, PVC) are managed by the K3s. If you uninstalled and reinstalled K3s, the new installation would not find the data on your old volumes. When running Chipster on a single node K3s, you may
+want to keep the data directly on the `hostPath` volumes instead. Then the data is stored in plain directories on the host. This allows you to uninstall and reinstall K3s and Chipster without losing the data.
 
 NOTE! There is no easy way to revert some of these changes if something goes wrong. Make sure you have working backups before starting!
 
-## Migration, part 1
+## Prepare for migration
+
+If you haven't yet installed Chipster, you can skip this step.
 
 Take copy of the current passwords. We will need the database passwords when we later want to connect to current databases.
 
@@ -14,7 +16,7 @@ Take copy of the current passwords. We will need the database passwords when we 
 kubectl get secret passwords -o yaml > ~/chipster-passwords.yaml
 ```
 
-Chipster must be uninstalled first, because Kubernetes doesn't allow you to change the volume type of `statefulset`. We can still move the data from the volumes later, because this doesn't delete the volumes. If you haven't yet installed Chipster, you can skip this step.
+Chipster must be uninstalled first, because Kubernetes doesn't allow you to change the volume type of `statefulset`. We can still move the data from the volumes later, because this doesn't delete the volumes. 
 
 ```bash
 helm uninstall chipster
@@ -31,7 +33,7 @@ sudo chown ubuntu:ubuntu auth-postgresql session-db-postgresql job-history-postg
 popd
 ```
 
-Configure Chipster to store data in these directories. Unfortunately there are to separate configuration sections for each database: one for Chipster to create a hostPath volume (e.g. `databases.auth.hostPath`), and another for the database itself to use that volume (e.g. 'auth-postgresql.persistence.existingClaim`):
+Configure Chipster to store data in these directories. Add the following configuration to your `~/values.yaml`. Unfortunately there are to separate configuration sections for each database: one for Chipster to create a hostPath volume (e.g. `databases.auth.hostPath`), and another for the database itself to use that volume (e.g. 'auth-postgresql.persistence.existingClaim`):
 
 ```yaml
 deployments:
@@ -59,7 +61,7 @@ job-history-postgresql:
     existingClaim: "job-history-pvc-volume-postgres"
 ```
 
-## Migration, part 2
+## Migrate data
 
 We have to move the data from the old volume directories in `/mnt/data/k3s/storage/` to the new hostPath directories in `/mnt/data`.
 Unfortunately each old volume directory has an unieque VOLUME_ID in its name. Check the directory names and adjust the `mv` commands accordingly:
@@ -67,8 +69,9 @@ Unfortunately each old volume directory has an unieque VOLUME_ID in its name. Ch
 ```bash
 pushd /mnt/data
 
-sudo ls -alh k3s/storage/
+sudo ls -lah k3s/storage/
 
+# replace the VOLUME_IDs and remember to include the asterisk '*' in the end!
 sudo mv k3s/storage/pvc-VOLUME_ID_default_storage-file-storage-0/* file-storage
 sudo mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-job-history-postgresql-0/* job-history-postgresql
 sudo mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-session-db-postgresql-0/* session-db-postgresql
@@ -97,7 +100,7 @@ kubectl delete pvc storage-file-storage-0
 
 ## Reinstall K3s
 
-If you have done all the previous steps on this page, you can uninstall K3s:
+Now your data is stored on the host directories and you have a copy of your database passwords. You can uninstall K3s:
 
 ```bash
 /usr/local/bin/k3s-uninstall.sh
@@ -115,8 +118,9 @@ Restore the old passwords:
 kubectl apply -f ~/chipster-passwords.yaml
 ```
 
-Deploy Chipster (assuming you have settings in `~/values.yaml`):
+Deploy Chipster and wait until the all pods have started (assuming you have your configuration in `~/values.yaml`):
 
 ```bash
 bash deploy.bash -f ~/values.yaml
+watch kubectl get pod
 ```
