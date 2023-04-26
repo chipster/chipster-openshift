@@ -153,7 +153,7 @@ If you are going to maintain a Chipster server, you should subscribe at least to
 
 Before starting the update, please make sure you have the necessary [backups](#backups) in case something goes wrong in this process.
 
-If you plan to maintain a single node Chipster server for a longer period of time, consider storing data on [hostPath volumes](#change-k3s-version.md), which makes it easier to reinstall K3s if ever needed.
+If you plan to maintain a single node Chipster server for a longer period of time, consider storing data on [hostPath volumes](#change-k3s-version), which makes it easier to reinstall K3s if ever needed.
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
