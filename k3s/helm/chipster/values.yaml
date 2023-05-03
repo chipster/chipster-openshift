@@ -221,15 +221,15 @@ deploymentDefault:
 # names with dashes have to be quoted to work in jq
 databases:
   auth:    
-    passwordKey: "\"auth-postgresql\".postgresqlPassword"
+    passwordKey: "\"auth-postgresql\".auth.postgresPassword"
     enabled: true
     hostPath: ""
   sessionDb:
-    passwordKey: "\"session-db-postgresql\".postgresqlPassword"
+    passwordKey: "\"session-db-postgresql\".auth.postgresPassword"
     enabled: true
     hostPath: ""
   jobHistory:
-    passwordKey: "\"job-history-postgresql\".postgresqlPassword"
+    passwordKey: "\"job-history-postgresql\".auth.postgresPassword"
     enabled: true
     hostPath: ""
 
@@ -259,18 +259,21 @@ tokens:
 # the key is the dependency alias in Chart.yaml
 # aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
 auth-postgresql:
+  auth:
   # postgresqlDatabase is the name of the database
-  postgresqlDatabase: auth_db
-  # postgresqlPassword is the database password, see the comment of "databases" section 
-  postgresqlPassword: ""
+    database: auth_db
+    # postgresqlPassword is the database password, see the comment of "databases" section 
+    postgresPassword: ""
 
 session-db-postgresql:
-  postgresqlDatabase: session_db_db
-  postgresqlPassword: ""
+  auth:
+    database: session_db_db
+    postgresPassword: ""
 
 job-history-postgresql:
-  postgresqlDatabase: job_history_db
-  postgresqlPassword: ""
+  auth:
+    database: job_history_db
+    postgresPassword: ""
 
 # image is a section for defining how to get the images
 image:

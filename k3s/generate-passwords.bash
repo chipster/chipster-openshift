@@ -76,6 +76,19 @@ for key in $(yq e $default_values_yaml_path -o=json | jq '.databases | keys[]' -
     name="$key"
     passwordKey=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.passwordKey -r)
     old_password=$(echo "$values_json" | jq .$passwordKey -r)
+
+    # postgres template v8 stored passwords in different path than v12
+    if [[ $old_password == "null" ]]; then
+        oldPasswordKey=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.passwordKey -r | sed 's/.auth.postgresPassword/.postgresqlPassword/')
+        old_password=$(echo "$values_json" | jq .$oldPasswordKey -r)
+
+        if [[ $old_password != "null" ]]; then
+            echo "migrating database password from an old key $oldPasswordKey to new key $passwordKey"
+            values_json=$(echo $values_json | jq ".$passwordKey = \"$old_password\"")
+            values_json=$(echo $values_json | jq "del(.$oldPasswordKey)")
+        fi
+    fi
+    
     if [[ $old_password != "null" ]]; then
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
     else
