@@ -85,7 +85,7 @@ for key in $(yq e $default_values_yaml_path -o=json | jq '.databases | keys[]' -
         if [[ $old_password != "null" ]]; then
             echo "migrating database password from an old key $oldPasswordKey to new key $passwordKey"
             values_json=$(echo $values_json | jq ".$passwordKey = \"$old_password\"")
-            values_json=$(echo $values_json | jq "del(.$oldPasswordKey)")
+            # keep the password also in old path in case the old version is needed in the migration
         fi
     fi
     

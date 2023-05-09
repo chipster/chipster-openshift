@@ -37,3 +37,20 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     alias: job-history-postgresql
     condition: databases.jobHistory.enabled
+
+# dependencies:
+#   - name: postgresql
+#     version: 8.1.4
+#     repository: "https://charts.helm.sh/stable"
+#     alias: auth-postgresql
+#     condition: databases.auth.enabled
+#   - name: postgresql
+#     version: 8.1.4
+#     repository: "https://charts.helm.sh/stable"
+#     alias: session-db-postgresql
+#     condition: databases.sessionDb.enabled
+#   - name: postgresql
+#     version: 8.1.4
+#     repository: "https://charts.helm.sh/stable"
+#     alias: job-history-postgresql
+#     condition: databases.jobHistory.enabled
