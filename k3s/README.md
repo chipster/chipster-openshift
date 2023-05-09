@@ -161,6 +161,8 @@ If you have just installed Chipster, you can simply skim through this chapter no
 
 > 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster. The instructinos below do these updates in the correct order, just be careful not to skip those steps.
 
+> 2023-05-XX Note! The Chipster Helm chart updates now PostgreSQL from version 11 to 14. Please [migrate the data](update-postgres.md) before updating Chipster to keep your users' old sessions. If you want to stay in the old version, please run the following command to switch to another branch where the old version is retained for now: `git switch k3s-postgres11`.
+
 Pull latest changes from the deployment repository.
 
 ```bash
