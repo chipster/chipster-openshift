@@ -47,7 +47,7 @@ psql (PostgreSQL) 14.7
 
 The new database is configured to store data in directory `/bitnami/postgresql/data_14` instead of the old `/bitnami/postgresql/data`. If you open Chipster now, it doesn't show any sessions. 
 
-Let's restore the database dumps, assuming that you saved the .sql files in the home directory.
+Let's restore the database dumps, assuming that you saved the .sql files in the home directory. This will drop the database tables in the new databases, but that shouldn't matter, because the new databases should still be empty after those were just created.
 
 ```bash
 cat ~/auth.sql | kubectl exec -it chipster-auth-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres auth_db'
