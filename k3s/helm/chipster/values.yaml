@@ -265,18 +265,26 @@ auth-postgresql:
     # postgresqlPassword is the database password, see the comment of "databases" section 
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
+  image:
+    tag: 14
 
 session-db-postgresql:
   auth:
     database: session_db_db
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
+  image:
+    tag: 14
+
 
 job-history-postgresql:
   auth:
     database: job_history_db
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
+  image:
+    tag: 14
+
 
 # image is a section for defining how to get the images
 image:
