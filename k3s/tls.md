@@ -27,13 +27,13 @@ Use Ansible playbook to add the Helm repository of cert-manager and install its 
 ansible-playbook ansible/install-tls-deps.yml -i "localhost," -c local -e user=$(whoami)
 ```
 
-Now we only have to install cert-manager itself with Helm:
+Now we only have to install cert-manager itself with Helm. If you have already a previous version of the cert-manager installed, uninstall it first: `helm --namespace cert-manager uninstall cert-manager`.
 
 ```bash
 helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.3.1
+  --version v1.11.0
 ```
 
 ## Rate limits
