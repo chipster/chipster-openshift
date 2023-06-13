@@ -266,7 +266,7 @@ auth-postgresql:
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
-    tag: 14
+    tag: 14.5.0
 
 session-db-postgresql:
   auth:
@@ -274,16 +274,16 @@ session-db-postgresql:
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
-    tag: 14
+    tag: 14.5.0
 
 
-job-history-postgresql:
+job-history-postgresql: 
   auth:
     database: job_history_db
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
-    tag: 14
+    tag: 14.5.0
 
 
 # image is a section for defining how to get the images
