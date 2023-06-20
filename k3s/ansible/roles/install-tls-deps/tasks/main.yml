@@ -7,7 +7,7 @@
   become_user: "{{ user }}"
 
 - name: Install CustomResourceDefinitions
-  shell: kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.crds.yaml
+  shell: kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
 
 - name: Create a namespace for cert-manager
   shell: kubectl create namespace cert-manager | true

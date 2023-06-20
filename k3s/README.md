@@ -108,15 +108,15 @@ If you need to debug this process, you can run the above command with `--debug -
 
 All Chipster configuration options can be found from a file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `helm/chipster/values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs. 
 
-For example, edit your `~/values.yaml` to add the new setting.
+For example, edit your `~/values.yaml` to add the new setting (most tools require one "slot", so this will effectively limit the number of jobs to five).
 
 >Note! The Helm templates now assume that all Chipster configuration values are strings. For example the number 5 here must be enclosed in quotes.
 
 ```yaml
 deployments:
-  comp:
+  scheduler:
     configs:
-      comp-max-jobs: "5"
+      scheduler-bash-max-slots: "5"
 ```
 
 Then deploy Chipster again.
@@ -128,18 +128,20 @@ bash deploy.bash -f ~/values.yaml
 If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value from your own or default `values.yaml`.
 
 ```bash
-bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-jobs=\"10\"
+bash deploy.bash -f ~/values.yaml --set deployments.scheduler.configs.scheduler-bash-max-slots=\"10\"
 ```
 
 You can check that configuration file was changed correctly.
 
 ```bash
-$ bash get-secret.bash comp
+$ bash get-secret.bash scheduler
 url-int-service-locator: http://service-locator
 service-password-comp: "PASSWORD_HIDDEN"    
-comp-max-jobs: 5
+cheduler-bash-max-slots: |-
+  10
 ```
-Restart services.
+
+Restart services to force Chipster to read the configuration files again.
 
 ```bash
 bash restart.bash
@@ -152,6 +154,8 @@ Please note that two-word Chipster service names like `file-broker` are written 
 If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
 
 Before starting the update, please make sure you have the necessary [backups](#backups) in case something goes wrong in this process.
+
+If you plan to maintain a single node Chipster server for a longer period of time, consider storing data on [hostPath volumes](change-k3s-version.md), which makes it easier to reinstall K3s if ever needed.
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 

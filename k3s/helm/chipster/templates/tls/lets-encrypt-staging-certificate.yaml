@@ -2,7 +2,7 @@
 # The certificate object could be created implicitly by adding annotations 
 # to the Ingress object. However, we'll do it now separately, because otherwise 
 # we would repeat the annotations in our each and every ingress
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: chipster-tls-staging
