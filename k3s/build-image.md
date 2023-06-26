@@ -56,7 +56,7 @@ The K3s image registry requires us to use the long image names like `docker-regi
 
 ## Use the new image in a tool
 
-Now we can modify the tool script header to use this image. Follow the [the tool script development instructions](tool-script.dev.md) to see how these scripts can be edited.
+Now we can modify the tool script header to use this image. Follow the [the tool script development instructions](tool-script-dev.md) to see how these scripts can be edited.
 
 For example in the tool [enafetch.R](https://github.com/chipster/chipster-tools/blob/master/tools/common/R/enafetch.R):
 
