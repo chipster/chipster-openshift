@@ -7,7 +7,7 @@ for specific analysis needs or even to a compeletely new field of science.
 We would like to hear how Chipster is used, so we would encourage you to 
 report your use case and your custom solutions for example on the [chipster-tech email list](https://chipster.rahtiapp.fi/contact). You can also fork our [chipster-tools repository](https://github.com/chipster/chipster-tools) in GitHub to publish your changes for others (preferably with an open source license).
 
-[Building a new container image for tool scripts](build-image.md#appendix-2-build-image-for-tools-scripts) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work. 
+[Building a new container image for tool scripts](build-image.md#appendix-2-build-image-for-tool-scripts) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work. 
 
 To allow faster development cycle, these instructions show how to clone the chipster-tools repository to the host and then mount that directory to the toolbox container. This way you can easily edit the files on the host with your preferred editor. We use [Visual Studio Code](https://code.visualstudio.com/) [Remote Explorer](https://code.visualstudio.com/docs/remote/ssh) for our daily tool development work.
 
