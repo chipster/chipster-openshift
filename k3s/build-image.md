@@ -22,6 +22,23 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
+## Change image pull policy
+
+By default scheduler will start new job containers with `imagePullPolicy: Always` to make sure your server will pull new images when they are updated. However, this will cause an error if you try to use your own local image, which does not exists on our remote image registry. In this case you have to change the `imagePullPolicy`:
+
+```yaml
+deployments:
+  scheduler:
+    configs:
+      scheduler-bash-image-pull-policy: "IfNotPresent"
+```
+
+Restart scheduler to apply changes:
+
+```bash
+kubectl rollout restart deployment/toolbox
+```
+
 ## Building your own images
 
 Edit one of the current builds or add a new one:
