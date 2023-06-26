@@ -52,7 +52,7 @@ for build_template in kustomize/builds/*/*.yaml; do
   echo $build
 
   cat $build_template \
-    | yq r - --tojson \
+    | yq e - -o=json \
     | jq .spec.source.dockerfile="$(cat $template_dir/Dockerfile | jq -s -R .)" \
     > $base_dir/$build-bc.yaml
 
@@ -60,8 +60,8 @@ for build_template in kustomize/builds/*/*.yaml; do
   > $base_dir/$build-is.yaml
 
   # modify the object in memory in the write to the same file
-  echo "$(cat $base_dir/kustomization.yaml | yq r - --tojson | jq '.resources += ["'$build-bc.yaml'"]' | yq r - )" > $base_dir/kustomization.yaml
-  echo "$(cat $base_dir/kustomization.yaml | yq r - --tojson | jq '.resources += ["'$build-is.yaml'"]' | yq r - )" > $base_dir/kustomization.yaml  
+  echo "$(cat $base_dir/kustomization.yaml | yq e - -o=json | jq '.resources += ["'$build-bc.yaml'"]' | yq e - )" > $base_dir/kustomization.yaml
+  echo "$(cat $base_dir/kustomization.yaml | yq e - -o=json | jq '.resources += ["'$build-is.yaml'"]' | yq e - )" > $base_dir/kustomization.yaml  
 done
 
 # copy builds-mylly overlay to the build dir in case this deployment uses it
