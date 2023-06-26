@@ -123,16 +123,20 @@ A custom runtime is enabled in a tool script simply by referencing its name:
 
 ## Runtime with local image
 
-By default scheduler will start new job containers with `imagePullPolicy: Always` to make sure your server will pull new images when they are updated. However, this will cause an error if you try to use your own local image, which does not exists on our remote image registry. In this case you have to change the `imagePullPolicy` and restart also `deployment/scheduler`.
+You have to change the [image pull policy](build-image.md#change-image-pull-policy) to use the local images like this:
 
-deployments:
-  scheduler:
-    configs:
-      scheduler-bash-image-pull-policy: "IfNotPresent"
+```yaml
   toolbox:
     configs:
       toolbox-runtime-command-R-4.1.1-asv: /opt/chipster/tools/R-4.1.1-asv/bin/R
       toolbox-runtime-image-R-4.1.1-asv: comp-20.04-asv
+```
+
+Restart toolbox to apply changes:
+
+```bash
+kubectl rollout restart deployment/toolbox
+```
 
 ## Manual pages
 
