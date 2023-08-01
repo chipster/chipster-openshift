@@ -191,26 +191,66 @@ I have no name!@service-locator-cb95969c5-fxdgz:/opt/chipster$ curl http://auth
 HTTP 404 Not Found
 ```
 
-List ingresses
+Show IngressRoute. Usually Kubernetes routes would be configured with plain `Ingress` objects, but Traefik in K3s uses its own object type `IngressRoute`.
+
 ```bash
-$ kubectl get ingress
-NAME                HOSTS   ADDRESS        PORTS   AGE
-session-worker      *       192.168.15.5   80      64m
-scheduler           *       192.168.15.5   80      64m
-type-service        *       192.168.15.5   80      64m
-job-history         *       192.168.15.5   80      64m
-auth                *       192.168.15.5   80      64m
-service-locator     *       192.168.15.5   80      64m
-session-db          *       192.168.15.5   80      64m
-comp                *       192.168.15.5   80      64m
-file-broker         *       192.168.15.5   80      64m
-toolbox             *       192.168.15.5   80      64m
-backup              *       192.168.15.5   80      64m
-session-db-events   *       192.168.15.5   80      64m
-web-server          *       192.168.15.5   80      64m
+$ kubectl describe ingressroute
+Name:         chipster
+Namespace:    default
+Labels:       app=chipster
+              app.kubernetes.io/managed-by=Helm
+Annotations:  meta.helm.sh/release-name: chipster
+              meta.helm.sh/release-namespace: default
+API Version:  traefik.containo.us/v1alpha1
+Kind:         IngressRoute
+Metadata:
+  Creation Timestamp:  2023-06-27T08:10:37Z
+  Generation:          1
+  Managed Fields:
+    API Version:  traefik.containo.us/v1alpha1
+    Fields Type:  FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .:
+          f:meta.helm.sh/release-name:
+          f:meta.helm.sh/release-namespace:
+        f:labels:
+          .:
+          f:app:
+          f:app.kubernetes.io/managed-by:
+      f:spec:
+        .:
+        f:entryPoints:
+        f:routes:
+    Manager:         helm
+    Operation:       Update
+    Time:            2023-06-27T08:10:37Z
+  Resource Version:  803
+  UID:               cd0a4321-02fd-463b-8a0c-9d5675514ea3
+Spec:
+  Entry Points:
+    web
+  Routes:
+    Kind:   Rule
+    Match:  PathPrefix(`/auth`)
+    Middlewares:
+      Name:  chipster-stripprefix
+    Services:
+      Name:  auth
+      Port:  80
+    Kind:    Rule
+    Match:   PathPrefix(`/auth-admin`)
+    Middlewares:
+      Name:  chipster-stripprefix
+    Services:
+      Name:  auth-admin
+      Port:  80
+    Kind:    Rule
+    ...
 ```
 
-Finally you can check that you can connect to your ingress from your laptop. If everything works, the Rest API should respond with `HTTP 404` again.
+Finally you can check that you can connect to your IngressRoute from your laptop. If everything works, the Rest API should respond with `HTTP 404` again. 
 
 ```bash
 $ curl http://HOST_ADDRESS/auth
