@@ -247,7 +247,7 @@ Spec:
       Name:  auth-admin
       Port:  80
     Kind:    Rule
-    ...
+...
 ```
 
 Finally you can check that you can connect to your IngressRoute from your laptop. If everything works, the Rest API should respond with `HTTP 404` again. 
