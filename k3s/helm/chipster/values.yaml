@@ -72,7 +72,7 @@ deployments:
     eventsPort: 8005
     workDir: /opt/chipster
     password: ""
-    configs: 
+    configs:
     # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback: false
     replicas: ""
@@ -130,7 +130,7 @@ deployments:
     class: ""
     image: toolbox
     apiPort: 8008
-    adminPort: 8108    
+    adminPort: 8108
     eventsPort: ""
     # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
     workDir: /opt/chipster/toolbox
@@ -220,16 +220,16 @@ deploymentDefault:
 # we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
 # names with dashes have to be quoted to work in jq
 databases:
-  auth:    
-    passwordKey: "\"auth-postgresql\".auth.postgresPassword"
+  auth:
+    passwordKey: '"auth-postgresql".auth.postgresPassword'
     enabled: true
     hostPath: ""
   sessionDb:
-    passwordKey: "\"session-db-postgresql\".auth.postgresPassword"
+    passwordKey: '"session-db-postgresql".auth.postgresPassword'
     enabled: true
     hostPath: ""
   jobHistory:
-    passwordKey: "\"job-history-postgresql\".auth.postgresPassword"
+    passwordKey: '"job-history-postgresql".auth.postgresPassword'
     enabled: true
     hostPath: ""
 
@@ -260,13 +260,15 @@ tokens:
 # aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
 auth-postgresql:
   auth:
-  # postgresqlDatabase is the name of the database
+    # postgresqlDatabase is the name of the database
     database: auth_db
-    # postgresqlPassword is the database password, see the comment of "databases" section 
+    # postgresqlPassword is the database password, see the comment of "databases" section
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.5.0
+  persistence:
+    storageClass: local-path
 
 session-db-postgresql:
   auth:
@@ -275,16 +277,18 @@ session-db-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.5.0
+  persistence:
+    storageClass: local-path
 
-
-job-history-postgresql: 
+job-history-postgresql:
   auth:
     database: job_history_db
     postgresPassword: ""
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.5.0
-
+  persistence:
+    storageClass: local-path
 
 # image is a section for defining how to get the images
 image:
@@ -294,14 +298,14 @@ image:
   chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images/
 
 # securityContext sets the access rights of the container user
-securityContext: 
+securityContext:
   runAsNonRoot: true
   runAsUser: 1000
 
 # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
 
 # podSecurityContext allows you set fsGroup: 0, if the file permissions prevent containers to modify volumes
 podSecurityContext: {}
@@ -324,7 +328,6 @@ tools:
   # manualHostPath where from manual pages are mounted . By default manual pages from the image are used.
   manualHostPath: ""
 
-
 html:
   # hostPath where from the html pages are mounted. By default html pages from the image are used.
   hostPath: ""
@@ -342,9 +345,9 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-
 # resources are not used in the templates yet. We would need separate definitions for different kind of services
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
