@@ -263,14 +263,21 @@ auth-postgresql:
   postgresqlDatabase: auth_db
   # postgresqlPassword is the database password, see the comment of "databases" section 
   postgresqlPassword: ""
+  persistence:
+    storageClass: local-path
 
 session-db-postgresql:
   postgresqlDatabase: session_db_db
   postgresqlPassword: ""
+  persistence:
+    storageClass: local-path
+  
 
 job-history-postgresql:
   postgresqlDatabase: job_history_db
   postgresqlPassword: ""
+  persistence:
+    storageClass: local-path
 
 # image is a section for defining how to get the images
 image:

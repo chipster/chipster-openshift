@@ -111,6 +111,7 @@ spec:
       name: storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: local-path
       resources:
         requests:
           storage: {{ $.Values.deployments.fileStorage.storageVolumeSize }}
