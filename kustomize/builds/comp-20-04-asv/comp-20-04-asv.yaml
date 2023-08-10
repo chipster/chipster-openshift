@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-20.04-python
-  name: comp-20.04-python
+    build: comp-20-04-asv
+  name: comp-20-04-asv
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-20.04-python:latest
+      name: comp-20-04-asv:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-20.04:latest
+        name: comp-20-04-r-deps:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

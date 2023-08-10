@@ -1,4 +1,4 @@
-FROM comp-20.04-r-deps
+FROM comp-20-04-r-deps
 
 RUN ls -lah /opt/chipster/tools
 

@@ -1,4 +1,4 @@
-FROM base-java-16.04
+FROM base-java-16-04
 
 RUN apt-get update -y \ 
 && apt-get install -y \  
