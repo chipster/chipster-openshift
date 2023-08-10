@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-20.04-phyloseq
-  name: comp-20.04-phyloseq
+    build: base-java-16-04
+  name: base-java-16-04
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-20.04-phyloseq:latest
+      name: base-java-16-04:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,9 +19,8 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-20.04-r-deps:latest
+        name: base-16-04:latest
     type: Docker
-  successfulBuildsHistoryLimit: 5
   triggers:
   - type: ConfigChange
   - imageChange:

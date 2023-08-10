@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-20.04-fastqc
-  name: comp-20.04-fastqc
+    build: comp-20-04-python
+  name: comp-20-04-python
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-20.04-fastqc:latest
+      name: comp-20-04-python:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-20.04-r-deps:latest
+        name: comp-20-04:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

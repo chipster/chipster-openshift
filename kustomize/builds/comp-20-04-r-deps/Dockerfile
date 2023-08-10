@@ -1,4 +1,4 @@
-FROM comp-20.04
+FROM comp-20-04
 
 # packages for R
 # libssl-dev, libpng-dev and libxml2-dev required by Seurat and DESeq2, but probably by many other packages too
