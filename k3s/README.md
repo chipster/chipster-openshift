@@ -159,7 +159,7 @@ If you plan to maintain a single node Chipster server for a longer period of tim
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
-If you have just installed Chipster, you can simply skim through this chapter now and return here when it's time to update your installation.
+Even if you have just installed Chipster, you should follow this Chipster to specify the container image version. It ensures that all container images are from the same Chipster version and compatible together.
 
 > 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster. The instructinos below do these updates in the correct order, just be careful not to skip those steps.
 
@@ -180,6 +180,13 @@ Check if new passwords need to be generated:
 ```bash
 cd git/chipster-openshift/k3s
 bash generate-passwords.bash
+```
+
+Check the [latest image version](https://raw.githubusercontent.com/chipster/chipster-openshift/master/k3s/image-tags.txt) and configure it in your `~/values.yaml`:
+
+```yaml
+images:
+  tag: v4.6.10
 ```
 
 Pull the latest images:
