@@ -120,6 +120,7 @@ deployments:
     storageHostPath: ""
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
+    storageClassName: ""
     configs: {}
     replicas: ""
     adminRoute: "default"
@@ -267,8 +268,6 @@ auth-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.5.0
-  persistence:
-    storageClass: local-path
 
 session-db-postgresql:
   auth:
@@ -277,8 +276,6 @@ session-db-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.5.0
-  persistence:
-    storageClass: local-path
 
 job-history-postgresql:
   auth:
@@ -287,8 +284,6 @@ job-history-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.5.0
-  persistence:
-    storageClass: local-path
 
 # image is a section for defining how to get the images
 image:
@@ -296,6 +291,7 @@ image:
   localPullPolicy: IfNotPresent
   #localPullPolicy: Never
   chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images/
+  tag: latest
 
 # securityContext sets the access rights of the container user
 securityContext:
@@ -338,8 +334,9 @@ tls:
   # email is the address where Let's Encrypt sends expiration notifications, when the automatic certificate renewal fails.
   email: ""
 
-# ingress is sectino for the optional https configuration
+# ingress is section for the optional https configuration
 ingress:
+  kind: IngressRoute
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

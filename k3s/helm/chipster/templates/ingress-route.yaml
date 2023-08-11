@@ -1,0 +1,139 @@
+{{- if eq .Values.ingress.kind "IngressRoute" }}
+---
+# http/websocket reverse proxy for making Chipster APIs accessible
+# from the internet
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: chipster
+  labels:
+    app: chipster
+spec:
+  {{- if or (eq $.Values.tls.env "prod") (eq $.Values.tls.env "staging") }}
+  tls:
+    {{- if eq $.Values.tls.env "prod" }}
+    # Let's Encrypt production certificate
+    secretName: chipster-tls
+    {{- else if eq $.Values.tls.env "staging" }}
+    # Let's Encrypt staging certificate
+    secretName: chipster-tls-staging
+    {{- end }}
+  {{- end }}
+  entryPoints:
+    {{- if $.Values.tls.env }}
+    - websecure
+    {{- else }}
+    - web
+    {{- end }}
+  routes:
+    {{- range $deploymentKey, $deployment := .Values.deployments }}
+    {{- if ne $deployment.name "file-storage" }}
+    {{- if ne $deployment.name "single-shot-comp" }}
+    {{- if eq $deployment.name "web-server" }}
+    - match: PathPrefix(`/`)
+    {{ else }}
+    - match: PathPrefix(`/{{ $deployment.name }}`)
+    {{- end }}
+      kind: Rule
+      services:
+        - name: {{ $deployment.name }}
+          port: 80
+      middlewares:
+        - name: chipster-stripprefix
+    # create admin route
+    # if enabled for this deployment or using default config and it's enabled
+    {{- if or (eq $deployment.adminRoute "enable") (and (eq $deployment.adminRoute "default") (eq $.Values.deploymentDefault.adminRoute "enable")) }}
+    - match: PathPrefix(`/{{ $deployment.name }}-admin`)    
+      kind: Rule
+      services:
+        - name: {{ $deployment.name }}-admin
+          port: 80
+      middlewares:
+        - name: chipster-stripprefix
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    - match: PathPrefix(`/session-db-events`)    
+      kind: Rule
+      services:
+        - name: session-db-events
+          port: 80
+      middlewares:
+        - name: chipster-stripprefix
+
+
+{{- if $.Values.tls.env }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: TLSOption
+metadata:
+  # Configuration for a special name tlsoption/default which affects also when
+  # none of the routes match. For example, non-sni request using plain IP address
+  # to port 443 would respond with Traefik's self-signed certificate. Also the 
+  # ssllabs.com complained about inscecure TLS versions and ciphers. 
+  # Now the non-sni request produces a clear protocol error and ssllabs.com is 
+  # happy too.
+  # https://doc.traefik.io/traefik/https/tls/#tls-options
+  name: default
+spec:
+  minVersion: VersionTLS12
+  cipherSuites:
+    # from Traefik migration example and looks good also in sslabs.com
+    - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+    - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  sniStrict: true
+{{- end }}
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: chipster-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      # names with prefixes (-events, -admin) has to be first to match before the short name (or we could create own middleware for each route)
+      - /session-db-events
+    {{- range $deploymentKey, $deployment := .Values.deployments }}
+    {{- if ne $deployment.name "file-storage" }}
+    {{- if ne $deployment.name "single-shot-comp" }}
+      - /{{ $deployment.name }}-admin
+      - /{{ $deployment.name }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+
+{{- if $.Values.tls.env }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: chipster-http-redirect
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`{{ $.Values.host }}`)
+      kind: Rule
+      services:
+        - name: web-server
+          port: 80
+      middlewares:
+        - name: chipster-https-redirect
+{{- end }}
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: chipster-https-redirect
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: false
+{{- end }}
