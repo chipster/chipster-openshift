@@ -12,3 +12,7 @@ spec:
         kind: DockerImage
         name: 'ubuntu:20.04'
       name: '20.04'
+    - from:
+        kind: DockerImage
+        name: 'ubuntu:16.04'
+      name: '16.04'
