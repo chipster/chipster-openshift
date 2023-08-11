@@ -171,23 +171,10 @@ Pull latest changes from the deployment repository.
 git pull
 ```
 
-Install latest package repositories etc. This will also install the latest K3s and Helm.
+Install latest package repositories etc. This will also install the latest K3s (compatible with Chipster) and Helm.
 
 ```bash
 ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami)
-```
-
-Update operating system packages on the host (including Docker and Ansible).
-
-```bash
-sudo apt update
-sudo apt upgrade -y
-```
-
-Restart the server to make sure all new packages are taken in use.
-
-```bash
-sudo shutdown -r 0
 ```
 
 Check if new passwords need to be generated:
@@ -197,28 +184,23 @@ cd git/chipster-openshift/k3s
 bash generate-passwords.bash
 ```
 
-Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. 
+Pull the latest images:
 
 ```bash
-bash deploy.bash -f ~/values.yaml --set image.localPullPolicy=Always
+bash pull-images.bash
 ```
 
-Wait until all deployments have tried to start at least once, which triggers the pull of the latest image.
+Update operating system packages on the host (including Ansible).
 
 ```bash
-watch kubectl get pod
+sudo apt update
+sudo apt upgrade -y
 ```
 
-Put back the default pull policy `IfNotPresent`, so that you can restart pods without pulling images in every restart. 
+Restart the server to make sure all new packages and images are taken in use.
 
 ```bash
-bash deploy.bash -f ~/values.yaml
-```
-
-Restart all pods.
-
-```bash
-bash restart.bash
+sudo shutdown -r 0
 ```
 
 See also the next chapter for instructions how to update the tools-bin package.
