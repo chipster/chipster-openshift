@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-r-4-2-3
-  name: comp-r-4-2-3
+    build: comp-20-04-fastqc
+  name: comp-20-04-fastqc
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-r-4-2-3:latest
+      name: comp-20-04-fastqc:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial

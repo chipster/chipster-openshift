@@ -1,4 +1,4 @@
-FROM base-16.04
+FROM base-16-04
 
 RUN apt-get update -y \
 	&& apt-get install -y software-properties-common apt-transport-https \

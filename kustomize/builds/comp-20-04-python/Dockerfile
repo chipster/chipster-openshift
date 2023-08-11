@@ -1,4 +1,4 @@
-FROM comp-20.04
+FROM comp-20-04
 
 RUN apt update -qq -y \ 
 && apt install -y python3 \
