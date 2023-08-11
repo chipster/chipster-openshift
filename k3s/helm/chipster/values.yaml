@@ -120,6 +120,7 @@ deployments:
     storageHostPath: ""
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
+    storageClassName: ""
     configs: {}
     replicas: ""
     adminRoute: "default"
@@ -263,21 +264,14 @@ auth-postgresql:
   postgresqlDatabase: auth_db
   # postgresqlPassword is the database password, see the comment of "databases" section 
   postgresqlPassword: ""
-  persistence:
-    storageClass: local-path
 
 session-db-postgresql:
   postgresqlDatabase: session_db_db
-  postgresqlPassword: ""
-  persistence:
-    storageClass: local-path
-  
+  postgresqlPassword: ""  
 
 job-history-postgresql:
   postgresqlDatabase: job_history_db
   postgresqlPassword: ""
-  persistence:
-    storageClass: local-path
 
 # image is a section for defining how to get the images
 image:
@@ -285,6 +279,7 @@ image:
   localPullPolicy: IfNotPresent
   #localPullPolicy: Never
   chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images/
+  tag: latest
 
 # securityContext sets the access rights of the container user
 securityContext: 
@@ -328,8 +323,9 @@ tls:
   # email is the address where Let's Encrypt sends expiration notifications, when the automatic certificate renewal fails.
   email: ""
 
-# ingress is sectino for the optional https configuration
+# ingress is section for the optional https configuration
 ingress:
+  kind: IngressRoute
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
