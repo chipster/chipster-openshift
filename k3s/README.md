@@ -149,6 +149,41 @@ bash restart.bash
 
 Please note that two-word Chipster service names like `file-broker` are written with `camelCase` in the `deployments` map, i.e. `fileBroker` to make them easier to use in Helm templates.
 
+### Specify container image version
+
+By default Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. Some tools have their own images, so those are pulled only when that particular tool is run. If you don't specify the image version, the newer tool image may not be compatible with your other Chipster services started from the older images. 
+
+Check the [latest image version](https://raw.githubusercontent.com/chipster/chipster-openshift/master/k3s/image-tags.txt) and configure it in your `~/values.yaml`:
+
+```yaml
+images:
+  tag: v4.6.10
+```
+
+Pull the configured images:
+
+```bash
+bash pull-images.bash
+```
+
+Configure Chipster to use that image version:
+
+```bash
+bash deploy.bash -f ~/values.yaml
+```
+
+Restart Chispter containers to take those new images in use:
+
+```bash
+bash restart.bash
+```
+
+If you want to know when the restarts are over, follow the pod listing until all old pods have disappeared. You can close the `watch` by pressing Ctrl+C.
+
+```bash
+watch kubectl get pod
+```
+
 ### Updates
 
 If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
@@ -158,8 +193,6 @@ Before starting the update, please make sure you have the necessary [backups](#b
 If you plan to maintain a single node Chipster server for a longer period of time, consider storing data on [hostPath volumes](change-k3s-version.md), which makes it easier to reinstall K3s if ever needed.
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
-
-Even if you have just installed Chipster, you should follow this Chipster to specify the container image version. It ensures that all container images are from the same Chipster version and compatible together.
 
 > 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster. The instructinos below do these updates in the correct order, just be careful not to skip those steps.
 
@@ -184,18 +217,8 @@ cd git/chipster-openshift/k3s
 bash generate-passwords.bash
 ```
 
-Check the [latest image version](https://raw.githubusercontent.com/chipster/chipster-openshift/master/k3s/image-tags.txt) and configure it in your `~/values.yaml`:
+If there is a newer [Chipster container image version](#specify-container-image-version) available, configure and deploy it. You don't have to restart the containers, because we will soon restart the whole server, which will force also the containers to restart.
 
-```yaml
-images:
-  tag: v4.6.10
-```
-
-Pull the latest images:
-
-```bash
-bash pull-images.bash
-```
 
 Update operating system packages on the host (including Ansible).
 
@@ -204,7 +227,7 @@ sudo apt update
 sudo apt upgrade -y
 ```
 
-Restart the server to make sure all new packages and images are taken in use.
+Restart the server to make sure all new packages taken in use.
 
 ```bash
 sudo shutdown -r 0
@@ -216,11 +239,11 @@ See also the next chapter for instructions how to update the tools-bin package.
 
 The tools-bin package contains most of the Chipster analysis tool program binaries and all reference data. Its size is about 500 GB and it has hundreds of thousands files. Its download can be challenging if the internet connection is less than perfect and also simply creating so many files may take hours on some high-latency file systems.
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest  tools-bin version. 
+When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest tools-bin version. 
 
 There are two ways to download the tools-bin. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
 
-To let the deployment scripts do the download, simply run the deployment again, but set the tools-bin version this time. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version.
+To let the deployment scripts do the download, simply configure the tools-bin version and run the deployment again. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It means only that the tools-bin package hasn't changed since that version.
 
 Set the tools-bin version in your `~/values.yaml`.
 
