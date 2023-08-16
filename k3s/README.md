@@ -153,11 +153,23 @@ Please note that two-word Chipster service names like `file-broker` are written 
 
 By default Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. Some tools have their own images, so those are pulled only when that particular tool is run. If you don't specify the image version, the newer tool image may not be compatible with your other Chipster services started from the older images. 
 
-Check the [latest image version](https://raw.githubusercontent.com/chipster/chipster-openshift/master/k3s/image-tags.txt) and configure it in your `~/values.yaml`:
+Run the following command to see what image vesions are available. For examle, the output could look something like this:
+
+```bash
+$ curl -s https://docker-registry.rahti.csc.fi/v2/chipster-images-beta/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r
+latest
+v4.7.0-rc1
+v4.7.0-rc2
+v4.7.0
+v4.6.0
+```
+
+Select the newest version, which doesn't have letters "-rc" (for release candidate).
+Configure it in your `~/values.yaml`:
 
 ```yaml
 images:
-  tag: v4.6.10
+  tag: v4.7.0
 ```
 
 Pull the configured images:
