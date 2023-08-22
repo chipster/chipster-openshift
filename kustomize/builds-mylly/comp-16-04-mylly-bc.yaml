@@ -2,19 +2,19 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-16.04-mylly
-  name: comp-16.04-mylly
+    build: comp-16-04-mylly
+  name: comp-16-04-mylly
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-16.04-mylly:latest
+      name: comp-16-04-mylly:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
   source:
     dockerfile: |
-      FROM comp-16.04
+      FROM comp-16-04
 
       RUN apt-get update -y \ 
         && apt-get install -y python-pip python3-setuptools python3-dev python3-pip \
@@ -40,7 +40,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-16.04:latest
+        name: comp-16-04:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
