@@ -168,7 +168,7 @@ Select the newest version, which doesn't have letters "-rc" (short for "release 
 Configure it in your `~/values.yaml`:
 
 ```yaml
-images:
+image:
   tag: v4.7.0
 ```
 
@@ -225,7 +225,6 @@ ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(who
 Check if new passwords need to be generated:
 
 ```bash
-cd git/chipster-openshift/k3s
 bash generate-passwords.bash
 ```
 
@@ -239,7 +238,7 @@ sudo apt update
 sudo apt upgrade -y
 ```
 
-Restart the server to make sure all new packages taken in use.
+Restart the server to make sure all new packages are taken in use.
 
 ```bash
 sudo shutdown -r 0
