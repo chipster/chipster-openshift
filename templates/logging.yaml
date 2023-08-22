@@ -48,7 +48,13 @@ objects:
                 failureThreshold: 3
                 successThreshold: 1
                 timeoutSeconds: 5
-              resources: {}
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 2Gi
+                requests:
+                  cpu: 2
+                  memory: 2Gi
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
               volumeMounts:
