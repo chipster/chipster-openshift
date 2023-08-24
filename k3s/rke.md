@@ -117,10 +117,6 @@ Create file `~/values.yaml`:
 ```yaml
 host: PUBLIC_IP_OR_HOST_NAME
 
-image:
-  localPullPolicy: Always
-  chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images-beta/
-
 ingress:
   kind: Ingress
 
