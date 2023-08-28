@@ -37,9 +37,9 @@ deployments:
     configs:
         auth-oidc-issuer-google: https://accounts.google.com
         auth-oidc-client-id-google: CLIENT_ID
-        auth-oidc-logo-google: /assets/btn_google_signin_light_normal_web@2x_without_borders.png
-        auth-oidc-priority-google: 1
-        auth-oidc-verified-email-only-google: true
+        auth-oidc-logo-google: /assets/html/login/btn_google_signin_light_normal_web@2x.png
+        auth-oidc-priority-google: "1"
+        auth-oidc-verified-email-only-google: "true"
         auth-oidc-user-id-prefix-google: google
 ```
 
