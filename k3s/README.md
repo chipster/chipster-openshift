@@ -186,9 +186,9 @@ Check if new passwords need to be generated:
 bash generate-passwords.bash
 ```
 
-In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. Some tools have their own images, so those would be pulled only when that particular tool is run. If you don't specify the image version, the newer tool image may not be compatible with your other Chipster services started from the older images. 
+In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. 
 
-Run the following command to see what image versions are available. For examle, the output could look something like this:
+Run the following command to see what image versions are available. For example, the output could look something like this:
 
 ```bash
 $ curl -s https://docker-registry.rahti.csc.fi/v2/chipster-images-release/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r
@@ -199,15 +199,14 @@ v4.7.0
 v4.6.0
 ```
 
-Select the newest version, which doesn't have letters "-rc" (short for "release candidate").
-Configure it in your `~/values.yaml`. Keep it there until you update your Chipster version next time.
+Select the newest version, which doesn't have letters "-rc" (short for "release candidate"). Configure it in your `~/values.yaml`. Keep it there until it's time to update to the next Chipster version.
 
 ```yaml
 image:
   tag: v4.7.0
 ```
 
-Pull the configured images:
+Pull the configured images to make sure your installation keeps working even if our image repository isn't available:
 
 ```bash
 bash pull-images.bash
@@ -219,7 +218,7 @@ Configure Chipster to use that image version. This will be taken in use soon aft
 bash deploy.bash -f ~/values.yaml
 ```
 
-Update operating system packages on the host (including Ansible). These commands give you the latest updates of the current Ubuntu 20.04. Ubuntu releases LTS (Long Term Support) versions every two years and each version receives updates for five years. We minimize migration work by skipping every other LTS release. For example, we are using now Ubuntu 20.04 and plan to upgrade to Ubuntu 24.04 after it is released in April 2024. We'll send a notification on the [chipster-tech email list](https://chipster.rahtiapp.fi/contact) when we have tested the migration. Until then we recommend staying in the current Ubuntu 20.04 version.
+Update operating system packages on the host (including Ansible). These commands give you the latest updates of the Ubuntu 20.04. Our plan is to migrate next to Ubuntu 24.04 after it's released. We recommend staying in the Ubuntu version 20.04 until we have tested the migration.
 
 TODO Prevent Ubuntu from advertising `do-release-upgrade` at login?
 
@@ -228,7 +227,7 @@ sudo apt update
 sudo apt upgrade -y
 ```
 
-Restart the server to make sure all new packages and containers images are taken in use.
+Restart the server to make sure all new packages and container images are taken in use.
 
 ```bash
 sudo shutdown -r 0
