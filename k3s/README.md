@@ -151,52 +151,11 @@ Please note that two-word Chipster service names like `file-broker` are written 
 
 ### Specify container image version
 
-By default Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. Some tools have their own images, so those are pulled only when that particular tool is run. If you don't specify the image version, the newer tool image may not be compatible with your other Chipster services started from the older images. 
-
-Run the following command to see what image versions are available. For examle, the output could look something like this:
-
-```bash
-$ curl -s https://docker-registry.rahti.csc.fi/v2/chipster-images-release/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r
-latest
-v4.7.0-rc1
-v4.7.0-rc2
-v4.7.0
-v4.6.0
-```
-
-Select the newest version, which doesn't have letters "-rc" (short for "release candidate").
-Configure it in your `~/values.yaml`:
-
-```yaml
-image:
-  tag: v4.7.0
-```
-
-Pull the configured images:
-
-```bash
-bash pull-images.bash
-```
-
-Configure Chipster to use that image version:
-
-```bash
-bash deploy.bash -f ~/values.yaml
-```
-
-Restart Chipster containers to take those new images in use:
-
-```bash
-bash restart.bash
-```
-
-If you want to know when the restarts are over, follow the pod listing until all old pods have disappeared. You can close the `watch` by pressing Ctrl+C.
-
-```bash
-watch kubectl get pod
-```
-
+See the next chapter.
 ### Updates
+
+Even if you have just installed a new Chipster server, it's recommended to follow this chapter. It includes instructions for specifying a container image version and pulling
+all images, which makes sure your Chipster installation doesn't break when new versions are released.
 
 If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
 
@@ -213,6 +172,7 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 Pull latest changes from the deployment repository.
 
 ```bash
+cd ~/git/chipster-openshift/k3s
 git pull
 ```
 
@@ -228,17 +188,49 @@ Check if new passwords need to be generated:
 bash generate-passwords.bash
 ```
 
-If there is a newer [Chipster container image version](#specify-container-image-version) available, configure and deploy it. You don't have to restart the containers, because we will soon restart the whole server, which will force also the containers to restart.
+In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. Some tools have their own images, so those would be pulled only when that particular tool is run. If you don't specify the image version, the newer tool image may not be compatible with your other Chipster services started from the older images. 
 
+Run the following command to see what image versions are available. For examle, the output could look something like this:
 
-Update operating system packages on the host (including Ansible).
+```bash
+$ curl -s https://docker-registry.rahti.csc.fi/v2/chipster-images-release/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r
+latest
+v4.7.0-rc1
+v4.7.0-rc2
+v4.7.0
+v4.6.0
+```
+
+Select the newest version, which doesn't have letters "-rc" (short for "release candidate").
+Configure it in your `~/values.yaml`. Keep it there until you update your Chipster version next time.
+
+```yaml
+image:
+  tag: v4.7.0
+```
+
+Pull the configured images:
+
+```bash
+bash pull-images.bash
+```
+
+Configure Chipster to use that image version. This will be taken in use soon after the Ubuntu reboot forces containers to restart.
+
+```bash
+bash deploy.bash -f ~/values.yaml
+```
+
+Update operating system packages on the host (including Ansible). These commands give you the latest updates of the current Ubuntu 20.04. Ubuntu releases LTS (Long Term Support) versions every two years and each version receives updates for five years. We minimize migration work by skipping every other LTS release. For example, we are using now Ubuntu 20.04 and plan to upgrade to Ubuntu 24.04 after it is released in April 2024. We'll send a notification on the [chipster-tech email list](https://chipster.rahtiapp.fi/contact) when we have tested the migration. Until then we recommend staying in the current Ubuntu 20.04 version.
+
+TODO Prevent Ubuntu from advertising `do-release-upgrade` at login?
 
 ```bash
 sudo apt update
 sudo apt upgrade -y
 ```
 
-Restart the server to make sure all new packages are taken in use.
+Restart the server to make sure all new packages and containers images are taken in use.
 
 ```bash
 sudo shutdown -r 0
