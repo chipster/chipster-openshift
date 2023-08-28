@@ -47,7 +47,7 @@ spec:
           env:
             - name: JAVA_CLASS
               value: {{ $.Values.deployments.fileStorage.class }}
-          image: {{$.Values.image.chipsterImageRepo}}{{ $.Values.deployments.fileStorage.image }}
+          image: {{$.Values.image.chipsterImageRepo}}{{ $.Values.deployments.fileStorage.image }}:{{$.Values.image.tag}}
           # pull policy for Chipster images
           imagePullPolicy: {{ $.Values.image.localPullPolicy }}
           name: file-storage
@@ -78,7 +78,7 @@ spec:
               name: storage
       initContainers:
         - name: chown-storage-dir
-          image: {{$.Values.image.chipsterImageRepo}}{{ $.Values.deployments.fileStorage.image }}
+          image: {{$.Values.image.chipsterImageRepo}}{{ $.Values.deployments.fileStorage.image }}:{{$.Values.image.tag}}
           command:
           - chown
           - -R
@@ -97,6 +97,13 @@ spec:
           secret:
             defaultMode: 420
             secretName: file-storage
+        {{- if $.Values.deployments.fileStorage.storageHostPath }}
+        - name: storage
+          hostPath:
+            path: {{ $.Values.deployments.fileStorage.storageHostPath }}
+            type: Directory
+        {{- end}}
+  {{- if not $.Values.deployments.fileStorage.storageHostPath }}
   volumeClaimTemplates:
   - metadata:
       labels:
@@ -104,6 +111,10 @@ spec:
       name: storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      {{- if $.Values.deployments.fileStorage.storageClassName }}
+      storageClassName: {{ $.Values.deployments.fileStorage.storageClassName }}
+      {{- end }}
       resources:
         requests:
           storage: {{ $.Values.deployments.fileStorage.storageVolumeSize }}
+  {{- end}}

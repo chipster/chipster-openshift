@@ -116,8 +116,11 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
+    # storageHostPath is the hostPath to store users' files. PVC is used when this is not set.
+    storageHostPath: ""
     # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
     storageVolumeSize: 300Gi
+    storageClassName: ""
     configs: {}
     replicas: ""
     adminRoute: "default"
@@ -218,15 +221,18 @@ deploymentDefault:
 # we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
 # names with dashes have to be quoted to work in jq
 databases:
-  auth:
+  auth:    
     passwordKey: "\"auth-postgresql\".postgresqlPassword"
     enabled: true
+    hostPath: ""
   sessionDb:
     passwordKey: "\"session-db-postgresql\".postgresqlPassword"
     enabled: true
+    hostPath: ""
   jobHistory:
     passwordKey: "\"job-history-postgresql\".postgresqlPassword"
     enabled: true
+    hostPath: ""
 
 # generate-passwords.bash will generate all serviceAccounts.*.password fields
 serviceAccounts:
@@ -257,11 +263,11 @@ auth-postgresql:
   # postgresqlDatabase is the name of the database
   postgresqlDatabase: auth_db
   # postgresqlPassword is the database password, see the comment of "databases" section 
-  postgresqlPassword: ""  
+  postgresqlPassword: ""
 
 session-db-postgresql:
   postgresqlDatabase: session_db_db
-  postgresqlPassword: ""
+  postgresqlPassword: ""  
 
 job-history-postgresql:
   postgresqlDatabase: job_history_db
@@ -272,7 +278,8 @@ image:
   # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
   localPullPolicy: IfNotPresent
   #localPullPolicy: Never
-  chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images/
+  chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images-release/
+  tag: latest
 
 # securityContext sets the access rights of the container user
 securityContext: 
@@ -316,8 +323,9 @@ tls:
   # email is the address where Let's Encrypt sends expiration notifications, when the automatic certificate renewal fails.
   email: ""
 
-# ingress is sectino for the optional https configuration
+# ingress is section for the optional https configuration
 ingress:
+  kind: IngressRoute
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

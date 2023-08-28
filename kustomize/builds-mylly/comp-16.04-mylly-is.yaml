@@ -1,9 +1,0 @@
-apiVersion: image.openshift.io/v1
-kind: ImageStream
-metadata:
-  labels:
-    build: comp-16.04-mylly
-  name: comp-16.04-mylly
-spec:
-  lookupPolicy:
-    local: false

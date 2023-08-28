@@ -108,15 +108,15 @@ If you need to debug this process, you can run the above command with `--debug -
 
 All Chipster configuration options can be found from a file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `helm/chipster/values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs. 
 
-For example, edit your `~/values.yaml` to add the new setting.
+For example, edit your `~/values.yaml` to add the new setting (most tools require one "slot", so this will effectively limit the number of jobs to five).
 
 >Note! The Helm templates now assume that all Chipster configuration values are strings. For example the number 5 here must be enclosed in quotes.
 
 ```yaml
 deployments:
-  comp:
+  scheduler:
     configs:
-      comp-max-jobs: "5"
+      scheduler-bash-max-slots: "5"
 ```
 
 Then deploy Chipster again.
@@ -128,18 +128,20 @@ bash deploy.bash -f ~/values.yaml
 If you want to change a setting only momentarily, you can pass it with `--set`, but this will be overriden in the next deploy with the value from your own or default `values.yaml`.
 
 ```bash
-bash deploy.bash -f ~/values.yaml --set deployments.comp.configs.comp-max-jobs=\"10\"
+bash deploy.bash -f ~/values.yaml --set deployments.scheduler.configs.scheduler-bash-max-slots=\"10\"
 ```
 
 You can check that configuration file was changed correctly.
 
 ```bash
-$ bash get-secret.bash comp
+$ bash get-secret.bash scheduler
 url-int-service-locator: http://service-locator
 service-password-comp: "PASSWORD_HIDDEN"    
-comp-max-jobs: 5
+cheduler-bash-max-slots: |-
+  10
 ```
-Restart services.
+
+Restart services to force Chipster to read the configuration files again.
 
 ```bash
 bash restart.bash
@@ -147,15 +149,62 @@ bash restart.bash
 
 Please note that two-word Chipster service names like `file-broker` are written with `camelCase` in the `deployments` map, i.e. `fileBroker` to make them easier to use in Helm templates.
 
+### Specify container image version
+
+By default Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. Some tools have their own images, so those are pulled only when that particular tool is run. If you don't specify the image version, the newer tool image may not be compatible with your other Chipster services started from the older images. 
+
+Run the following command to see what image versions are available. For examle, the output could look something like this:
+
+```bash
+$ curl -s https://docker-registry.rahti.csc.fi/v2/chipster-images-release/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r
+latest
+v4.7.0-rc1
+v4.7.0-rc2
+v4.7.0
+v4.6.0
+```
+
+Select the newest version, which doesn't have letters "-rc" (short for "release candidate").
+Configure it in your `~/values.yaml`:
+
+```yaml
+image:
+  tag: v4.7.0
+```
+
+Pull the configured images:
+
+```bash
+bash pull-images.bash
+```
+
+Configure Chipster to use that image version:
+
+```bash
+bash deploy.bash -f ~/values.yaml
+```
+
+Restart Chipster containers to take those new images in use:
+
+```bash
+bash restart.bash
+```
+
+If you want to know when the restarts are over, follow the pod listing until all old pods have disappeared. You can close the `watch` by pressing Ctrl+C.
+
+```bash
+watch kubectl get pod
+```
+
 ### Updates
 
 If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
 
 Before starting the update, please make sure you have the necessary [backups](#backups) in case something goes wrong in this process.
 
-TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
+If you plan to maintain a single node Chipster server for a longer period of time, consider storing data on [hostPath volumes](change-k3s-version.md), which makes it easier to reinstall K3s if ever needed.
 
-If you have just installed Chipster, you can simply skim through this chapter now and return here when it's time to update your installation.
+TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster. The instructinos below do these updates in the correct order, just be careful not to skip those steps.
 
@@ -165,13 +214,22 @@ Pull latest changes from the deployment repository.
 git pull
 ```
 
-Install latest package repositories etc. This will also install the latest K3s and Helm.
+Install latest package repositories etc. This will also install the latest K3s (compatible with Chipster) and Helm.
 
 ```bash
 ansible-playbook ansible/install-deps.yml -i "localhost," -c local -e user=$(whoami)
 ```
 
-Update operating system packages on the host (including Docker and Ansible).
+Check if new passwords need to be generated:
+
+```bash
+bash generate-passwords.bash
+```
+
+If there is a newer [Chipster container image version](#specify-container-image-version) available, configure and deploy it. You don't have to restart the containers, because we will soon restart the whole server, which will force also the containers to restart.
+
+
+Update operating system packages on the host (including Ansible).
 
 ```bash
 sudo apt update
@@ -184,48 +242,17 @@ Restart the server to make sure all new packages are taken in use.
 sudo shutdown -r 0
 ```
 
-Check if new passwords need to be generated:
-
-```bash
-cd git/chipster-openshift/k3s
-bash generate-passwords.bash
-```
-
-Pull the latest images and update deployments, assuming that you have created your own `~/values.yaml`. 
-
-```bash
-bash deploy.bash -f ~/values.yaml --set image.localPullPolicy=Always
-```
-
-Wait until all deployments have tried to start at least once, which triggers the pull of the latest image.
-
-```bash
-watch kubectl get pod
-```
-
-Put back the default pull policy `IfNotPresent`, so that you can restart pods without pulling images in every restart. 
-
-```bash
-bash deploy.bash -f ~/values.yaml
-```
-
-Restart all pods.
-
-```bash
-bash restart.bash
-```
-
 See also the next chapter for instructions how to update the tools-bin package.
 
 ### Download the tools-bin package
 
 The tools-bin package contains most of the Chipster analysis tool program binaries and all reference data. Its size is about 500 GB and it has hundreds of thousands files. Its download can be challenging if the internet connection is less than perfect and also simply creating so many files may take hours on some high-latency file systems.
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest  tools-bin version. 
+When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest tools-bin version. 
 
 There are two ways to download the tools-bin. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
 
-To let the deployment scripts do the download, simply run the deployment again, but set the tools-bin version this time. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the tools-bin package hasn't changed since that version.
+To let the deployment scripts do the download, simply configure the tools-bin version and run the deployment again. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It means only that the tools-bin package hasn't changed since that version.
 
 Set the tools-bin version in your `~/values.yaml`.
 
@@ -281,11 +308,52 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 [Configure Chipster to use TLS](tls.md) (https) to encrypt and validate the network traffic between the browser and the server.
 
 ### Authentication
-### JWT keys
+#### JWT keys
 
 Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
 
-TODO How to generate new keys if the old keys have leaked?
+You can generate a new private key if you want invalidate all current authentication tokens. First take a copy of the current secret `passwords`:
+
+```bash
+kubectl get secret passwords -o json > ~/passwords-backup.json
+```
+
+Use this one-liner to remove the old key from the secret:
+
+```bash
+kubectl get secret passwords -o json | jq '.data."values.yaml"="'"$(kubectl get secret passwords -o json | jq '.data."values.yaml"' -r | base64 -d | jq  'del(.tokens)' | base64)"'"' | kubectl apply -f -
+```
+
+Generate a new key:
+
+```bash
+bash generate-passwords.bash
+```
+
+Generate new configuration secrets for each service, restart all services and wait until old pods have disappeared:
+
+```bash
+bash deploy.bash -f ~/values.yaml
+bash restart.bash 
+watch kubectl get pod
+```
+
+If all services started properly and you are able to log in to Chipster, you can remove the copy of the passwords secret:
+
+```bash
+rm ~/passwords-backup.json
+```
+
+If something goes wrong, you can restore your old passwords. Note! Make sure that you have your original database passwords in `~/passwords-backup.json`, because those are the most difficult to change. If the database passwords are there, you can delete the current secret, apply the old version and deploy the changes:
+
+```
+# Only for reverting to the old passwords!
+kubectl delete secret passwords
+kubectl apply -f ~/passwords-backup.json
+bash deploy.bash -f ~/values.yaml
+bash restart.bash 
+watch kubectl get pod
+```
 
 #### OpenID Connect
 

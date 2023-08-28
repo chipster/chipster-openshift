@@ -38,7 +38,7 @@ spec:
             - name: JAVA_CLASS
               value: {{ $deployment.class }}
             {{- include "chipster.listDeploymentEnv" (dict "deployment" $deployment "deploymentDefault" $.Values.deploymentDefault) | nindent 12 }}
-          image: {{$.Values.image.chipsterImageRepo}}{{ $deployment.image }}
+          image: {{$.Values.image.chipsterImageRepo}}{{ $deployment.image }}:{{$.Values.image.tag}}
           # pull policy for Chipster images
           imagePullPolicy: {{ $.Values.image.localPullPolicy }}
           ports:

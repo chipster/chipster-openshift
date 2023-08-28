@@ -20,18 +20,75 @@ function download_file {
 	fail=0
 	for i in $(seq 1 $retries); do
 		echo "$url/$file $size, try $i" 
-		wget --no-verbose --tries 5 $url/$file -O $temp/$file || fail="$?"
+		wget --no-verbose --tries 5 $url/$file -O $temp/$file || fail="$?"		
 		
 		if [ $fail != 0 ]; then
 			echo "$url/$file $size, try $i download failed"
 			continue
 		fi
+
+		temp_dir="$temp/$(basename $file .tar.lz4)"
+
+		mkdir $temp_dir
+		pushd $temp_dir
 		 
 		cat $temp/$file | lz4 -d | tar -x || fail="$?"
 		if [ $fail != 0 ]; then
 			echo "$url/$file $size, try $i extraction failed"
 			continue
 		fi
+
+		sleep 1
+
+		#echo "verify checksums"
+		echo "copy files"
+		cat $temp/$file | lz4 -d | tar -t | while read -r extracted_file; do
+
+			# sleep little bit after each file, because glusterfs seems to have problems when too many files
+			# are created too fast: https://bugzilla.redhat.com/show_bug.cgi?id=1701736
+
+			mkdir -p "/mnt/tools/$(dirname "$extracted_file")"
+
+			# if symlink
+			if [[ -L "$temp_dir/$extracted_file" ]]; then
+				cp --no-dereference "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			else
+				cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
+			fi
+			
+			sleep 0.1
+
+			# # if symlink, just continue to the next file
+			# if [[ -L $extracted_file ]]; then
+			# 	continue
+			# fi
+
+    		# file_checksum="$(md5sum "$extracted_file")"
+			# # we have to use regexp in grep to match the end of the line
+			# # escape dots, because otherwise those will match any character
+			# escaped_file="$(echo $extracted_file | sed 's/\./\\./g')"
+			# correct_checksum="$(cat $temp/checksums.md5 | grep " $escaped_file$")"
+
+			# if [ -z "$correct_checksum" ]; then
+			# 	echo "file extracted, but checksum not found: $extracted_file"
+
+			# elif [ "$file_checksum" == "$correct_checksum" ]; then
+			# 	# nothing to do
+			# 	:
+			# else
+			# 	echo "incorrect checksum of file "$extracted_file" ($file_checksum vs. $correct_checksum)"				
+			# 	# next iteration of outer loop
+			# 	continue 2
+			# fi
+		done
+
+		if [ $fail != 0 ]; then
+			# try again after incorrect checksum
+			continue
+		fi
+
+		popd
+		rm -rf $temp_dir
 		
 		rm $temp/$file
 		break
@@ -52,5 +109,7 @@ rm -rf $temp/lost+found
 
 # delete old download temp files
 rm -f $temp/*
+
+# wget --no-verbose $url/checksums.md5 -O $temp/checksums.md5
           
-curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 4 --halt 2 "download_file {}"
+curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}" 2>&1 | tee /mnt/tools/download.log

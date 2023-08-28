@@ -1,6 +1,8 @@
 ---    
 - name: Install Chipster K3s prerequisites
   hosts: all
+  vars:
+    k3s_version: v1.26.4+k3s1
   become: yes
 
   roles:

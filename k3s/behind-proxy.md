@@ -21,28 +21,6 @@ your specific setting. (Rebooting the system so that all services get this envir
 
 Now following the [prerequesites](prerequisites.md), the proxy settings are automatically set in /etc/systemd/system/k3s.service.env
 
-## Docker
-
-The following needs to be created:
-
-/etc/systemd/system/docker.service.d/http-proxy.conf
-
-with content like:
-
-```ini
-[Service]
-Environment="HTTP_PROXY=http://your.proxy:3128/"
-Environment="HTTPS_PROXY=http://your.proxy:3128/"
-Environment="NO_PROXY=localhost,127.0.0.0/8,0.0.0.0,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,chipstervm1,.your-domain.com,cattle-system.svc,.svc,.cluster.local"
-```
-
-Reload configuration and restart docker:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-```
-
 ## Tools-bin package
 
 Now further installation did work until tools-bin package.

@@ -42,4 +42,4 @@ oc process -f templates/jobs/bash-job-template-with-tools-bin.yaml --local \
 	| oc create -f - --validate 
 	
 #TODO show logs even if the job completed already
-follow_job download-tools-bin
+follow_job $name
