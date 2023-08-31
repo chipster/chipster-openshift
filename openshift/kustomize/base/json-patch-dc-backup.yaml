@@ -1,0 +1,7 @@
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/2
+  value: {"name": "db-backups","mountPath": "/opt/chipster/db-backups"}
+
+- op: add
+  path: /spec/template/spec/volumes/2
+  value: {"name":"db-backups","persistentVolumeClaim":{"claimName":"db-backups"}}

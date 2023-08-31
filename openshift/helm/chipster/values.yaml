@@ -1,0 +1,134 @@
+# Default values for chipster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Default values for Chipster Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into the templates.
+
+# deployments defines all Chipster services
+# generate-passwords.bash will generate all deployments.*.password fields
+deployments:
+  # keys written in camelCase to make them easier to use in templates
+  webServer:
+    # name is the Chipster service name in its usual dash-separated form
+    name: web-server
+    # class to start if using chipster-web-server image
+    class: ""
+    # image is the name of the container image
+    image: web-server
+    # apiPort is the port which the process binds to serve API requests
+    apiPort: 8000
+    # adminPort is the port which the process binds to serve admin requests
+    adminPort: 8100
+    # workDir is the working directory in container where the process is started
+    workDir: /opt/chipster
+    # password is used by a Chipster service to authenticate to the auth service
+    password: ""
+  auth:
+    name: auth
+    class: fi.csc.chipster.auth.AuthenticationService
+    image: chipster-web-server
+    apiPort: 8002
+    adminPort: 8102
+    workDir: /opt/chipster
+    password: ""
+  serviceLocator:
+    name: service-locator
+    class: fi.csc.chipster.servicelocator.ServiceLocator
+    image: chipster-web-server
+    apiPort: 8003
+    adminPort: 8103
+    workDir: /opt/chipster
+    password: ""
+  sessionDb:
+    name: session-db
+    class: fi.csc.chipster.sessiondb.SessionDb
+    image: chipster-web-server
+    apiPort: 8004
+    adminPort: 8104
+    workDir: /opt/chipster
+    password: ""
+  scheduler:
+    name: scheduler
+    class: fi.csc.chipster.scheduler.Scheduler
+    image: chipster-web-server
+    apiPort: 8006
+    adminPort: 8106
+    workDir: /opt/chipster
+    password: ""
+  fileBroker:
+    name: file-broker
+    class: fi.csc.chipster.filebroker.FileBroker
+    image: chipster-web-server
+    apiPort: 8007
+    adminPort: 8107
+    workDir: /opt/chipster
+    password: ""
+  fileStorage:
+    name: file-storage
+    class: fi.csc.chipster.filestorage.FileStorage
+    image: chipster-web-server
+    apiPort: 8016
+    adminPort: 8116
+    workDir: /opt/chipster
+    password: ""
+  toolbox:
+    name: toolbox
+    class: ""
+    image: toolbox
+    apiPort: 8008
+    adminPort: 8108    
+    # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
+    workDir: /opt/chipster/toolbox
+    password: ""
+  sessionWorker:
+    name: session-worker
+    class: fi.csc.chipster.sessionworker.SessionWorker
+    image: chipster-web-server
+    apiPort: 8009
+    adminPort: 8109
+    workDir: /opt/chipster
+    password: ""
+  typeService:
+    name: type-service
+    class: ""
+    image: chipster-web-server-js
+    apiPort: 8010
+    adminPort: 8110
+    workDir: /opt/chipster
+    password: ""
+  backup:
+    name: backup
+    class: fi.csc.chipster.backup.Backup
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8115
+    workDir: /opt/chipster
+    password: ""
+  jobHistory:
+    name: job-history
+    class: fi.csc.chipster.jobhistory.JobHistoryService
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8114
+    workDir: /opt/chipster
+    password: ""
+
+deploymentDefault:
+  env: {}
+
+image:
+  repository: docker-registry.default.svc:5000/chipster-images-release/
+  # repository: docker-registry.rahti.csc.fi/chipster-images-release/
+  namespace: chipster-images-release
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+project: chipster-petri
+domain: rahtiapp.fi
+
+ipWhitelist: 
+  api: ""
+  admin: ""
