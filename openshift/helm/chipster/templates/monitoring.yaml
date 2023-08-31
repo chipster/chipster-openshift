@@ -29,7 +29,7 @@ spec:
       containers:
       # influxdb2 is very different
       - image: 'influxdb:1.8'
-        imagePullPolicy: Always
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: influxdb
         ports:
         - containerPort: 8086
@@ -90,7 +90,7 @@ spec:
     spec:
       containers:
       - image: {{$.Values.image.repository}}grafana
-        imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: grafana
         ports:
         - containerPort: 3000

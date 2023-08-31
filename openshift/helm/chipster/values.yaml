@@ -126,8 +126,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-project: chipster-petri
-domain: rahtiapp.fi
+project: ""
+domain: ""
 
 ipWhitelist: 
   api: ""

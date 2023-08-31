@@ -41,7 +41,7 @@ spec:
             - name: JAVA_CLASS
               value: {{ $.Values.deployments.fileStorage.class }}
           image: "{{$.Values.image.repository}}{{ $.Values.deployments.fileStorage.image }}:{{$.Values.image.tag}}"
-          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: file-storage
           ports:
             - containerPort: 8016
@@ -86,7 +86,7 @@ spec:
                   key: password
                   name: monitoring
           image: {{$.Values.image.repository}}monitoring
-          imagePullPolicy: Always
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
           readinessProbe:
             failureThreshold: 3
@@ -107,7 +107,7 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         - image: {{$.Values.image.repository}}filebeat
-          imagePullPolicy: Always
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: filebeat
           volumeMounts:
             - mountPath: /opt/chipster/logs

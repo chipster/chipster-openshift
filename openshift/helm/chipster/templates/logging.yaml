@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - image: "{{$.Values.image.repository}}logstash"
-          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: logstash
           ports:
             - containerPort: 5044
