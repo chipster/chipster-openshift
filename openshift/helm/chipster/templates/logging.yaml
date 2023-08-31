@@ -1,0 +1,94 @@
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  generation: 1
+  labels:
+    app: chipster
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    name: logstash
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    recreateParams:
+      timeoutSeconds: 600
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: logstash
+    spec:
+      containers:
+        - image: "{{$.Values.image.repository}}logstash"
+          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          name: logstash
+          ports:
+            - containerPort: 5044
+              name: api
+              protocol: TCP
+            - containerPort: 9600
+              name: monitoring-api
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9600
+              scheme: HTTP
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 2
+              memory: 2Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /usr/share/logstash/data
+              name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: logstash
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - logstash
+        from:
+          kind: ImageStreamTag
+          name: logstash:latest
+          namespace: {{$.Values.image.namespace}}
+      type: ImageChange
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: logstash
+spec:
+  ports:
+    - port: 5044
+      protocol: TCP
+      targetPort: api
+  selector:
+    name: logstash
+  sessionAffinity: None
+  type: ClusterIP

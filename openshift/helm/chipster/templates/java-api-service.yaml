@@ -1,0 +1,23 @@
+# deployment for each Chipster service
+{{- range $deploymentKey, $deployment := .Values.deployments }}
+{{- if ne $deployment.name "file-storage" }}
+{{- if $deployment.apiPort }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: {{ $deployment.name }}
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: api
+  selector:
+    name: {{ $deployment.name }}
+  sessionAffinity: None
+  type: ClusterIP
+{{- end }}
+{{- end }}
+{{- end }}
