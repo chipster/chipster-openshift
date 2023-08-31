@@ -1,7 +1,5 @@
 resources:
 - helm-output.yaml
-patchesStrategicMerge:
-- merge-patch-dc.yaml
 patchesJson6902:
   - target:
       group: apps.openshift.io

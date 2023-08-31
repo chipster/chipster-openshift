@@ -43,7 +43,7 @@ spec:
             {{- end }}
           image: "{{$.Values.image.repository}}{{ $deployment.image }}:{{$.Values.image.tag}}"
           # pull policy for Chipster images
-          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -90,7 +90,7 @@ spec:
                   key: password
                   name: monitoring
           image: {{$.Values.image.repository}}monitoring
-          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
           readinessProbe:
             failureThreshold: 3
@@ -111,7 +111,7 @@ spec:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         - image: {{$.Values.image.repository}}filebeat
-          imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: filebeat
           volumeMounts:
             - mountPath: /opt/chipster/logs

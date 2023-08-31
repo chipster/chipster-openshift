@@ -38,7 +38,7 @@ spec:
         - --schedule
         - '*/5 * * * *:availability:1:300'          
         image: "{{$.Values.image.repository}}cli-client:{{$.Values.image.tag}}"
-        imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: replay
         ports:
         - containerPort: 9000
@@ -79,7 +79,7 @@ spec:
           successThreshold: 1
           timeoutSeconds: 30          
       - image: {{$.Values.image.repository}}filebeat
-        imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: filebeat
         volumeMounts:
           - mountPath: /opt/chipster-web-server/logs
