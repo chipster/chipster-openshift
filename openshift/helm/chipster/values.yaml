@@ -118,6 +118,14 @@ deployments:
 deploymentDefault:
   env: {}
 
+db:
+  auth:
+    password: ""
+  sessionDb:
+    password: ""  
+  jobHistory:
+    password: ""
+
 image:
   repository: docker-registry.default.svc:5000/chipster-images-release/
   # repository: docker-registry.rahti.csc.fi/chipster-images-release/
@@ -125,6 +133,9 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
+
+toolsBin:
+  version: TOOLS_BIN_VERSION
 
 project: ""
 domain: ""
