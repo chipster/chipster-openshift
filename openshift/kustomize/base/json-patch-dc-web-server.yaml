@@ -6,7 +6,3 @@
 - op: add
   path: /spec/template/spec/volumes/2
   value: {"name":"app-conf","secret":{"secretName":"web-server-app"}}
-
-- op: add
-  path: /metadata/annotations
-  value: {"console.alpha.openshift.io/overview-app-route":"true"}

@@ -38,9 +38,11 @@ fi
 
 echo "** Helm"
 if [ -s "$private_conf_dir" ]; then
-    helm template helm-instance-name $default_conf_dir/helm/chipster -f $private_conf_dir/helm/values.yaml > $tmp_dir/kustomize/base/helm-output.yaml
+    oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d \
+        | helm template helm-instance-name $default_conf_dir/helm/chipster -f - -f $private_conf_dir/helm/values.yaml > $tmp_dir/kustomize/base/helm-output.yaml
 else
-    helm template helm-instance-name $default_conf_dir/helm/chipster > $tmp_dir/kustomize/base/helm-output.yaml
+    oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d \
+        | helm template helm-instance-name $default_conf_dir/helm/chipster -f - > $tmp_dir/kustomize/base/helm-output.yaml
 fi
 
 echo "** Kustomize"

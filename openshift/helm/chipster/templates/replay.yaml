@@ -32,7 +32,7 @@ spec:
         - --username
         - replay_test
         - --password
-        - PASSWORD
+        - {{ $.Values.users.replay_test.password }}
         - --influxdb
         - http://influxdb:8086/write?db=db
         - --schedule
