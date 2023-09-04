@@ -13,8 +13,15 @@ metadata:
     {{- if $.Values.ipWhitelist.api }}
     haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.api }}"
     {{- end }}
+    {{- if eq $deployment.name "web-server" }}
+    console.alpha.openshift.io/overview-app-route: true
+    {{- end }}
 spec:
+  {{- if eq $deployment.name "web-server" }}
+  host: {{ $.Values.project }}.{{ $.Values.domain }}
+  {{- else }}
   host: {{ $deployment.name }}-{{ $.Values.project }}.{{ $.Values.domain }}
+  {{- end }}
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge

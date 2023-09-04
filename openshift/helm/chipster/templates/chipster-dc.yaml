@@ -79,16 +79,17 @@ spec:
               name: logs
             - mountPath: /opt/chipster/conf
               name: conf
+            {{- if eq $deployment.name "toolbox" }}
+            - mountPath: "/mnt/tools-bin"
+              name: tools-bin
+            {{- end }}
         - env:
             - name: admin_port
               value: "{{ $deployment.adminPort }}"
             - name: role
               value: {{ $deployment.name }}
             - name: password
-              valueFrom:
-                secretKeyRef:
-                  key: password
-                  name: monitoring
+              value: {{ $.Values.serviceAccounts.monitoring.password }}
           image: {{$.Values.image.repository}}monitoring
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
@@ -146,6 +147,11 @@ spec:
           secret:
             defaultMode: 420
             secretName: {{ $deployment.name }}
+        {{- if eq $deployment.name "toolbox" }}
+        - name: tools-bin
+          persistentVolumeClaim:
+            claimName: "tools-bin-{{ $.Values.toolsBin.version }}"
+        {{- end }}
   test: false
   triggers:
     - type: ConfigChange

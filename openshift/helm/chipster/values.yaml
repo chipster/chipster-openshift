@@ -8,6 +8,7 @@
 
 # deployments defines all Chipster services
 # generate-passwords.bash will generate all deployments.*.password fields
+# no single-shot-comp here (unlike in k3s). It would create the secret automatically, but much more things that shouldn't be created (like DeploymentConfig)
 deployments:
   # keys written in camelCase to make them easier to use in templates
   webServer:
@@ -120,10 +121,13 @@ deploymentDefault:
 
 db:
   auth:
+    name: auth
     password: ""
   sessionDb:
+    name: session-db
     password: ""  
   jobHistory:
+    name: job-history
     password: ""
 
 image:
@@ -132,10 +136,10 @@ image:
   namespace: chipster-images-release
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 toolsBin:
-  version: TOOLS_BIN_VERSION
+  version: "empty"
 
 project: ""
 domain: ""
@@ -143,3 +147,15 @@ domain: ""
 ipWhitelist: 
   api: ""
   admin: ""
+
+serviceAccounts:
+  monitoring:
+    password: ""
+
+tokens:
+  auth:
+    privateKey: ""
+
+users:
+  replay_test:
+    password: ""

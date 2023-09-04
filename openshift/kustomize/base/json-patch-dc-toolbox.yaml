@@ -5,11 +5,3 @@
 - op: replace
   path: /spec/template/spec/containers/0/volumeMounts/1/mountPath
   value: "/opt/chipster/toolbox/conf"
-
-- op: add
-  path: /spec/template/spec/containers/0/volumeMounts/2
-  value: {"name":"tools-bin","mountPath":"/mnt/tools","readOnly":true}
-
-- op: add
-  path: /spec/template/spec/volumes/2
-  value: {"name":"tools-bin","persistentVolumeClaim":{"claimName":"tools-bin-VERSION"}}

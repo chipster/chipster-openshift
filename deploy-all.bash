@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# run only once, because we can't change the db password without deleting the db
+pushd openshift
 bash generate-passwords.bash
-
-# run if configuration has changed (and bash rollout-services.bash if running only this)
-bash create-secrets.bash
+popd
 
 # deploy databases
 bash deploy-postgres.bash
@@ -12,15 +10,13 @@ bash deploy-postgres.bash
 # create or update builds
 bash deploy-builds.bash
 
-# run if the templates have changed or there are new services
-# - remove all: bash remove-all-services.bash
-bash deploy-servers.bash
+pushd openshift
+# run if the templates or configuration have changed or there are new services
+bash deploy.bash
+popd
 
 # optional
 #bash deploy-mylly-app.bash
-
-# run always after create-secrets.bash
-#bash rollout-services.bash
 
 # create default users in auth and configure grafana password and dashboards (not started with the default quota)
 bash setup.bash
