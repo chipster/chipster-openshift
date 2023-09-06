@@ -54,7 +54,7 @@ deployments:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
     image: chipster-web-server
-    apiPort: 8006
+    apiPort: ""
     adminPort: 8106
     workDir: /opt/chipster
     password: ""

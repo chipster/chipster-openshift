@@ -36,7 +36,7 @@ spec:
         - --influxdb
         - http://influxdb:8086/write?db=db
         - --schedule
-        - '*/5 * * * *:availability:1:300'          
+        - '*/10 * * * *:availability:1:500'          
         image: "{{$.Values.image.repository}}cli-client:{{$.Values.image.tag}}"
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: replay
