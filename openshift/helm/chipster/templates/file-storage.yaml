@@ -81,10 +81,7 @@ spec:
             - name: role
               value: file-storage
             - name: password
-              valueFrom:
-                secretKeyRef:
-                  key: password
-                  name: monitoring
+              value: {{ $.Values.serviceAccounts.monitoring.password }}
           image: {{$.Values.image.repository}}monitoring
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
@@ -142,7 +139,6 @@ spec:
           secret:
             defaultMode: 420
             secretName: file-storage
-  test: false
   volumeClaimTemplates:
   - metadata:
       labels:
