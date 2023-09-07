@@ -46,44 +46,14 @@ else
 fi
 
 echo "** Kustomize"
-oc kustomize $tmp_dir/kustomize/overlays/$conf_dir > $tmp_dir/kustomized.yaml
-cat $tmp_dir/kustomized.yaml | yq ea -o=json > $tmp_dir/kustomized.json
-
-
-# the Helm templates generate chipster configs to yaml object enabling kustomization
-# convert the yaml object to string, because Java code expects to find them in one file
-# now done with yq (v4) and jq, perhaps we could even write a simple python program for this
-
-# separate secrets from other objects
-cat $tmp_dir/kustomized.json | jq 'select(.kind != "Secret")' > $tmp_dir/other.json
-
-# this would make it in one line, but produces ugly one-line json configs
-# cat $tmp_dir/kustomized.json | jq 'select(.kind == "Secret") | .stringData."chipster.yaml" = (.chipsterConfig | tostring) | del(.chipsterConfig)' > $tmp_dir/kube-secrets.json
-
-# let's handle secrets one by one to get pretty yaml output
-cat $tmp_dir/kustomized.json | jq 'select(.kind == "Secret")' > $tmp_dir/chipster-secrets.json
-
-# split the multi-document
-mkdir $tmp_dir/secrets
-pushd $tmp_dir/secrets
-yq --output-format=json -s '.metadata.name' ../chipster-secrets.json
-popd
-
-# create emtpy file for results
-echo "" > $tmp_dir/kube-secrets.json
-
-# for each secret
-for secret_file in $tmp_dir/secrets/*.json; do
-    # echo $secret_file
-    # convert chipster config to pretty yaml and json encode it
-    encoded_conf="$(cat $secret_file | jq .chipsterConfig | yq -P | jq -Rsa .)"
-
-    # remove .chipsterConfig from the secret and assign in pretty yaml
-    cat $secret_file | jq 'del(.chipsterConfig) | .stringData."chipster.yaml" = '"$encoded_conf" >> $tmp_dir/kube-secrets.json
-done
+if [ -s "$private_conf_dir" ]; then
+    oc kustomize $tmp_dir/kustomize/overlays/$conf_dir > $tmp_dir/kustomized.yaml
+else
+    oc kustomize $tmp_dir/kustomize/base > $tmp_dir/kustomized.yaml
+fi
 
 echo "** Apply"
-oc apply -f $tmp_dir/kube-secrets.json
-oc apply -f $tmp_dir/other.json
+
+oc apply -f $tmp_dir/kustomized.yaml
 
 rm -rf $tmp_dir
