@@ -20,7 +20,8 @@ spec:
   {{- if eq $deployment.name "web-server" }}
   host: {{ $.Values.project }}.{{ $.Values.domain }}
   {{- else }}
-  host: {{ $deployment.name }}-{{ $.Values.project }}.{{ $.Values.domain }}
+  # stop here if somebody tries to run the default deploy.bash without any configuratin (like ip whitelists)
+  host: {{ $deployment.name }}-{{ required "project not found (most likely you are trying to deploy Chipster without any configuration)" $.Values.project }}.{{ $.Values.domain }}
   {{- end }}
   tls:
     insecureEdgeTerminationPolicy: Redirect

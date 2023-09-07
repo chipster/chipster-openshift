@@ -29,6 +29,9 @@ metadata:
   annotations:
     {{- if $.Values.ipWhitelist.admin }}
     haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.admin }}"
+    {{- else }}
+    # create the annotations object anyway, so that new annotations can be added in json patches
+    {}
     {{- end }}
 spec:
   host: {{ $deployment.name }}-admin-{{ $.Values.project }}.{{ $.Values.domain }}

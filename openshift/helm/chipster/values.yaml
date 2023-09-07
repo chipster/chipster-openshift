@@ -26,6 +26,8 @@ deployments:
     workDir: /opt/chipster
     # password is used by a Chipster service to authenticate to the auth service
     password: ""
+    # configs is a YAML map to pass configuration key-value pairs to the Chipster service
+    configs: {}
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
@@ -34,6 +36,7 @@ deployments:
     adminPort: 8102
     workDir: /opt/chipster
     password: ""
+    configs: {}
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
@@ -42,6 +45,7 @@ deployments:
     adminPort: 8103
     workDir: /opt/chipster
     password: ""
+    configs: {}
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
@@ -50,6 +54,7 @@ deployments:
     adminPort: 8104
     workDir: /opt/chipster
     password: ""
+    configs: {}
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
@@ -58,6 +63,7 @@ deployments:
     adminPort: 8106
     workDir: /opt/chipster
     password: ""
+    configs: {}
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
@@ -66,6 +72,7 @@ deployments:
     adminPort: 8107
     workDir: /opt/chipster
     password: ""
+    configs: {}
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
@@ -74,6 +81,7 @@ deployments:
     adminPort: 8116
     workDir: /opt/chipster
     password: ""
+    configs: {}
   toolbox:
     name: toolbox
     class: ""
@@ -83,6 +91,7 @@ deployments:
     # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
     workDir: /opt/chipster/toolbox
     password: ""
+    configs: {}
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
@@ -91,6 +100,7 @@ deployments:
     adminPort: 8109
     workDir: /opt/chipster
     password: ""
+    configs: {}
   typeService:
     name: type-service
     class: ""
@@ -99,6 +109,7 @@ deployments:
     adminPort: 8110
     workDir: /opt/chipster
     password: ""
+    configs: {}
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
@@ -107,6 +118,7 @@ deployments:
     adminPort: 8115
     workDir: /opt/chipster
     password: ""
+    configs: {}
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
@@ -115,6 +127,42 @@ deployments:
     adminPort: 8114
     workDir: /opt/chipster
     password: ""
+    configs: {}
+
+app:
+  configs:
+    service-locator: https://service-locator-{{ $.Values.project }}.{{ $.Values.domain }}
+    # otherwise this is a copy from https://github.com/chipster/chipster-web/blob/master/src/assets/conf/chipster.yaml. 
+    # TODO Change app to use defaults automatically to avoid this copy like in backend
+
+    terms-of-use-auths: ["haka"]
+    terms-of-use-path: assets/html/terms-of-use-v1.html
+    terms-of-use-version: 2
+    # service-locator: http://localhost:8003
+    #service-locator: https://service-locator-chipster.rahti-int-app.csc.fi
+
+    home-path: assets/html/app-home.html
+    home-header-path: assets/html/app-home-header.html
+    accessibility-path: assets/html/accessibility.html
+    contact-path: assets/html/app-contact.html
+    access-path: assets/html/access.html
+    privacy-notice-path: assets/html/privacy-notice.html
+
+    # Bio modules and manual
+    modules: ["NGS", "Microarray", "Misc"]
+    manual-path: assets/manual/
+    manual-tool-postfix: .html
+    app-name: Chipster
+    app-id: chipster
+
+    example-session-owner-user-id: jaas/example_session_owner
+    support-session-owner-user-id: jaas/support_session_owner
+
+    jaas-description: ""
+
+    visualization-blacklist: []
+
+
 
 deploymentDefault:
   env: {}
