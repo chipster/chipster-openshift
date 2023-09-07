@@ -31,6 +31,8 @@ spec:
     name: {{ $deployment.name }}
     weight: 100
   wildcardPolicy: None
+status: 
+  ingress: []
 {{- end }}
 {{- end }}
 {{- end }}

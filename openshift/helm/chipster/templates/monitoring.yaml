@@ -142,6 +142,8 @@ spec:
     name: grafana
     weight: 100
   wildcardPolicy: None
+status: 
+  ingress: []
 
 ---
 apiVersion: v1

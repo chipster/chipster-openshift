@@ -3,8 +3,15 @@
 set -e
 
 private_conf_dir="$1"
-default_conf_dir="$(dirname "$0")"
+
+shift
+
 oc_project=$(oc project -q)
+script_dir="$(dirname $(readlink -f "$0"))"
+
+# echo private_conf_dir: $private_conf_dir
+# echo oc_project: $oc_project
+# echo script_dir: $script_dir
 
 # compare configuration dir name and oc project to make sure correct configuration is applied
 if [ -s "$private_conf_dir" ]; then
@@ -25,7 +32,7 @@ echo "Creating temp dir $tmp_dir"
 
 echo "Copy kustomize files"
 # copy default kustomize dir, because we want to produce its base version with Helm
-cp -r $default_conf_dir/kustomize $tmp_dir
+cp -r $script_dir/kustomize $tmp_dir
 
 if [ -s "$private_conf_dir" ]; then
     # copy our overlay next to it, so that it doesn't need to know the path to tmp_dir
@@ -34,26 +41,42 @@ if [ -s "$private_conf_dir" ]; then
     cp -r $private_conf_dir/kustomize/* $tmp_dir/kustomize/overlays/$conf_dir
 fi
 
-#ls $tmp_dir/kustomize/*/*
+pushd "$tmp_dir"/kustomize
 
 echo "** Helm"
 if [ -s "$private_conf_dir" ]; then
-    oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d \
-        | helm template helm-instance-name $default_conf_dir/helm/chipster -f - -f $private_conf_dir/helm/values.yaml > $tmp_dir/kustomize/base/helm-output.yaml
+
+    export CHIPSTER_KUSTOMIZE_DIR="overlays/low-pod-quota"
+
+    oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | helm upgrade chipster $script_dir/helm/chipster  \
+            --install \
+            -f - \
+            -f $private_conf_dir/helm/values.yaml \
+            --post-renderer $script_dir/utils/kustomize-post-renderer.bash \
+            "$@"
+
+    # oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d \
+    #     | helm upgrade chipster $script_dir/helm/chipster  \
+    #         --install \
+    #         -f - \
+    #         -f $private_conf_dir/helm/values.yaml
+            
+    #         #  \
+    #         # --post-renderer $script_dir/utils/kustomize-post-renderer.bash
+        
 else
-    oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d \
-        | helm template helm-instance-name $default_conf_dir/helm/chipster -f - > $tmp_dir/kustomize/base/helm-output.yaml
+
+    export CHIPSTER_KUSTOMIZE_DIR="base"
+
+    oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | helm upgrade chipster $script_dir/helm/chipster  \
+            --install \
+            -f - \
+            --post-renderer $script_dir/utils/kustomize-post-renderer.bash
 fi
 
-echo "** Kustomize"
-if [ -s "$private_conf_dir" ]; then
-    oc kustomize $tmp_dir/kustomize/overlays/$conf_dir > $tmp_dir/kustomized.yaml
-else
-    oc kustomize $tmp_dir/kustomize/base > $tmp_dir/kustomized.yaml
-fi
 
-echo "** Apply"
+# echo "** Apply"
 
-oc apply -f $tmp_dir/kustomized.yaml
+# oc apply -f $tmp_dir/kustomized.yaml
 
 rm -rf $tmp_dir
