@@ -37,7 +37,7 @@ spec:
         - http://influxdb:8086/write?db=db
         - --schedule
         - '*/10 * * * *:availability:1:500'          
-        image: "{{$.Values.image.repository}}cli-client:{{$.Values.image.tag}}"
+        image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/cli-client:{{$.Values.image.tag}}"
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: replay
         ports:
@@ -78,7 +78,7 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 30          
-      - image: {{$.Values.image.repository}}filebeat
+      - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: filebeat
         volumeMounts:
