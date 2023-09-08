@@ -10,3 +10,6 @@ cat > base/helm-output.yaml
 >&2 echo "** Kustomize"
 
 oc kustomize $CHIPSTER_KUSTOMIZE_DIR
+
+# there should be no need to delete the base/helm-output.yaml, because deploy.bash is running 
+# this in a temporary directory and should delete the whole directory soon
