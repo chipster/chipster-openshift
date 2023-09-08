@@ -4,7 +4,10 @@ set -e
 
 private_conf_dir="$1"
 
-shift
+if [ -s "$1" ]; then
+    # first argument is the private_conf_dir. Remaining arguments are passed to Helm
+    shift
+fi
 
 oc_project=$(oc project -q)
 script_dir="$(dirname $(readlink -f "$0"))"
@@ -27,6 +30,8 @@ else
     echo "Deploy default deployment to $oc_project"
 fi
 
+# Create a temp dir. Don't store the temporary Helm output in the repository folders to avoid
+# committing it by accident. It contains a few passwords.
 tmp_dir=$(mktemp -d -t deploy-chipster)
 echo "Creating temp dir $tmp_dir"
 
@@ -54,15 +59,6 @@ if [ -s "$private_conf_dir" ]; then
             -f $private_conf_dir/helm/values.yaml \
             --post-renderer $script_dir/utils/kustomize-post-renderer.bash \
             "$@"
-
-    # oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d \
-    #     | helm upgrade chipster $script_dir/helm/chipster  \
-    #         --install \
-    #         -f - \
-    #         -f $private_conf_dir/helm/values.yaml
-            
-    #         #  \
-    #         # --post-renderer $script_dir/utils/kustomize-post-renderer.bash
         
 else
 
@@ -73,10 +69,5 @@ else
             -f - \
             --post-renderer $script_dir/utils/kustomize-post-renderer.bash
 fi
-
-
-# echo "** Apply"
-
-# oc apply -f $tmp_dir/kustomized.yaml
 
 rm -rf $tmp_dir

@@ -88,8 +88,12 @@ spec:
               value: "{{ $deployment.adminPort }}"
             - name: role
               value: {{ $deployment.name }}
+              # get password from secret to hide it from this dc
             - name: password
-              value: {{ $.Values.serviceAccounts.monitoring.password }}
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: monitoring
           image: {{$.Values.image.repository}}monitoring
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
