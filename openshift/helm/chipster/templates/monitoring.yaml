@@ -89,7 +89,7 @@ spec:
         name: grafana
     spec:
       containers:
-      - image: {{$.Values.image.repository}}grafana
+      - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/grafana
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: grafana
         ports:

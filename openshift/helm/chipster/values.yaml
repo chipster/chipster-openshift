@@ -131,8 +131,8 @@ deployments:
 
 app:
   configs:
-    service-locator: https://service-locator-{{ $.Values.project }}.{{ $.Values.domain }}
-    # otherwise this is a copy from https://github.com/chipster/chipster-web/blob/master/src/assets/conf/chipster.yaml. 
+    # Define default here instead of web-app-secret.yaml, so that own value.yaml is really 
+    # merged and not only appended to the end (which may work too, but looks messy).
     # TODO Change app to use defaults automatically to avoid this copy like in backend
 
     terms-of-use-auths: ["haka"]
@@ -179,8 +179,7 @@ db:
     password: ""
 
 image:
-  repository: docker-registry.default.svc:5000/chipster-images-release/
-  # repository: docker-registry.rahti.csc.fi/chipster-images-release/
+  repository: docker-registry.default.svc:5000
   namespace: chipster-images-release
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.

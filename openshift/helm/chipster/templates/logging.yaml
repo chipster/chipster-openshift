@@ -23,7 +23,7 @@ spec:
         name: logstash
     spec:
       containers:
-        - image: "{{$.Values.image.repository}}logstash"
+        - image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/logstash"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: logstash
           ports:

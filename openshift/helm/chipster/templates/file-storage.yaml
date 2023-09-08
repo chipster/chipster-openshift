@@ -40,7 +40,7 @@ spec:
         - env:
             - name: JAVA_CLASS
               value: {{ $.Values.deployments.fileStorage.class }}
-          image: "{{$.Values.image.repository}}{{ $.Values.deployments.fileStorage.image }}:{{$.Values.image.tag}}"
+          image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/{{ $.Values.deployments.fileStorage.image }}:{{$.Values.image.tag}}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: file-storage
           ports:
@@ -82,7 +82,7 @@ spec:
               value: file-storage
             - name: password
               value: {{ $.Values.serviceAccounts.monitoring.password }}
-          image: {{$.Values.image.repository}}monitoring
+          image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
           readinessProbe:
@@ -103,7 +103,7 @@ spec:
               memory: 10Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-        - image: {{$.Values.image.repository}}filebeat
+        - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: filebeat
           volumeMounts:
