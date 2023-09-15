@@ -2,7 +2,7 @@
 
 set -e
 
-source scripts/utils.bash
+source ../scripts/utils.bash
 
 function deploy_postgres {
 
@@ -22,9 +22,9 @@ function deploy_postgres {
 
   db_password="$(oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | jq .db.$camel_case_name.password -r)"
 
-  # add different subproject label for databases, so that those can be kept or removed separately 
   echo "$template" \
   | jq ".labels.app=\"chipster\"" \
+  | jq .objects[2].metadata.annotations.\"helm.sh/resource-policy\"=\"keep\" \
   | jq .objects[3].spec.template.spec.containers[0].resources.limits.cpu=\"1900m\" \
   | jq .objects[3].spec.template.spec.containers[0].resources.requests.cpu=\"1900m\" \
   | jq .objects[3].spec.template.spec.containers[0].resources.requests.memory=\"1Gi\" \
@@ -42,7 +42,7 @@ function deploy_postgres {
 
 PROJECT=$(oc project -q)
 DOMAIN=$(get_domain)
-private_config_path="../chipster-private/confs"
+private_config_path="../../chipster-private/confs"
 
 template="$(oc get template -n openshift postgresql-persistent -o json)" 
 
