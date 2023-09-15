@@ -2,6 +2,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: auth-security
@@ -15,6 +17,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: db-backups
@@ -28,6 +32,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: grafana
@@ -41,6 +47,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: influxdb
@@ -54,6 +62,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: logstash
@@ -67,6 +77,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: tools-bin-empty
@@ -81,6 +93,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: tools-bin-mylly
@@ -94,6 +108,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
   labels:
     app: chipster
   name: replay-results

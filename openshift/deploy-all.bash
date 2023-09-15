@@ -1,8 +1,6 @@
 #!/bin/bash
 
-pushd openshift
 bash generate-passwords.bash
-popd
 
 # deploy databases
 bash deploy-postgres.bash
@@ -10,10 +8,9 @@ bash deploy-postgres.bash
 # create or update builds
 bash deploy-builds.bash
 
-pushd openshift
+
 # run if the templates or configuration have changed or there are new services
 bash deploy.bash
-popd
 
 # optional
 #bash deploy-mylly-app.bash

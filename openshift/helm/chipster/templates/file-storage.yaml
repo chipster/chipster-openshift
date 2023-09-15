@@ -141,6 +141,9 @@ spec:
             secretName: file-storage
   volumeClaimTemplates:
   - metadata:
+      annotations:
+        # at the moment "helm uninstall" doesn't delete sts volumes, but let's add this anyway in case this changes
+        "helm.sh/resource-policy": keep
       labels:
         app: chipster
       name: storage
