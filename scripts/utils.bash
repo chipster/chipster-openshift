@@ -264,7 +264,7 @@ function get_deploy_config {
 
   # if project specific file exists
   if [ -f $deploy_config_path_project ]; then
-    value="$(yq r $deploy_config_path_project "$key")"
+    value="$(cat $deploy_config_path_project | yq e ."$key")"
     # if the key was found    
     if [ "$value" != "null" ]; then
       echo "$value"
@@ -274,7 +274,7 @@ function get_deploy_config {
   
   # not found from project specific, try shared
   if [ -f $deploy_config_path_shared ]; then
-    value="$(yq r $deploy_config_path_shared "$key")"
+    value="$(cat $deploy_config_path_shared | yq e ."$key")"
     if [ "$value" != "null" ]; then
       echo "$value"
       return
