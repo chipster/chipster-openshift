@@ -7,19 +7,12 @@ source scripts/utils.bash
 function deploy_postgres {
 
   template="$1"
-  subproject="$2"
-  subproject_postfix="$3" 
-  name="$4"
-  PROJECT="$5"
-  DOMAIN="$6"
+  name="$2"
+  camel_case_name="$3"
+  PROJECT="$4"
+  DOMAIN="$5"
   
   db_name="$(echo $name | tr "-" "_")_db"
-  
-  if [ -n "$subproject" ]; then
-    subproject_label="${subproject}-db"
-  else
-    subproject_label="db"
-  fi
   
   pvc_size="$(get_deploy_config $private_config_path pvc-size-$name-postgres $PROJECT $DOMAIN)"
   
@@ -27,19 +20,18 @@ function deploy_postgres {
     pvc_size="100Mi"
   fi
 
-  passwords="$(oc get secret passwords$subproject_postfix -o json)"
+  db_password="$(oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | jq .db.$camel_case_name.password -r)"
 
   # add different subproject label for databases, so that those can be kept or removed separately 
   echo "$template" \
-  | jq ".labels.subproject=\"${subproject_label}\"" \
-  | jq ".labels.app=\"chipster$subproject_postfix\"" \
+  | jq ".labels.app=\"chipster\"" \
   | jq .objects[3].spec.template.spec.containers[0].resources.limits.cpu=\"1900m\" \
   | jq .objects[3].spec.template.spec.containers[0].resources.requests.cpu=\"1900m\" \
   | jq .objects[3].spec.template.spec.containers[0].resources.requests.memory=\"1Gi\" \
   | oc process -f - --local \
   -p POSTGRESQL_DATABASE=$db_name \
-  -p DATABASE_SERVICE_NAME=$name-postgres$subproject_postfix \
-  -p POSTGRESQL_PASSWORD=$(get_password_cached "$passwords" "$name-db-password") \
+  -p DATABASE_SERVICE_NAME=$name-postgres \
+  -p POSTGRESQL_PASSWORD=$db_password \
   -p POSTGRESQL_USER=user \
   -p NAMESPACE=openshift \
   -p VOLUME_CAPACITY=$pvc_size \
@@ -48,20 +40,12 @@ function deploy_postgres {
   | oc apply -f - 
 }
 
-subproject="$1"
-
-if [ -z $subproject ]; then
-  subproject_postfix=""
-else
-  subproject_postfix="-$subproject"
-fi
-
 PROJECT=$(oc project -q)
 DOMAIN=$(get_domain)
 private_config_path="../chipster-private/confs"
 
 template="$(oc get template -n openshift postgresql-persistent -o json)" 
 
-deploy_postgres "$template" "$subproject" "$subproject_postfix" auth $PROJECT $DOMAIN
-deploy_postgres "$template" "$subproject" "$subproject_postfix" session-db $PROJECT $DOMAIN
-deploy_postgres "$template" "$subproject" "$subproject_postfix" job-history $PROJECT $DOMAIN
+deploy_postgres "$template" auth auth $PROJECT $DOMAIN 
+deploy_postgres "$template" session-db sessionDb $PROJECT $DOMAIN
+deploy_postgres "$template" job-history jobHistory $PROJECT $DOMAIN
