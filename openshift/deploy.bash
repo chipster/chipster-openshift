@@ -51,7 +51,7 @@ pushd "$tmp_dir"/kustomize
 echo "** Helm"
 if [ -s "$private_conf_dir" ]; then
 
-    export CHIPSTER_KUSTOMIZE_DIR="overlays/low-pod-quota"
+    export CHIPSTER_KUSTOMIZE_DIR="overlays/$conf_dir"
 
     oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | helm upgrade chipster $script_dir/helm/chipster  \
             --install \
