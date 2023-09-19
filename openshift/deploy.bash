@@ -53,6 +53,14 @@ if [ -s "$private_conf_dir" ]; then
 
     export CHIPSTER_KUSTOMIZE_DIR="overlays/$conf_dir"
 
+    # print helm output for debugging
+    
+    # oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | helm template chipster $script_dir/helm/chipster  \
+    #         -f - \
+    #         -f $private_conf_dir/helm/values.yaml \
+    #         --post-renderer $script_dir/utils/kustomize-post-renderer.bash \
+    #         "$@"
+
     oc get secret passwords -o json | jq '.data."values.json"' -r | base64 -d | helm upgrade chipster $script_dir/helm/chipster  \
             --install \
             -f - \
