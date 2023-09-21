@@ -37,7 +37,7 @@ spec:
         - name: TOOLS_BIN_VERSION
           value: ${tools_bin_version}
         name: ${name}
-        image: docker-registry.rahti.csc.fi/chipster-images/base
+        image: docker-registry.rahti.csc.fi/chipster-images-release/base
         command: ["bash", "-c", ""]
         resources:
           limits:
