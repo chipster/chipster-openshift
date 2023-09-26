@@ -1,7 +1,0 @@
-- op: add
-  path: /spec/source/images/1
-  value: {"as":null,"from":{"kind":"ImageStreamTag","name":"mylly-tools:latest"},"paths":[{"destinationDir":"tools","sourcePath":"/home/user/mylly-tools/tools"}]}
-
-- op: add
-  path: /spec/triggers/1
-  value: {"imageChange": {"from": {"kind": "ImageStreamTag", "name": "mylly-tools:latest"}}, "type": "ImageChange"}

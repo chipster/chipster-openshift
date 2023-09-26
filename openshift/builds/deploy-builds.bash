@@ -2,7 +2,7 @@
 
 set -e
 
-source scripts/utils.bash
+source ../../scripts/utils.bash
 
 if ! kubectl --help > /dev/null 2>&1; then
   echo "Error: command 'kubectl' not found"
@@ -25,7 +25,7 @@ if [ -n "$branch" ]; then
   exit 1
 fi
 
-private_config_path=" ../chipster-private/confs"
+private_config_path=" ../../../chipster-private/confs"
 
 # better to do this outside repo
 build_dir=$(make_temp chipster-openshift_deploy-builds)
@@ -40,12 +40,12 @@ base_dir="$build_dir/builds"
 mkdir -p $base_dir
 
 echo "copy Kustomize yaml files"
-cp kustomize/builds/*.yaml $base_dir
+cp ../../kustomize/builds/*.yaml $base_dir
 
 echo "create base BuildConfigs and ImageStreams"
 
 # use oc templates to put Dockerfiles to BuildConfigs and to copy ImageStreams for each build
-for build_template in kustomize/builds/*/*.yaml; do
+for build_template in ../../kustomize/builds/*/*.yaml; do
   build=$(basename $build_template .yaml)
   template_dir=$(dirname $build_template)
 
@@ -56,16 +56,13 @@ for build_template in kustomize/builds/*/*.yaml; do
     | jq .spec.source.dockerfile="$(cat $template_dir/Dockerfile | jq -s -R .)" \
     > $base_dir/$build-bc.yaml
 
-  oc process -f templates/imagestreams/imagestream.yaml --local -p NAME=$build \
+  oc process -f templates/imagestream.yaml --local -p NAME=$build \
   > $base_dir/$build-is.yaml
 
   # modify the object in memory in the write to the same file
   echo "$(cat $base_dir/kustomization.yaml | yq e - -o=json | jq '.resources += ["'$build-bc.yaml'"]' | yq e - )" > $base_dir/kustomization.yaml
   echo "$(cat $base_dir/kustomization.yaml | yq e - -o=json | jq '.resources += ["'$build-is.yaml'"]' | yq e - )" > $base_dir/kustomization.yaml  
 done
-
-# copy builds-mylly overlay to the build dir in case this deployment uses it
-cp -r kustomize/builds-mylly $build_dir
 
 private_all_kustomize_path="$private_config_path/chipster-all/builds"
 private_kustomize_path="$private_config_path/$PROJECT.$DOMAIN/builds"
