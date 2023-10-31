@@ -41,6 +41,8 @@ fi
 # create a db to influxdb
 if [ $(oc get dc influxdb -o json | jq .spec.replicas) == 1 ]; then
   oc rsh dc/influxdb curl -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE db" -X POST
+  # set 2 year retention policy. Use this command to see it:  oc rsh dc/influxdb curl 'localhost:8086/query?pretty=true' -X POST --data-binary "db=db;q=show retention policies;'"
+  oc rsh dc/influxdb curl 'localhost:8086/query?pretty=true' -X POST --data-binary "q=alter retention policy autogen on db duration 104w shard duration 1w replication 1 default;'"
 fi
 
 if [ $(oc get dc grafana -o json | jq .spec.replicas) == 1 ]; then
