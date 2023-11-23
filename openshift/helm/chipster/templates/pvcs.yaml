@@ -13,6 +13,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  storageClassName: user-sc-fs
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -28,6 +29,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  storageClassName: user-sc-fs
 ---      
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -43,6 +45,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  storageClassName: user-sc-fs
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -58,6 +61,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: user-sc-fs
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -73,6 +77,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: user-sc-fs
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -88,7 +93,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-
+  storageClassName: user-sc-fs
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -104,6 +109,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: user-sc-fs
 ---  
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -119,3 +125,4 @@ spec:
   resources:
     requests:
       storage: 1Gi          
+  storageClassName: user-sc-fs

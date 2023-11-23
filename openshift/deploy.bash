@@ -20,8 +20,21 @@ script_dir="$(dirname $(readlink -f "$0"))"
 if [ -s "$private_conf_dir" ]; then
     conf_dir=$(basename $private_conf_dir)
 
-    if [ $conf_dir != $oc_project.rahtiapp.fi ]; then
-        echo "wrong project. oc: $oc_project, dir: $conf_dir"
+    api=$(oc project | cut -d '"' -f 4)
+
+    if [ $api == "https://api.okd.lumi-k.csc.fi:6443" ]; then
+        domain="apps.okd.lumi-k.csc.fi"
+    elif [ $api == "https://rahti.csc.fi:8443" ]; then
+        domain="rahtiapp.fi"
+    else
+        echo "unknown api: $api"
+        exit 1
+    fi
+
+    if [ $conf_dir != $oc_project.$domain ]; then
+        echo "wrong project"
+        echo "  oc:  $oc_project.$domain"
+        echo "  dir: $conf_dir"
         exit 1
     fi
 
