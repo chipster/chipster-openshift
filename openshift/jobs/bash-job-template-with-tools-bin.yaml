@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   name: ${{NAME}}
@@ -19,7 +19,7 @@ objects:
           - name: TOOLS_BIN_VERSION
             value: ${{TOOLS_BIN_VERSION}}
           name: ${{NAME}}
-          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/base
+          image: docker-registry.default.svc:5000/chipster-images-release/base
           command: ["bash", "-c", ""]
           resources:
             limits:
@@ -38,13 +38,9 @@ objects:
           persistentVolumeClaim:
             claimName: tools-bin-${TOOLS_BIN_VERSION}
         - name: temp
-          # persistentVolumeClaim:
-          #   claimName: ${{TEMP_PVC}}
           emptyDir: {}
         restartPolicy: OnFailure
 parameters:
-- name: IMAGE_PROJECT
 - name: TOOLS_BIN_VERSION
 - name: NAME
 - name: CPU
-- name: TEMP_PVC
