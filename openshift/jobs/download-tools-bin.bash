@@ -1,5 +1,7 @@
 set -e
 
+echo "download tools-bin $TOOLS_BIN_VERSION"
+
 cd /mnt/tools
 
 export temp="/mnt/temp"
@@ -111,5 +113,8 @@ rm -rf $temp/lost+found
 rm -f $temp/*
 
 # wget --no-verbose $url/checksums.md5 -O $temp/checksums.md5
+
+echo "files in $url/files.txt":
+curl -s $url/files.txt | wc -l
           
 curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}" 2>&1 | tee /mnt/tools/download.log
