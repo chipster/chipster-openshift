@@ -35,7 +35,7 @@ function deploy_postgres {
   -p POSTGRESQL_USER=user \
   -p NAMESPACE=openshift \
   -p VOLUME_CAPACITY=$pvc_size \
-  -p POSTGRESQL_VERSION=9.5 \
+  -p POSTGRESQL_VERSION="10-el8" \
   -p MEMORY_LIMIT=1Gi \
   | oc apply -f - 
 }
