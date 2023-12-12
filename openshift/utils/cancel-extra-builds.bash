@@ -13,7 +13,7 @@ cancel_build () {
 }
 
 if [ -z "$1" ]; then
-    echo cancel all builds
+    echo cancel extra builds from all build configs
     for bc in $(oc get bc -o name | cut -d "/" -f 2); do
         cancel_build $bc
     done
