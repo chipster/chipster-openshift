@@ -35,9 +35,9 @@ metadata:
     {{- end }}
 spec:
   host: {{ $deployment.name }}-admin-{{ $.Values.project }}.{{ $.Values.domain }}
-  # tls:
-  #   insecureEdgeTerminationPolicy: Redirect
-  #   termination: edge
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
   to:
     kind: Service
     name: {{ $deployment.name }}-admin
