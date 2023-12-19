@@ -28,10 +28,13 @@ fi
 
 echo "** create pvc"
 
+#storage_class="user-sc-fs"
+storage_class="glusterfs-storage"
+
 oc process -f jobs/pvc.yaml --local \
 	-p NAME=$pvc_name \
 	-p SIZE=$tools_bin_size \
-  -p STORAGE_CLASS="glusterfs-storage" \
+  -p STORAGE_CLASS=$storage_class \
 	| oc create -f - --validate
 	
 # bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version" "$temp_pvc"

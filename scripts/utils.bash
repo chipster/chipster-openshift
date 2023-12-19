@@ -14,8 +14,10 @@ function get_domain {
     echo "rahtiapp.fi"
   elif [[ $console == "rahti-int.csc.fi" ]]; then
     echo "rahti-int-app.csc.fi"
+  elif [[ $console == "api.okd.lumi-k.csc.fi" ]]; then
+    echo "apps.okd.lumi-k.csc.fi"
   else
-    >&2 echo "no app url defined for OpenShift console " + $console
+    >&2 echo "no app url defined for OpenShift console $console"
   fi
 }
 
