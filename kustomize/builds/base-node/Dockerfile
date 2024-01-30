@@ -4,7 +4,7 @@ FROM base
 # disable update-notifier. Otherwise node doesn't start a week after the image build, because the .npm is directory was created by root. As a side effect node refuses to start immediately, if the root-owned .npm directory exists, but you can simply delete it.
 RUN apt-get update -y \
 	&& apt-get install -y build-essential \
-	&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+	&& curl -sL https://deb.nodesource.com/setup_20.x | bash - \
 	&& apt-get install -y nodejs \
 	&& npm config set update-notifier false \
 	&& apt-get clean
