@@ -114,7 +114,7 @@ bash scripts/build-image.bash web-server
 Copy the new image to K3s.
 
 ```bash
-sudo docker save docker-registry.rahti.csc.fi/chipster-images/web-server | sudo k3s ctr -n k8s.io images import -
+sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
 ```
 
 Restart the pod and wait until it starts:
@@ -134,7 +134,7 @@ Build image, copy it and restart the pod:
 ```bash
 sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/src/assets
 bash scripts/build-image.bash web-server
-sudo docker save docker-registry.rahti.csc.fi/chipster-images/web-server | sudo k3s ctr -n k8s.io images import -
+sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
 kubectl rollout restart deployment/web-server
 watch kubectl get pod
 ```
@@ -144,7 +144,7 @@ watch kubectl get pod
 ```
 bash pull-images.bash
 bash scripts/build-image.bash web-server
-sudo docker save docker-registry.rahti.csc.fi/chipster-images/web-server | sudo k3s ctr -n k8s.io images import -
+sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
 kubectl rollout restart deployment/web-server
 watch kubectl get pod
 ```

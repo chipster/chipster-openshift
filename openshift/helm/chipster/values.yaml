@@ -1,0 +1,208 @@
+# Default values for chipster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Default values for Chipster Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into the templates.
+
+# deployments defines all Chipster services
+# generate-passwords.bash will generate all deployments.*.password fields
+# no single-shot-comp here (unlike in k3s). It would create the secret automatically, but much more things that shouldn't be created (like DeploymentConfig)
+deployments:
+  # keys written in camelCase to make them easier to use in templates
+  webServer:
+    # name is the Chipster service name in its usual dash-separated form
+    name: web-server
+    # class to start if using chipster-web-server image
+    class: ""
+    # image is the name of the container image
+    image: web-server
+    # apiPort is the port which the process binds to serve API requests
+    apiPort: 8000
+    # adminPort is the port which the process binds to serve admin requests
+    adminPort: 8100
+    # workDir is the working directory in container where the process is started
+    workDir: /opt/chipster
+    # password is used by a Chipster service to authenticate to the auth service
+    password: ""
+    # configs is a YAML map to pass configuration key-value pairs to the Chipster service
+    configs: {}
+  auth:
+    name: auth
+    class: fi.csc.chipster.auth.AuthenticationService
+    image: chipster-web-server
+    apiPort: 8002
+    adminPort: 8102
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  serviceLocator:
+    name: service-locator
+    class: fi.csc.chipster.servicelocator.ServiceLocator
+    image: chipster-web-server
+    apiPort: 8003
+    adminPort: 8103
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  sessionDb:
+    name: session-db
+    class: fi.csc.chipster.sessiondb.SessionDb
+    image: chipster-web-server
+    apiPort: 8004
+    adminPort: 8104
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  scheduler:
+    name: scheduler
+    class: fi.csc.chipster.scheduler.Scheduler
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8106
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  fileBroker:
+    name: file-broker
+    class: fi.csc.chipster.filebroker.FileBroker
+    image: chipster-web-server
+    apiPort: 8007
+    adminPort: 8107
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  fileStorage:
+    name: file-storage
+    class: fi.csc.chipster.filestorage.FileStorage
+    image: chipster-web-server
+    apiPort: 8016
+    adminPort: 8116
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  toolbox:
+    name: toolbox
+    class: ""
+    image: toolbox
+    apiPort: 8008
+    adminPort: 8108    
+    # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
+    workDir: /opt/chipster/toolbox
+    password: ""
+    configs: {}
+  sessionWorker:
+    name: session-worker
+    class: fi.csc.chipster.sessionworker.SessionWorker
+    image: chipster-web-server
+    apiPort: 8009
+    adminPort: 8109
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  typeService:
+    name: type-service
+    class: ""
+    image: chipster-web-server-js
+    apiPort: 8010
+    adminPort: 8110
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  backup:
+    name: backup
+    class: fi.csc.chipster.backup.Backup
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8115
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  jobHistory:
+    name: job-history
+    class: fi.csc.chipster.jobhistory.JobHistoryService
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8114
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+
+app:
+  configs:
+    # Define default here instead of web-app-secret.yaml, so that own value.yaml is really 
+    # merged and not only appended to the end (which may work too, but looks messy).
+    # TODO Change app to use defaults automatically to avoid this copy like in backend
+
+    terms-of-use-auths: ["haka"]
+    terms-of-use-path: assets/html/terms-of-use-v1.html
+    terms-of-use-version: 2
+    # service-locator: http://localhost:8003
+    #service-locator: https://service-locator-chipster.rahti-int-app.csc.fi
+
+    home-path: assets/html/app-home.html
+    home-header-path: assets/html/app-home-header.html
+    accessibility-path: assets/html/accessibility.html
+    contact-path: assets/html/app-contact.html
+    access-path: assets/html/access.html
+    privacy-notice-path: assets/html/privacy-notice.html
+
+    # Bio modules and manual
+    modules: ["NGS", "Microarray", "Misc"]
+    manual-path: assets/manual/
+    manual-tool-postfix: .html
+    app-name: Chipster
+    app-id: chipster
+
+    example-session-owner-user-id: jaas/example_session_owner
+    support-session-owner-user-id: jaas/support_session_owner
+
+    jaas-description: ""
+
+    visualization-blacklist: []
+
+
+
+deploymentDefault:
+  env: {}
+
+db:
+  auth:
+    name: auth
+    password: ""
+  sessionDb:
+    name: session-db
+    password: ""  
+  jobHistory:
+    name: job-history
+    password: ""
+
+image:
+  repository: docker-registry.default.svc:5000
+  namespace: chipster-images-release
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+toolsBin:
+  version: "empty"
+
+project: ""
+domain: ""
+
+ipWhitelist: 
+  api: ""
+  admin: ""
+
+serviceAccounts:
+  monitoring:
+    password: ""
+
+tokens:
+  auth:
+    privateKey: ""
+
+users:
+  replay_test:
+    password: ""

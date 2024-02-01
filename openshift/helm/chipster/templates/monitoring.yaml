@@ -1,0 +1,180 @@
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  generation: 1
+  labels:      
+    app: chipster
+  name: influxdb
+spec:
+  replicas: 1
+  selector:
+    name: influxdb
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: influxdb
+    spec:
+      containers:
+      # influxdb2 is very different
+      - image: 'influxdb:1.8'
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        name: influxdb
+        ports:
+        - containerPort: 8086
+          name: api
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2
+            memory: 2Gi
+          requests:
+            cpu: 2
+            memory: 2Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/influxdb
+          name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: influxdb
+  test: false
+  triggers:
+  - type: ConfigChange
+  
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  generation: 1
+  labels:
+    app: chipster
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    name: grafana
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: grafana
+    spec:
+      containers:
+      - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/grafana
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        name: grafana
+        ports:
+        - containerPort: 3000
+          name: api
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2
+            memory: 2Gi
+          requests:
+            cpu: 2
+            memory: 2Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /usr/share/grafana/data
+          name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: grafana
+  test: false
+  triggers:
+  - type: ConfigChange
+  
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: chipster
+  name: grafana
+  annotations:
+    {{- if $.Values.ipWhitelist.admin }}
+    haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.admin }}"
+    {{- end }}
+spec:
+  host: grafana-{{ $.Values.project }}.{{ $.Values.domain }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: grafana
+    weight: 100
+  wildcardPolicy: None
+status: 
+  ingress: []
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: influxdb
+spec:
+  ports:
+  - port: 8086
+    protocol: TCP
+    targetPort: api
+  selector:
+    name: influxdb
+  sessionAffinity: None
+  type: ClusterIP
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: grafana
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: api
+  selector:
+    name: grafana
+  sessionAffinity: None
+  type: ClusterIP

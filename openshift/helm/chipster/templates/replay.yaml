@@ -1,0 +1,160 @@
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  generation: 1
+  labels:      
+    app: chipster
+  name: replay
+spec:
+  replicas: 1
+  selector:
+    name: replay
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    recreateParams:
+      timeoutSeconds: 600
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: replay
+    spec:
+      containers:
+      - command:
+        - node
+        args:
+        - --max-old-space-size=2048
+        - lib/replay-server
+        - https://{{ $.Values.project }}.{{ $.Values.domain }}
+        - --username
+        - replay_test
+        - --password
+        - {{ $.Values.users.replay_test.password }}
+        - --influxdb
+        - http://influxdb:8086/write?db=db
+        - --schedule
+        - '*/10 * * * *:availability:1:500'          
+        image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/cli-client:{{$.Values.image.tag}}"
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        name: replay
+        ports:
+        - containerPort: 9000
+          name: admin
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /home/user/chipster-web-server/js/cli-client/results
+          name: results
+        - mountPath: /home/user/chipster-web-server/js/cli-client/tmp
+          name: tmp
+        - mountPath: /home/user/chipster-web-server/js/cli-client/logs
+          name: logs
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /alive
+            port: 9000
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1800m
+            memory: 1900Mi
+          requests:
+            cpu: 1800m
+            memory: 1900Mi
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /alive
+            port: 9000
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30          
+      - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        name: filebeat
+        volumeMounts:
+          - mountPath: /opt/chipster-web-server/logs
+            name: logs
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 200m
+            memory: 100Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: results
+        persistentVolumeClaim:
+          claimName: replay-results
+      - name: tmp
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - replay
+      from:
+        kind: ImageStreamTag
+        name: "cli-client:{{$.Values.image.tag}}"
+        namespace: {{$.Values.image.namespace}}
+    type: ImageChange
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: chipster
+  name: replay
+  annotations:
+    {{- if $.Values.ipWhitelist.admin }}
+    haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.admin }}"
+    {{- end }}
+spec:
+  host: replay-{{ $.Values.project }}.{{ $.Values.domain }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: replay
+    weight: 100
+  wildcardPolicy: None
+status: 
+  ingress: []
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: replay
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: admin
+  selector:
+    name: replay
+  sessionAffinity: None
+  type: ClusterIP

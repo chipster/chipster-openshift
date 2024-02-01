@@ -1,0 +1,5 @@
+# backup monitoring is too slow
+# slash "/" is encoded as "~1" https://datatracker.ietf.org/doc/html/rfc6901#section-3
+- op: add
+  path: /metadata/annotations/haproxy.router.openshift.io~1timeout
+  value: "120s"

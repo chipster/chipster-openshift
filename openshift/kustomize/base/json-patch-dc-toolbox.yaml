@@ -1,0 +1,7 @@
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/0/mountPath
+  value: "/opt/chipster/toolbox/logs"
+
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/1/mountPath
+  value: "/opt/chipster/toolbox/conf"

@@ -1,0 +1,172 @@
+# deployment for each Chipster service
+{{- range $deploymentKey, $deployment := .Values.deployments }}
+{{- if ne $deployment.name "file-storage" }}
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: {{ $deployment.name }}
+  labels:
+    app: chipster
+spec:
+  replicas: 1
+  selector:
+    name: {{ $deployment.name }}
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+    # recreateParams:
+    #   timeoutSeconds: 600
+    # type: Recreate
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: {{ $deployment.name }}
+    spec:
+      containers:
+        - name: {{ $deployment.name }}
+          # Java class to start for the chipster-web-server image
+          env:
+            - name: JAVA_CLASS
+              value: {{ $deployment.class }}
+            {{- range $key, $value := $.Values.deploymentDefault.env }}
+            - name: {{ $key }}
+              value: {{ $value }}
+            {{- end }}
+          image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/{{ $deployment.image }}:{{$.Values.image.tag}}"
+          # pull policy for Chipster images
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: {{ $deployment.adminPort }}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 1600m
+              memory: 512Mi
+            requests:
+              cpu: 1600m
+              memory: 512Mi
+          #FIXME if port exists for the service
+          ports:
+            {{- if $deployment.apiPort }}
+            - containerPort: {{ $deployment.apiPort }}
+              name: api
+              protocol: TCP
+            {{- end }}
+            {{- if $deployment.adminPort }}
+            - containerPort: {{ $deployment.adminPort }}
+              name: admin
+              protocol: TCP
+            {{- end }}            
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /opt/chipster/logs
+              name: logs
+            - mountPath: /opt/chipster/conf
+              name: conf
+            {{- if eq $deployment.name "toolbox" }}
+            - mountPath: "/mnt/tools"
+              name: tools-bin
+            {{- end }}
+        - env:
+            - name: admin_port
+              value: "{{ $deployment.adminPort }}"
+            - name: role
+              value: {{ $deployment.name }}
+              # get password from secret to hide it from this dc
+            - name: password
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: monitoring
+          image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          name: status
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: {{ $deployment.adminPort }}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+            requests:
+              cpu: 200m
+              memory: 10Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          name: filebeat
+          volumeMounts:
+            - mountPath: /opt/chipster/logs
+              name: logs
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: {{ $deployment.adminPort }}
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+            requests:
+              cpu: 200m
+              memory: 10Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: logs
+        - name: conf
+          secret:
+            defaultMode: 420
+            secretName: {{ $deployment.name }}
+        {{- if eq $deployment.name "toolbox" }}
+        - name: tools-bin
+          persistentVolumeClaim:
+            claimName: "tools-bin-{{ $.Values.toolsBin.version }}"
+        {{- end }}
+  test: false
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - {{ $deployment.name }}
+        from:
+          kind: ImageStreamTag
+          name: "{{ $deployment.image }}:{{$.Values.image.tag}}"
+          namespace: {{$.Values.image.namespace}}
+      type: ImageChange
+{{- end }}
+{{- end }}

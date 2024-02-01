@@ -1,0 +1,40 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: chipster
+  name: session-db-events
+  annotations:
+    {{- if $.Values.ipWhitelist.api }}
+    haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.api }}"
+    {{- end }}
+spec:
+  host: session-db-events-{{ $.Values.project }}.{{ $.Values.domain }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: session-db-events
+    weight: 100
+  wildcardPolicy: None
+status: 
+  ingress: []
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: session-db-events
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: events
+  selector:
+    name: session-db
+  sessionAffinity: None
+  type: ClusterIP

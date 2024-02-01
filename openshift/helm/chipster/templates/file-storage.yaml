@@ -1,0 +1,154 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: file-storage
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    name: api
+  selector:
+    name: file-storage
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: chipster
+    server: file-storage
+  name: file-storage
+spec:
+  podManagementPolicy: Parallel
+  serviceName: file-storage
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chipster
+  template:
+    metadata:
+      labels:
+        app: chipster
+        name: file-storage
+        server: file-storage
+    spec:
+      containers:
+        - env:
+            - name: JAVA_CLASS
+              value: {{ $.Values.deployments.fileStorage.class }}
+          image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/{{ $.Values.deployments.fileStorage.image }}:{{$.Values.image.tag}}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          name: file-storage
+          ports:
+            - containerPort: 8016
+              name: api
+              protocol: TCP
+            - containerPort: 8116
+              name: admin
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: 8116
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 1600m
+              memory: 512Mi
+            requests:
+              cpu: 1600m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /opt/chipster/logs
+              name: logs
+            - mountPath: /opt/chipster/conf
+              name: conf
+            - mountPath: /opt/chipster/storage
+              name: storage
+        - env:
+            - name: admin_port
+              value: "8116"
+            - name: role
+              value: file-storage
+            - name: password
+              value: {{ $.Values.serviceAccounts.monitoring.password }}
+          image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          name: status
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: 8116
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+            requests:
+              cpu: 200m
+              memory: 10Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          name: filebeat
+          volumeMounts:
+            - mountPath: /opt/chipster/logs
+              name: logs
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /admin/alive
+              port: 8116
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+            requests:
+              cpu: 200m
+              memory: 10Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: logs
+        - name: conf
+          secret:
+            defaultMode: 420
+            secretName: file-storage
+  volumeClaimTemplates:
+  - metadata:
+      annotations:
+        # at the moment "helm uninstall" doesn't delete sts volumes, but let's add this anyway in case this changes
+        "helm.sh/resource-policy": keep
+      labels:
+        app: chipster
+      name: storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

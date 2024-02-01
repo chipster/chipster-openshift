@@ -1,0 +1,7 @@
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/2
+  value: {"name": security,"mountPath": "/opt/chipster/security"}
+
+- op: add
+  path: /spec/template/spec/volumes/2
+  value: {"name":security,"persistentVolumeClaim":{"claimName":"auth-security"}}

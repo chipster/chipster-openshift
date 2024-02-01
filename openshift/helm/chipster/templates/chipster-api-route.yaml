@@ -1,0 +1,38 @@
+# deployment for each Chipster service
+{{- range $deploymentKey, $deployment := .Values.deployments }}
+{{- if ne $deployment.name "file-storage" }}
+{{- if $deployment.apiPort }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: chipster
+  name: {{ $deployment.name }}
+  annotations:
+    {{- if $.Values.ipWhitelist.api }}
+    haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.api }}"
+    {{- end }}
+    {{- if eq $deployment.name "web-server" }}
+    console.alpha.openshift.io/overview-app-route: true
+    {{- end }}
+spec:
+  {{- if eq $deployment.name "web-server" }}
+  host: {{ $.Values.project }}.{{ $.Values.domain }}
+  {{- else }}
+  # stop here if somebody tries to run the default deploy.bash without any configuration (like ip whitelists)
+  host: {{ $deployment.name }}-{{ required "project not found (most likely you are trying to deploy Chipster without any configuration)" $.Values.project }}.{{ $.Values.domain }}
+  {{- end }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: {{ $deployment.name }}
+    weight: 100
+  wildcardPolicy: None
+status: 
+  ingress: []
+{{- end }}
+{{- end }}
+{{- end }}

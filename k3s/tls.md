@@ -27,13 +27,13 @@ Use Ansible playbook to add the Helm repository of cert-manager and install its 
 ansible-playbook ansible/install-tls-deps.yml -i "localhost," -c local -e user=$(whoami)
 ```
 
-Now we only have to install cert-manager itself with Helm:
+Now we only have to install cert-manager itself with Helm. If you have already a previous version of the cert-manager installed, uninstall it first: `helm --namespace cert-manager uninstall cert-manager`.
 
 ```bash
 helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.3.1
+  --version v1.11.0
 ```
 
 ## Rate limits
@@ -90,7 +90,6 @@ Again, deploy the new settings. Restart also all deployments to make sure that t
 
 ```bash
 bash deploy.bash -f ~/values.yaml
-bash restart.bash
 ```
 
 Wait until this production certificate is ready. Follow the troubleshooting tips in `staging` chapter above if that doesn't happen.
@@ -99,6 +98,12 @@ Wait until this production certificate is ready. Follow the troubleshooting tips
 $ kubectl get certificate
 NAME           READY   SECRET         AGE
 chipster-tls   True    chipster-tls   48s
+```
+
+Restart all services to make sure the client will use https protocol for all connections:
+
+```bash
+bash restart.bash
 ```
 
 Now open the address https://HOST_ADDRESS in the browser. You should see a closed lock icon in the address bar. If you click on that icon, the browser should show you a valid certificate for you HOST_ADDRESS issued by Let's Encrypt.

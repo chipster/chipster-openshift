@@ -1,0 +1,8 @@
+
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/2
+  value: {"name":"app-conf","mountPath":"/opt/chipster/web-root/assets/conf"}
+
+- op: add
+  path: /spec/template/spec/volumes/2
+  value: {"name":"app-conf","secret":{"secretName":"web-server-app"}}

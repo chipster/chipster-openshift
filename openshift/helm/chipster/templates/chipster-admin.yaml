@@ -1,0 +1,50 @@
+# deployment for each Chipster service
+{{- range $deploymentKey, $deployment := .Values.deployments }}
+{{- if ne $deployment.name "file-storage" }}
+{{- if $deployment.adminPort }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: {{ $deployment.name }}-admin
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: admin
+  selector:
+    name: {{ $deployment.name }}
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: chipster
+  name: {{ $deployment.name }}-admin
+  annotations:
+    {{- if $.Values.ipWhitelist.admin }}
+    haproxy.router.openshift.io/ip_whitelist: "{{- $.Values.ipWhitelist.admin }}"
+    {{- else }}
+    # create the annotations object anyway, so that new annotations can be added in json patches
+    {}
+    {{- end }}
+spec:
+  host: {{ $deployment.name }}-admin-{{ $.Values.project }}.{{ $.Values.domain }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: {{ $deployment.name }}-admin
+    weight: 100
+  wildcardPolicy: None
+status: 
+  ingress: []
+{{- end }}
+{{- end }}
+{{- end }}

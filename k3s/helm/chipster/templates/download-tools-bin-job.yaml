@@ -19,7 +19,7 @@ spec:
         - name: TOOLS_BIN_VERSION
           value: {{ $.Values.toolsBin.version }}
         name: download-tools-bin-{{ $.Values.toolsBin.version | replace "." "-" }}
-        image: {{$.Values.image.chipsterImageRepo}}base
+        image: {{$.Values.image.chipsterImageRepo}}base:{{$.Values.image.tag}}
         imagePullPolicy: {{ $.Values.image.localPullPolicy }}
         command: 
         - bash
