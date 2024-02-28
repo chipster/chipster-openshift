@@ -1,0 +1,28 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: comp-r-4-2-3-seurat5
+  name: comp-r-4-2-3-seurat5
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: comp-r-4-2-3-seurat5:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: comp-20-04-r-deps:latest
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - type: ConfigChange
+  - imageChange:
+    type: ImageChange
