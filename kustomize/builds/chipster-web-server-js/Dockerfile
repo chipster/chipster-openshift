@@ -9,16 +9,16 @@ RUN cd /tmp/build/chipster-web-server/js/type-service \
 	&& npm install \
 	&& npm run build \
 	&& rm -rf /home/user/.npm
-	
+
 RUN cd /tmp/build/chipster-web-server/js/type-service \
-	&& mkdir -p /opt/chipster/js/type-service/src \
-	&& mv src/*.js /opt/chipster/js/type-service/src \
+	&& mkdir -p /opt/chipster/js/type-service \
+	&& mv lib /opt/chipster/js/type-service \
 	&& mv *.json /opt/chipster/js/type-service/ \
 	&& mv node_modules /opt/chipster/js/type-service \
 	&& mkdir -p /opt/chipster/src/main/resources \
 	&& mv /tmp/build/chipster-web-server/src/main/resources/chipster-defaults.yaml /opt/chipster/src/main/resources/ \
- 	&& chmod -R ugo+rwx /opt/chipster \
- 	&& rm -rf /tmp/build/chipster-web-server
+	&& chmod -R ugo+rwx /opt/chipster \
+	&& rm -rf /tmp/build/chipster-web-server
 
 WORKDIR /opt/chipster/js/type-service
 

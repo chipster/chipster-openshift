@@ -27,7 +27,7 @@ spec:
         - node
         args:
         - --max-old-space-size=2048
-        - lib/replay-server
+        - lib/replay-server.js
         - https://{{ $.Values.project }}.{{ $.Values.domain }}
         - --username
         - replay_test
