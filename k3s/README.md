@@ -266,7 +266,7 @@ If you updated the tools-bin version, you can free disk space by removing the ol
 kubectl get pvc
 ```
 
-End remove it:
+Remove it:
 
 ```bash
 kubectl delete pvc NAME_OF_OLD_TOOLS_BIN_VOLUME
