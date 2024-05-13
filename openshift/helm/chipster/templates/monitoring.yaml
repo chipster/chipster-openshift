@@ -13,13 +13,9 @@ spec:
   strategy:
     activeDeadlineSeconds: 21600
     resources: {}
-    rollingParams:
-      intervalSeconds: 1
-      maxSurge: 25%
-      maxUnavailable: 25%
+    recreateParams:
       timeoutSeconds: 600
-      updatePeriodSeconds: 1
-    type: Rolling
+    type: Recreate
   template:
     metadata:
       labels:
@@ -28,7 +24,10 @@ spec:
     spec:
       containers:
       # influxdb2 is very different
-      - image: 'influxdb:1.8'
+      # 2024-05-13 Openshift 3.11 cannot pull anymore latest influxdb:1.8. Old image format? Download and upload the image (and see login commands in prune-images.bash):
+      # skopeo copy docker://influxdb:1.8 dir:influxdb --override-os linux --override-arch amd64
+      # skopeo copy dir:influxdb docker://docker-registry.rahti.csc.fi/$PROJECT/influxdb:1.8 --override-os linux --override-arch amd64
+      - image: 'docker-registry.default.svc:5000/chipster-beta/influxdb:1.8'
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: influxdb
         ports:
