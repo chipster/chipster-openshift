@@ -21,4 +21,5 @@ RUN cd chipster-web-server \
 
 WORKDIR /opt/chipster
 
-CMD java -cp lib/*: ${JAVA_CLASS:-fi.csc.chipster.rest.ServerLauncher}
+# disable TLSv1.3, because downloads from ha-proxy (a3s.fi) fail at key update after 128 GiB
+CMD java -cp lib/*: -Djdk.tls.client.protocols="TLSv1.2" ${JAVA_CLASS:-fi.csc.chipster.rest.ServerLauncher}
