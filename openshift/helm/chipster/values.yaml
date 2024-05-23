@@ -87,7 +87,7 @@ deployments:
     class: ""
     image: toolbox
     apiPort: 8008
-    adminPort: 8108    
+    adminPort: 8108
     # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
     workDir: /opt/chipster/toolbox
     password: ""
@@ -98,6 +98,15 @@ deployments:
     image: chipster-web-server
     apiPort: 8009
     adminPort: 8109
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+  s3Storage:
+    name: s3-storage
+    class: fi.csc.chipster.s3storage.S3Storage
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8117
     workDir: /opt/chipster
     password: ""
     configs: {}
@@ -131,7 +140,7 @@ deployments:
 
 app:
   configs:
-    # Define default here instead of web-app-secret.yaml, so that own value.yaml is really 
+    # Define default here instead of web-app-secret.yaml, so that own value.yaml is really
     # merged and not only appended to the end (which may work too, but looks messy).
     # TODO Change app to use defaults automatically to avoid this copy like in backend
 
@@ -162,8 +171,6 @@ app:
 
     visualization-blacklist: []
 
-
-
 deploymentDefault:
   env: {}
 
@@ -173,7 +180,7 @@ db:
     password: ""
   sessionDb:
     name: session-db
-    password: ""  
+    password: ""
   jobHistory:
     name: job-history
     password: ""
@@ -191,7 +198,7 @@ toolsBin:
 project: ""
 domain: ""
 
-ipWhitelist: 
+ipWhitelist:
   api: ""
   admin: ""
 
