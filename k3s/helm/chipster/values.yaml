@@ -200,10 +200,26 @@ deployments:
     eventsPort: ""
     workDir: /opt/chipster
     password: ""
-    configs:
+    configs: {}
     # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
     db-fallback-job-history: false
     replicas: ""
+    adminRoute: "default"
+    conf: {}
+    env: {}
+  s3Storage:
+    name: s3-storage
+    class: fi.csc.chipster.s3storage.S3Storage
+    image: chipster-web-server
+    apiPort: ""
+    adminPort: 8117
+    eventsPort: ""
+    workDir: /opt/chipster
+    password: ""
+    configs: {}
+    # don't waste resources on s3-storage before it's configured
+    # has no effect without quotes. Probably if-clause considers it as "false".
+    replicas: "0"
     adminRoute: "default"
     conf: {}
     env: {}
