@@ -12,12 +12,8 @@ bash deploy-builds.bash
 # run if the templates or configuration have changed or there are new services
 bash deploy.bash
 
-# optional
-#bash deploy-mylly-app.bash
-
 # create default users in auth and configure grafana password and dashboards (not started with the default quota)
 bash setup.bash
 
 # download tools if you have enough storage quota
 #bash download-tools-bin.bash
-#bash download-tools-bin-mylly.bash

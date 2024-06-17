@@ -28,7 +28,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
----      
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -97,25 +97,10 @@ metadata:
     "helm.sh/resource-policy": keep
   labels:
     app: chipster
-  name: tools-bin-mylly
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
----  
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    "helm.sh/resource-policy": keep
-  labels:
-    app: chipster
   name: replay-results
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi          
+      storage: 1Gi
