@@ -64,9 +64,6 @@ for build_template in kustomize/builds/*/*.yaml; do
   echo "$(cat $base_dir/kustomization.yaml | yq e - -o=json | jq '.resources += ["'$build-is.yaml'"]' | yq e - )" > $base_dir/kustomization.yaml  
 done
 
-# copy builds-mylly overlay to the build dir in case this deployment uses it
-cp -r kustomize/builds-mylly $build_dir
-
 private_all_kustomize_path="$private_config_path/chipster-all/builds"
 private_kustomize_path="$private_config_path/$PROJECT.$DOMAIN/builds"
 
