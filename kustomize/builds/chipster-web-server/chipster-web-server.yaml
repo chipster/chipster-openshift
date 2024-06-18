@@ -10,7 +10,13 @@ spec:
       kind: ImageStreamTag
       name: chipster-web-server:latest
   postCommit: {}
-  resources: {}
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 1Gi
   runPolicy: Serial
   source:
     dockerfile: ""
@@ -26,6 +32,6 @@ spec:
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
-  - imageChange:
-    type: ImageChange
-  - type: ConfigChange
+    - imageChange:
+      type: ImageChange
+    - type: ConfigChange

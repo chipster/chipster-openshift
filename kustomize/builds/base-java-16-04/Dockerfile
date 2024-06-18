@@ -5,7 +5,7 @@ RUN apt-get update -y \
 	&& wget -O- https://apt.corretto.aws/corretto.key | apt-key add - \
 	&& add-apt-repository 'deb https://apt.corretto.aws stable main' \
 	&& apt-get update -y \ 
-	&& apt-get install -y java-21-amazon-corretto-jdk gradle postgresql-client postgresql-contrib gnupg2 awscli \
+	&& apt-get install -y java-21-amazon-corretto-jdk gradle \
 	&& apt-get clean
 
 CMD sleep inf

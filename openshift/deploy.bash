@@ -26,6 +26,8 @@ if [ -s "$private_conf_dir" ]; then
         domain="apps.okd.lumi-k.csc.fi"
     elif [ $api == "https://rahti.csc.fi:8443" ]; then
         domain="rahtiapp.fi"
+    elif [ $api == "https://api.2.rahti.csc.fi:6443" ]; then
+        domain="2.rahtiapp.fi"
     else
         echo "unknown api: $api"
         exit 1
