@@ -10,7 +10,13 @@ spec:
       kind: ImageStreamTag
       name: comp-r-4-2-3-cellbender:latest
   postCommit: {}
-  resources: {}
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 500Mi
   runPolicy: Serial
   source:
     dockerfile: ""
@@ -23,6 +29,6 @@ spec:
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
-  - type: ConfigChange
-  - imageChange:
-    type: ImageChange
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange

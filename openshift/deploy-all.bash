@@ -3,7 +3,7 @@
 bash generate-passwords.bash
 
 # deploy databases
-bash deploy-postgres.bash
+#bash deploy-postgres.bash
 
 # create or update builds
 bash deploy-builds.bash

@@ -12,8 +12,8 @@ function get_domain {
 
   if [[ $console == "rahti.csc.fi" ]]; then
     echo "rahtiapp.fi"
-  elif [[ $console == "rahti-int.csc.fi" ]]; then
-    echo "rahti-int-app.csc.fi"
+  elif [[ $console == "api.2.rahti.csc.fi" ]]; then
+    echo "2.rahtiapp.fi"
   elif [[ $console == "api.okd.lumi-k.csc.fi" ]]; then
     echo "apps.okd.lumi-k.csc.fi"
   else
