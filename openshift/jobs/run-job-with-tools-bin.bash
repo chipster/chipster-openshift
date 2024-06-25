@@ -26,7 +26,7 @@ if oc get job $name > /dev/null 2>&1; then
 fi
 
 max_cpu=$(oc get limits -o json | jq .items[].spec.limits[0].max.cpu -r)
-cpu="4"
+cpu="1"
 if [ "$cpu" -gt "$max_cpu" ]; then
   cpu="$max_cpu"  
 fi
@@ -34,7 +34,7 @@ fi
 echo "** create job"
 
 oc process -f jobs/bash-job-template-with-tools-bin.yaml --local \
-	-p TOOLS_BIN_VERSION=$tools_bin_version \
+	-p TOOLS_BIN_VERSION=${tools_bin_version} \
 	-p NAME=$name \
 	-p CPU=$cpu \
 	| yq e -o=json | jq .items[0].spec.template.spec.containers[0].command[2]="$(cat $job | jq -s -R .)" \
