@@ -58,7 +58,7 @@ function download_file {
 				cp "$temp_dir/$extracted_file" "/mnt/tools/$extracted_file"
 			fi
 			
-			sleep 0.1
+			# sleep 0.1
 
 			# # if symlink, just continue to the next file
 			# if [[ -L $extracted_file ]]; then

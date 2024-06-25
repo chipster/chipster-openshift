@@ -73,21 +73,21 @@ spec:
   resources:
     requests:
       storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    "helm.sh/resource-policy": keep
-  labels:
-    app: chipster
-  name: tools-bin-empty
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   annotations:
+#     "helm.sh/resource-policy": keep
+#   labels:
+#     app: chipster
+#   name: tools-bin-empty
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 1Gi
 
 ---
 apiVersion: v1
