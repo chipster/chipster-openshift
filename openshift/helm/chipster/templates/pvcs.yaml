@@ -104,3 +104,19 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
+  labels:
+    app: chipster
+  name: session-worker-tmp
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
