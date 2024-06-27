@@ -1,0 +1,11 @@
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/2
+  value: { "name": tmp, "mountPath": "/opt/chipster/tmp" }
+
+- op: add
+  path: /spec/template/spec/volumes/2
+  value:
+    {
+      "name": tmp,
+      "persistentVolumeClaim": { "claimName": "session-worker-tmp" },
+    }
