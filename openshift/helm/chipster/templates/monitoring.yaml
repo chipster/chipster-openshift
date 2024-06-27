@@ -24,10 +24,7 @@ spec:
     spec:
       containers:
       # influxdb2 is very different
-      # 2024-05-13 Openshift 3.11 cannot pull anymore latest influxdb:1.8. Old image format? Download and upload the image (and see login commands in prune-images.bash):
-      # skopeo copy docker://influxdb:1.8 dir:influxdb --override-os linux --override-arch amd64
-      # skopeo copy dir:influxdb docker://docker-registry.rahti.csc.fi/$PROJECT/influxdb:1.8 --override-os linux --override-arch amd64
-      - image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/influxdb:1.8"
+      - image: influxdb:1.8"
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: influxdb
         ports:
