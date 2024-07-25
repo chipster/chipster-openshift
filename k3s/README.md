@@ -2,7 +2,7 @@
 
 ## Overview
 
-These instructions show how to install the Chipster web app version 4 to an Ubuntu server. 
+These instructions show how to install the Chipster web app version 4 to an Ubuntu server.
 
 Chipster is based on microservice architecture. There is about a dozen different services, but each of service tries to be relatively simple and independent. Each service is run in its own container. The containers are orchestrated with [Lightweight Kubernetes K3s](https://k3s.io).
 
@@ -10,7 +10,7 @@ The user interface in the v4 Chipster is a single-page-application (SPA) running
 
 ## Status
 
-To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide [the critical pointers](migration.md), because we are migrating our own installations anyway. 
+To get started as fast as possible, these instructinos assume that were are setting up a new single-node server. At this point we don't promise to offer complete instructions for updating this server to new Chipster versions later. Especially migrating the user's sessions and files from one version to another is not always trivial. We do try to provide [the critical pointers](migration.md), because we are migrating our own installations anyway.
 
 These instructions will assume that you are running the latest version of deployment scripts and container images. If you have installed your Chipster server earlier, please [update](#Updates) it first to the latest version or find the old version of these insructions from the time when your server was installed.
 
@@ -28,7 +28,7 @@ Please follow a separate document [Chipster in K3s prerequisites](prerequisites.
 
 ### Deploy
 
-First we generate passwords. 
+First we generate passwords.
 
 Helm doesn't seem to have a standard way for handling passwords. Our solution is to have a separate bash script which generates the passwords and stores them in a Kubernetes secret. The passwords are stored in a same format as the `values.yaml` in the Chipster Helm chart.
 
@@ -77,7 +77,7 @@ Please see [Getting started with K3s](getting-started-with-k3s.md) for K3s basic
 
 Deployment settings are defined in the `helm/chipster/values.yaml` file. You can override any of these values by passing `--set KEY=VALUE` arguments to the `deploy.bash` script (in addition to all the previous arguments), just like you have already done with the host name.
 
-For example, to create a new user account `john` with a password `verysecretpassword`, you would check the file `helm/chipster/values.yaml` to see which object needs to modified. 
+For example, to create a new user account `john` with a password `verysecretpassword`, you would check the file `helm/chipster/values.yaml` to see which object needs to modified.
 You would run the `deploy.bash` scripte then again with an additional argument:
 
 ```bash
@@ -106,11 +106,11 @@ If you need to debug this process, you can run the above command with `--debug -
 
 ### Chipster settings
 
-All Chipster configuration options can be found from a file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `helm/chipster/values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs. 
+All Chipster configuration options can be found from a file [chipster-defaults.yaml](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/chipster-defaults.yaml). The `helm/chipster/values.yaml` (explained in the previous chapter) has a `deployments.CHIPSTER_SERVICE.configs` map for each Chipster service, where you can set Chipster configuration key-value pairs.
 
 For example, edit your `~/values.yaml` to add the new setting (most tools require one "slot", so this will effectively limit the number of jobs to five).
 
->Note! The Helm templates now assume that all Chipster configuration values are strings. For example the number 5 here must be enclosed in quotes.
+> Note! The Helm templates now assume that all Chipster configuration values are strings. For example the number 5 here must be enclosed in quotes.
 
 ```yaml
 deployments:
@@ -136,7 +136,7 @@ You can check that configuration file was changed correctly.
 ```bash
 $ bash get-secret.bash scheduler
 url-int-service-locator: http://service-locator
-service-password-comp: "PASSWORD_HIDDEN"    
+service-password-comp: "PASSWORD_HIDDEN"
 cheduler-bash-max-slots: |-
   10
 ```
@@ -152,12 +152,13 @@ Please note that two-word Chipster service names like `file-broker` are written 
 ### Specify container image version
 
 See the next chapter.
+
 ### Updates
 
 Even if you have just installed a new Chipster server, it's recommended to follow this chapter. It includes instructions for specifying a container image version and pulling
 all images, which makes sure your Chipster installation doesn't break when new versions are released.
 
-If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
+If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.2.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.2.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
 
 Before starting the update, please make sure you have the necessary [backups](#backups) in case something goes wrong in this process.
 
@@ -188,7 +189,7 @@ Check if new passwords need to be generated:
 bash generate-passwords.bash
 ```
 
-In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other. 
+In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other.
 
 Run the following command to see what image versions are available. For example, the output could look something like this:
 
@@ -241,7 +242,7 @@ See also the next chapter for instructions how to update the tools-bin package.
 
 The tools-bin package contains most of the Chipster analysis tool program binaries and all reference data. Its size is about 500 GB and it has hundreds of thousands files. Its download can be challenging if the internet connection is less than perfect and also simply creating so many files may take hours on some high-latency file systems.
 
-When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest tools-bin version. 
+When you have checked that the Chipster itself works, you can start the tools-bin download. If you are updating your Chipster server, you should check also if there is newer tools-bin version available. New analysis tools or new reference genome versions are added in the new tools-bin version. Usually most old tools continue working even if you don't update to the latest tools-bin version.
 
 There are two ways to download the tools-bin. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
 
@@ -276,13 +277,13 @@ kubectl delete pvc NAME_OF_OLD_TOOLS_BIN_VOLUME
 
 ### Admin view
 
- * check the password of `admin` user account from the auth
+- check the password of `admin` user account from the auth
 
- ```bash
- kubectl exec deployment/auth -it -- cat security/users
- ```
+```bash
+kubectl exec deployment/auth -it -- cat security/users
+```
 
- * when logged in with that account, there is `Admin` link in the top bar of the web app. Click that link to see the Admin view.
+- when logged in with that account, there is `Admin` link in the top bar of the web app. Click that link to see the Admin view.
 
 ### Custom DB queries
 
@@ -301,9 +302,10 @@ Single quotes (`'`) are important so that your local shell doesn't try to expand
 [Configure Chipster to use TLS](tls.md) (https) to encrypt and validate the network traffic between the browser and the server.
 
 ### Authentication
+
 #### JWT keys
 
-Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret. 
+Chipster service `auth` creates authentication tokens. These are JWT tokens that are signed with a private key. Other Chipster services can request the corresponding public key from the Rest API of these services to validate these tokens. The private key is generated in `generate-passwords.bash` and must be kept secret.
 
 You can generate a new private key if you want invalidate all current authentication tokens. First take a copy of the current secret `passwords`:
 
@@ -327,7 +329,7 @@ Generate new configuration secrets for each service, restart all services and wa
 
 ```bash
 bash deploy.bash -f ~/values.yaml
-bash restart.bash 
+bash restart.bash
 watch kubectl get pod
 ```
 
@@ -344,7 +346,7 @@ If something goes wrong, you can restore your old passwords. Note! Make sure tha
 kubectl delete secret passwords
 kubectl apply -f ~/passwords-backup.json
 bash deploy.bash -f ~/values.yaml
-bash restart.bash 
+bash restart.bash
 watch kubectl get pod
 ```
 
@@ -355,12 +357,14 @@ A separate document has instructions for [authenticating Chipster users with Ope
 #### LDAP authentication
 
 Instructions for [LDAP authentication](ldap.md) are provided in a separate document.
+
 #### File authentication
 
 There is a file `security/users` on `auth`, just like in the old Chipster v3, but it won't survive container restarts. The easiest way to add new users is through [values.yaml](#helm-chart-values).
+
 ### Backups
 
-Every disk will fail eventually, bugs may delete the data or administrators can make mistakes. Please make sure you take [backups](backup.md) from your server or make sure 
+Every disk will fail eventually, bugs may delete the data or administrators can make mistakes. Please make sure you take [backups](backup.md) from your server or make sure
 your users understand that they may lose the files they have stored in your Chipster server.
 
 ### Logging
@@ -379,15 +383,15 @@ TODO Configure ReplayServer
 
 ### Customize front page, contact details and terms of use
 
-[You can customize the front page](custom-html.md) and other html pages. It would be good to write at least 
+[You can customize the front page](custom-html.md) and other html pages. It would be good to write at least
 what kind of usage is allowed on your server, who is maintaining it and how to contact you in case there
 are any issues.
 
 ### Example sessions
 
- * check the password of `example_session_owner` from the auth (see the [Admin view](#admin-view) topic above)
- * login with that account and create same sessions
- * share them as read-only to user ID `everyone`
+- check the password of `example_session_owner` from the auth (see the [Admin view](#admin-view) topic above)
+- login with that account and create same sessions
+- share them as read-only to user ID `everyone`
 
 Check the latest example sessions version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-example-sessions/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It probably means only that the example-sessions hasn't changed since that version.
 
@@ -398,9 +402,10 @@ TODO write script for downloading, uploading and sharing all example sessions
 ### Support request sessions
 
 TODO
- * [configure](#chipster-settings) support email address on `session-worker`
- * check the password of `support_session_owner` from auth (see the [Admin view](#admin-view) topic above)
- * login with that account too see the support request sessions
+
+- [configure](#chipster-settings) support email address on `session-worker`
+- check the password of `support_session_owner` from auth (see the [Admin view](#admin-view) topic above)
+- login with that account too see the support request sessions
 
 ### Remote management
 
@@ -408,13 +413,14 @@ TODO copy kubectl configuration from the host and use `kubectl` from your laptop
 
 ### K3s cluster
 
-TODO 
- * How to handle possible custom images? Copy manually to each node or setup an image registry?
- * How to handle PVCs? Setup a NFS share or Longhorn?
- * How to scale the cluster up and down?
- * How to scale Chipster inside the cluster?
+TODO
 
- See also the page [Chipster cluster](chipster-cluster.md) for the instructions about the number of replicas for each Chipster service.
+- How to handle possible custom images? Copy manually to each node or setup an image registry?
+- How to handle PVCs? Setup a NFS share or Longhorn?
+- How to scale the cluster up and down?
+- How to scale Chipster inside the cluster?
+
+See also the page [Chipster cluster](chipster-cluster.md) for the instructions about the number of replicas for each Chipster service.
 
 ### Tool development
 
@@ -435,7 +441,7 @@ The `helm uninstall chipster` command gives you almost a fresh start with one ca
 If the Helm release is too badly broken for the uninstallation, you can delete everything manually with `kubectl`.
 
 ```bash
-for t in job deployment statefulset pod secret ingress service pvc; do  
+for t in job deployment statefulset pod secret ingress service pvc; do
     kubectl delete $t --all
 done
 ```

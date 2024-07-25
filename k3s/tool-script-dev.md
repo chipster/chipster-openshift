@@ -1,13 +1,14 @@
 # Tool script development
+
 ## Overview
 
 Chipster comes with large selection of ready-made tool scripts. It's easy to edit or add new tools, if you want to customize your Chipster server
 for specific analysis needs or even to a compeletely new field of science.
 
-We would like to hear how Chipster is used, so we would encourage you to 
-report your use case and your custom solutions for example on the [chipster-tech email list](https://chipster.rahtiapp.fi/contact). You can also fork our [chipster-tools repository](https://github.com/chipster/chipster-tools) in GitHub to publish your changes for others (preferably with an open source license).
+We would like to hear how Chipster is used, so we would encourage you to
+report your use case and your custom solutions for example on the [chipster-tech email list](https://chipster.2.rahtiapp.fi/contact). You can also fork our [chipster-tools repository](https://github.com/chipster/chipster-tools) in GitHub to publish your changes for others (preferably with an open source license).
 
-[Building a new container image for tool scripts](build-image.md#appendix-2-build-image-for-tool-scripts) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work. 
+[Building a new container image for tool scripts](build-image.md#appendix-2-build-image-for-tool-scripts) from version control repository is a good way to ensure that all hosts in a Kubernetes cluster are running the same version and the history of all previous versions is stored. However, commits and builds are usually too slow for any interactive development work.
 
 To allow faster development cycle, these instructions show how to clone the chipster-tools repository to the host and then mount that directory to the toolbox container. This way you can easily edit the files on the host with your preferred editor. We use [Visual Studio Code](https://code.visualstudio.com/) [Remote Explorer](https://code.visualstudio.com/docs/remote/ssh) for our daily tool development work.
 
@@ -38,10 +39,10 @@ Deploy changes.
 ```bash
 bash deploy.bash -f ~/values.yaml
 ```
+
 ## Reload toolbox after tool script changes
 
-
-When you have edited tool scirpts you have the trigger a tool reload in the toolbox. 
+When you have edited tool scirpts you have the trigger a tool reload in the toolbox.
 
 ```bash
 cd ~/git/chipster-tools/
@@ -83,7 +84,7 @@ toolbox-runtime-job-factory: fi.csc.chipster.comp.r.RJobFactory
 
 Let's go through these configuration options one by one.
 
-There are many ways to provide code and files for a Chipster tool. First of all, you can select the container image with configuration option `toolbox-runtime-image`. This decides 
+There are many ways to provide code and files for a Chipster tool. First of all, you can select the container image with configuration option `toolbox-runtime-image`. This decides
 the operating sytem where the tool will be run. Also packages from operating sytem package manager (e.g. `apt` in Ubuntu) is easiest to install directly to this container image. At the moment the container image must include also the program `SingleShotComp` which takes care of communication with Chipster APIs. The image repository is set in scheduler with `scheduler-bash-image-repository`.
 
 Container images are not suited for large data files. Chipster's way to provide larger
@@ -92,7 +93,7 @@ large tools-bin directory and this configuration option is used to switch betwee
 different versions when the Chipster is updated. Additional configuration option `toolbox-runtime-tools-bin-path` defines the path where the tools-bin directory is mounted.
 
 Third and easiest way to provide code for the tool is the tool script itself. The tool script is a text file which needs an interpreter program to be run. Tool scripts
-are written in R or Python language and the corresponding interpreter program is set with a configuration option `toolbox-runtime-command`. In the example above, in this case the interpreter program comes from the tools-bin directory, because the path points under the tools-bin mount `/opt/chipster/tools`. If the interpreter program requires additional parameters, those can be given with `toolbox-runtime-parameters`. 
+are written in R or Python language and the corresponding interpreter program is set with a configuration option `toolbox-runtime-command`. In the example above, in this case the interpreter program comes from the tools-bin directory, because the path points under the tools-bin mount `/opt/chipster/tools`. If the interpreter program requires additional parameters, those can be given with `toolbox-runtime-parameters`.
 
 Finally, each script language needs its own way of injecting that parameter variables and recognising errors. These functionalities are provided for the supported languages with a JobFactory, selected by configuration option `toolbox-runtime-job-factory`.
 
@@ -110,7 +111,7 @@ You don't have to override all configuration options, because Chipster will auto
 Deploy the configuration, restart toolbox and check the logs:
 
 ```bash
-bash deploy.bash -f ~/values.yaml 
+bash deploy.bash -f ~/values.yaml
 kubectl rollout restart deployment/toolbox
 kubectl logs deployment/toolbox --follow
 ```
@@ -126,10 +127,10 @@ A custom runtime is enabled in a tool script simply by referencing its name:
 You have to change the [image pull policy](build-image.md#change-image-pull-policy) to use the local images like this:
 
 ```yaml
-  toolbox:
-    configs:
-      toolbox-runtime-command-R-4.1.1-asv: /opt/chipster/tools/R-4.1.1-asv/bin/R
-      toolbox-runtime-image-R-4.1.1-asv: comp-20.04-asv
+toolbox:
+  configs:
+    toolbox-runtime-command-R-4.1.1-asv: /opt/chipster/tools/R-4.1.1-asv/bin/R
+    toolbox-runtime-image-R-4.1.1-asv: comp-20.04-asv
 ```
 
 Restart toolbox to apply changes:
@@ -163,4 +164,3 @@ watch kubectl get pod
 ```
 
 When you have edited manual pages, simply reload the browser to see the changes.
-
