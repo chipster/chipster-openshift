@@ -19,7 +19,7 @@ RUN apt update -y \
 
 RUN rm /opt/chipster/tools \
     && mkdir -p /opt/chipster/tools \
-    && curl -s https://a3s.fi/bundle-builds/R-4.2.3-seurat5_2024-03-18.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools \
+    && curl -s https://a3s.fi/bundle-builds/R-4.2.3-seurat5_2024-07-02.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools \
     && mkdir /opt/chipster/tools/seurat \
     && curl -s https://a3s.fi/bundle-builds/seurat_regev_lab_cell_cycle_genes_2023-09-21.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools/seurat
 
