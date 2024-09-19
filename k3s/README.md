@@ -244,7 +244,11 @@ When you have checked that the Chipster itself works, you can start the tools-bi
 
 There are two ways to download the tools-bin. This chapter shows the more automatic version, where you simply configure the tools-bin version and the deployment scripts will start a Kubernetes job to do the download. Alternatively, you could [mount a host directory](tools-bin-host-mount.md) and then do the download manually.
 
-To let the deployment scripts do the download, simply configure the tools-bin version and run the deployment again. Check the latest tools-bin version from the [file list](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). Don't worry if the latest tools-bin version there looks older than the latest Chipster version. It means only that the tools-bin package hasn't changed since that version.
+To let the deployment scripts do the download, simply configure the tools-bin version and run the deployment again. Use to following command to check the available tools-bin versions. Don't worry if the latest tools-bin version there is older than the latest Chipster version. It means only that the tools-bin package hasn't changed since that version.
+
+```bash
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | cut -d "/" -f 1 | sort | uniq
+```
 
 Set the tools-bin version in your `~/values.yaml`.
 

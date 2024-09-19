@@ -1,10 +1,18 @@
 # Mount tools-bin from the host
+
 ## Overview
 
 These instructions show how to mount a tools-bin directory of the host to the container.
+
 ## Tools-bin
 
-Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. 
+Use to following command to check the available tools-bin versions. Don't worry if the latest tools-bin version there is older than the latest Chipster version. It means only that the tools-bin package hasn't changed since that version.
+
+```bash
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | cut -d "/" -f 1 | sort | uniq
+```
+
+Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. Replace the version numbers in this example (4.5.2) with the latest version number.
 
 ```bash
 sudo mkdir -p /mnt/data/tools-bin/chipster-4.5.2
@@ -25,7 +33,7 @@ Deploy changes.
 bash deploy.bash -f ~/values.yaml
 ```
 
-Now you would have to download and extract the tools-bin packages. Replace all occurrances of "chipster-4.5.2" with your tools-bin version.
+Now you would have to download and extract the tools-bin packages. Replace all occurrances of "chipster-4.5.2" with the latest tools-bin version.
 
 ```
 # make a temporary directory for the download packages
@@ -43,7 +51,7 @@ cd ..
 # install lz4
 sudo apt install -y liblz4-tool
 
-# extract packages 
+# extract packages
 for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
 
 # remove packages
