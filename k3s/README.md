@@ -192,7 +192,7 @@ In the initial configuration Chipster did pull the latest container images, but 
 Run the following command to see what image versions are available. For example, the output could look something like this:
 
 ```bash
-$ curl -s https://docker-registry.rahti.csc.fi/v2/chipster-images-release/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort
+$ curl -s https://registry.apps.2.rahti.csc.fi/v2/chipster-images-release/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort
 latest
 v4.7.0-rc1
 v4.7.0-rc2

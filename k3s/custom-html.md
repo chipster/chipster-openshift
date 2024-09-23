@@ -1,7 +1,8 @@
 # Customize html pages
+
 ## Introduction
 
-You can customize the front page and other html pages. It would be good to write at least 
+You can customize the front page and other html pages. It would be good to write at least
 what kind of usage is allowed on your server, who is maintaining it and how to contact you in case there
 are any issues.
 
@@ -31,7 +32,7 @@ drwxrwxr-x 6 ubuntu ubuntu 4.0K Apr  1 06:24 ..
 
 ## Host mount
 
-If your Chipster is running only on one node, the easiest way to customize the html pages is to mount them from the virtual machine host. 
+If your Chipster is running only on one node, the easiest way to customize the html pages is to mount them from the virtual machine host.
 
 After having a copy of the html files, add the following configuration to your `~/values.yaml` to mount those files from the host:
 
@@ -52,11 +53,11 @@ browser to see your changes in the browser.
 
 ## Image build
 
-If you plan to run Chipster in a multi-node cluster, you need some other way to store your custom html files. In a Kubernetes cluster, we can either store files in container images or on a volume. As the server isn't supposed to change these html pages and those are not huge in size, the container images are an obvious choice. 
+If you plan to run Chipster in a multi-node cluster, you need some other way to store your custom html files. In a Kubernetes cluster, we can either store files in container images or on a volume. As the server isn't supposed to change these html pages and those are not huge in size, the container images are an obvious choice.
 
-These html files move from the code repository to the running container through two container images. The first image build, called [chipster-web](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/chipster-web/Dockerfile) simply takes the code repository and builds the whole Angular application. The second image build, [web-server](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/web-server/Dockerfile), collects files from multiple images: the app from the `chipster-web` image, the actual http server from the `chipster-web-server` image and manual pages from `chipster-tools` image. 
+These html files move from the code repository to the running container through two container images. The first image build, called [chipster-web](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/chipster-web/Dockerfile) simply takes the code repository and builds the whole Angular application. The second image build, [web-server](https://github.com/chipster/chipster-openshift/blob/kustomize-builds/kustomize/builds/web-server/Dockerfile), collects files from multiple images: the app from the `chipster-web` image, the actual http server from the `chipster-web-server` image and manual pages from `chipster-tools` image.
 
-You could follow the [image build instructions](build-image.md) to fork the [chipster-web](https://github.com/chipster/chipster-web/tree/kustomize-builds) repository and build it. However, building the whole app takes almost 10 minutes and merging future changes to your forked repository might become a bit cumbersome. 
+You could follow the [image build instructions](build-image.md) to fork the [chipster-web](https://github.com/chipster/chipster-web/tree/kustomize-builds) repository and build it. However, building the whole app takes almost 10 minutes and merging future changes to your forked repository might become a bit cumbersome.
 
 In the long run it's easier change the latter build `web-server`, which only combines files from other builds.
 
@@ -75,7 +76,6 @@ RUN ls -lah /home/user
 CMD ["sleep", "inf"]
 ```
 
-
 Now we can build our `custom-html` image.
 
 ```
@@ -86,19 +86,19 @@ sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/
 Next we are going to build the web-server image by using these files as an input. Take a look at the default BuildConfig:
 
 ```
-nano ../kustomize/builds/web-server/web-server.yaml 
+nano ../kustomize/builds/web-server/web-server.yaml
 ```
 
 Find a section like this (there are a few similar sections, but only the correct one has `destinationDir: html`):
 
 ```yaml
-    - as: null
-      from:
-        kind: ImageStreamTag
-        name: chipster-web:latest
-      paths:
-      - destinationDir: html
-        sourcePath: /home/user/chipster-web/assets/html
+- as: null
+  from:
+    kind: ImageStreamTag
+    name: chipster-web:latest
+  paths:
+    - destinationDir: html
+      sourcePath: /home/user/chipster-web/assets/html
 ```
 
 Change the `chipster-web` to your own image `custom-html`. Press Ctrl+O, Enter, Ctrl+X to save and close the editor.
@@ -114,7 +114,7 @@ bash scripts/build-image.bash web-server
 Copy the new image to K3s.
 
 ```bash
-sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
+sudo docker save registry.apps.2.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
 ```
 
 Restart the pod and wait until it starts:
@@ -134,7 +134,7 @@ Build image, copy it and restart the pod:
 ```bash
 sudo docker build -t custom-html -f ~/custom-html/Dockerfile ~/git/chipster-web/src/assets
 bash scripts/build-image.bash web-server
-sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
+sudo docker save registry.apps.2.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
 kubectl rollout restart deployment/web-server
 watch kubectl get pod
 ```
@@ -144,7 +144,7 @@ watch kubectl get pod
 ```
 bash pull-images.bash
 bash scripts/build-image.bash web-server
-sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
+sudo docker save registry.apps.2.rahti.csc.fi/chipster-images-release/web-server | sudo k3s ctr -n k8s.io images import -
 kubectl rollout restart deployment/web-server
 watch kubectl get pod
 ```

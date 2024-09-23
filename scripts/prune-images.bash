@@ -27,16 +27,16 @@ domain=$(oc config view -o json | jq '."current-context"' -r | cut -d "/" -f 2)
 namespace=$(oc config view -o json | jq '."current-context"' -r | cut -d "/" -f 1)
 token=$(oc config view -o json --raw | jq '.users[] | select(.name | contains("'$domain'")) | .user.token' -r)
 
-skopeo login -u $username -p $token docker-registry.rahti.csc.fi
+skopeo login -u $username -p $token registry.apps.2.rahti.csc.fi
 
 # use "skopeo" instead of "oc tag" because "oc tag" doesn't work if the imagestream has a dot in its name
 # oc tag $imagestream:latest $imagestream:latest-copy
-skopeo copy docker://docker-registry.rahti.csc.fi/$namespace/$imagestream:latest docker://docker-registry.rahti.csc.fi/$namespace/$imagestream:latest-copy
+skopeo copy docker://registry.apps.2.rahti.csc.fi/$namespace/$imagestream:latest docker://registry.apps.2.rahti.csc.fi/$namespace/$imagestream:latest-copy
 
 oc tag -d $imagestream:latest
 
 # oc tag $imagestream:latest-copy $imagestream:latest
-skopeo copy docker://docker-registry.rahti.csc.fi/$namespace/$imagestream:latest-copy docker://docker-registry.rahti.csc.fi/$namespace/$imagestream:latest
+skopeo copy docker://registry.apps.2.rahti.csc.fi/$namespace/$imagestream:latest-copy docker://registry.apps.2.rahti.csc.fi/$namespace/$imagestream:latest
 
 oc tag -d $imagestream:latest-copy
 
