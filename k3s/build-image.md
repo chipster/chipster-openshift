@@ -50,10 +50,10 @@ sudo docker save IMAGE | sudo k3s ctr -n k8s.io images import -
 For example, to copy the comp-r-4-2-3-enabrowsertools image from Docker to K3s registry:
 
 ```bash
-sudo docker save registry.apps.2.rahti.csc.fi/chipster-images-release/comp-r-4-2-3-enabrowsertools | sudo k3s ctr -n k8s.io images import -
+sudo docker save image-registry.apps.2.rahti.csc.fi/chipster-images/comp-r-4-2-3-enabrowsertools | sudo k3s ctr -n k8s.io images import -
 ```
 
-The K3s image registry requires us to use the long image names like `registry.apps.2.rahti.csc.fi/chipster-images-release/comp-r-4-2-3-enabrowsertools`. It assumes that short names like `comp-r-4-2-3-enabrowsertools` would refer to its default registry `docker.io/library/`.
+The K3s image registry requires us to use the long image names like `image-registry.apps.2.rahti.csc.fi/chipster-images/comp-r-4-2-3-enabrowsertools`. It assumes that short names like `comp-r-4-2-3-enabrowsertools` would refer to its default registry `docker.io/library/`.
 
 ## Use the new image in a tool
 
@@ -92,10 +92,10 @@ Let's check the images in K3s image registry:
 ```bash
 $ sudo k3s crictl images
 IMAGE                                                                 TAG                    IMAGE ID            SIZE
-registry.apps.2.rahti.csc.fi/chipster-images-release/chipster-web-server-js   latest                 ba6b8e4832b16       280MB
-registry.apps.2.rahti.csc.fi/chipster-images-release/chipster-web-server      latest                 d308fcb91521f       903MB
-registry.apps.2.rahti.csc.fi/chipster-images-release/toolbox                  latest                 7f94300d1e138       904MB
-registry.apps.2.rahti.csc.fi/chipster-images-release/web-server               latest                 e8c8edaaf2417       989MB
+image-registry.apps.2.rahti.csc.fi/chipster-images/chipster-web-server-js   latest                 ba6b8e4832b16       280MB
+image-registry.apps.2.rahti.csc.fi/chipster-images/chipster-web-server      latest                 d308fcb91521f       903MB
+image-registry.apps.2.rahti.csc.fi/chipster-images/toolbox                  latest                 7f94300d1e138       904MB
+image-registry.apps.2.rahti.csc.fi/chipster-images/web-server               latest                 e8c8edaaf2417       989MB
 docker.io/bitnami/minideb                                             stretch                e398a222dbd61       22.2MB
 docker.io/bitnami/postgresql                                          11.6.0-debian-9-r48    6db6971e4c89c       81.2MB
 docker.io/rancher/klipper-helm                                        v0.7.3-build20220613   38b3b9ad736af       83MB

@@ -306,7 +306,7 @@ image:
   # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
   localPullPolicy: IfNotPresent
   #localPullPolicy: Never
-  chipsterImageRepo: registry.apps.2.rahti.csc.fi/chipster-images-release/
+  chipsterImageRepo: image-registry.apps.2.rahti.csc.fi/chipster-images/
   tag: latest
 
 # securityContext sets the access rights of the container user
