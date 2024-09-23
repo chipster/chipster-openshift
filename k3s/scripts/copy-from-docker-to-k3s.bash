@@ -10,5 +10,5 @@ fi
 image="$1"
 
 time sudo docker run --privileged --volume /var/run:/var/run quay.io/skopeo/stable:latest copy \
-    docker-daemon:docker-registry.rahti.csc.fi/chipster-images-release/$image:latest \
-    containers-storage:docker-registry.rahti.csc.fi/chipster-images-release/$image:latest
+    docker-daemon:registry.apps.2.rahti.csc.fi/chipster-images-release/$image:latest \
+    containers-storage:registry.apps.2.rahti.csc.fi/chipster-images-release/$image:latest

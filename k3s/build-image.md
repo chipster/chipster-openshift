@@ -1,9 +1,10 @@
 # Build images
+
 ## Introduction
 
-Integration of new tool in Chipster often involves installation of new operating system packages, program binaries or other files.  If the files are not huge (e.g. < 5 GB), it's advisable to build a new container image for it. The container image makes it explicit which dependendencies are needed to run the tool. Container images are not designed for huge files, so [a shared tools-bin directory](tools-bin-host-mount.md) still needs to be used for larger files.
+Integration of new tool in Chipster often involves installation of new operating system packages, program binaries or other files. If the files are not huge (e.g. < 5 GB), it's advisable to build a new container image for it. The container image makes it explicit which dependendencies are needed to run the tool. Container images are not designed for huge files, so [a shared tools-bin directory](tools-bin-host-mount.md) still needs to be used for larger files.
 
-This page shows you how to build an image to install dependencies for a tool. There are a few other examples at the end of the page in case you want to change some other images, for example the server code. 
+This page shows you how to build an image to install dependencies for a tool. There are a few other examples at the end of the page in case you want to change some other images, for example the server code.
 
 ## Install Docker
 
@@ -49,10 +50,10 @@ sudo docker save IMAGE | sudo k3s ctr -n k8s.io images import -
 For example, to copy the comp-r-4-2-3-enabrowsertools image from Docker to K3s registry:
 
 ```bash
-sudo docker save docker-registry.rahti.csc.fi/chipster-images-release/comp-r-4-2-3-enabrowsertools | sudo k3s ctr -n k8s.io images import -
+sudo docker save registry.apps.2.rahti.csc.fi/chipster-images-release/comp-r-4-2-3-enabrowsertools | sudo k3s ctr -n k8s.io images import -
 ```
 
-The K3s image registry requires us to use the long image names like `docker-registry.rahti.csc.fi/chipster-images-release/comp-r-4-2-3-enabrowsertools`. It assumes that short names like `comp-r-4-2-3-enabrowsertools` would refer to its default registry `docker.io/library/`.
+The K3s image registry requires us to use the long image names like `registry.apps.2.rahti.csc.fi/chipster-images-release/comp-r-4-2-3-enabrowsertools`. It assumes that short names like `comp-r-4-2-3-enabrowsertools` would refer to its default registry `docker.io/library/`.
 
 ## Use the new image in a tool
 
@@ -66,19 +67,19 @@ First of all, define the name of the image. This will override the image definit
 # IMAGE comp-r-4-2-3-enabrowsertools
 ```
 
-Set a [runtime](tool-script-dev.md#runtimes). The tool is written in R language, so Chipster needs to know how to find an R interpreter. In this case the source image [comp-r-4-2-4](https://github.com/chipster/chipster-openshift/tree/k3s/kustomize/builds/comp-r-4-2-3) already contains an R. We can also use an existing runtime `R-4.2.3` to tell Chipster that it can find the R in `/opt/chipster/tools/R-4.2.3/bin/R`. 
+Set a [runtime](tool-script-dev.md#runtimes). The tool is written in R language, so Chipster needs to know how to find an R interpreter. In this case the source image [comp-r-4-2-4](https://github.com/chipster/chipster-openshift/tree/k3s/kustomize/builds/comp-r-4-2-3) already contains an R. We can also use an existing runtime `R-4.2.3` to tell Chipster that it can find the R in `/opt/chipster/tools/R-4.2.3/bin/R`.
 
 ```
 # RUNTIME R-4.2.3
 ```
 
-If we have managed to provide all the tool's dependendencies in the image, it shouldn't need the tools-bin directory anymore. Set it to an empty string `""` to tell Chipster that this tool doesn't need tools-bin at all. 
+If we have managed to provide all the tool's dependendencies in the image, it shouldn't need the tools-bin directory anymore. Set it to an empty string `""` to tell Chipster that this tool doesn't need tools-bin at all.
 
 ```
 # TOOLS_BIN ""
 ```
 
-Note that these header lines have to be in this specific order (first TOOL, INPUT, OUTPUT, PAREMETER and then remaining lines in alphabetical order) for the header parser to find them. 
+Note that these header lines have to be in this specific order (first TOOL, INPUT, OUTPUT, PAREMETER and then remaining lines in alphabetical order) for the header parser to find them.
 
 Remember to [reload toolbox](tool-script-dev.md#reload-toolbox-after-tool-script-changes) to apply the changes.
 
@@ -91,10 +92,10 @@ Let's check the images in K3s image registry:
 ```bash
 $ sudo k3s crictl images
 IMAGE                                                                 TAG                    IMAGE ID            SIZE
-docker-registry.rahti.csc.fi/chipster-images-release/chipster-web-server-js   latest                 ba6b8e4832b16       280MB
-docker-registry.rahti.csc.fi/chipster-images-release/chipster-web-server      latest                 d308fcb91521f       903MB
-docker-registry.rahti.csc.fi/chipster-images-release/toolbox                  latest                 7f94300d1e138       904MB
-docker-registry.rahti.csc.fi/chipster-images-release/web-server               latest                 e8c8edaaf2417       989MB
+registry.apps.2.rahti.csc.fi/chipster-images-release/chipster-web-server-js   latest                 ba6b8e4832b16       280MB
+registry.apps.2.rahti.csc.fi/chipster-images-release/chipster-web-server      latest                 d308fcb91521f       903MB
+registry.apps.2.rahti.csc.fi/chipster-images-release/toolbox                  latest                 7f94300d1e138       904MB
+registry.apps.2.rahti.csc.fi/chipster-images-release/web-server               latest                 e8c8edaaf2417       989MB
 docker.io/bitnami/minideb                                             stretch                e398a222dbd61       22.2MB
 docker.io/bitnami/postgresql                                          11.6.0-debian-9-r48    6db6971e4c89c       81.2MB
 docker.io/rancher/klipper-helm                                        v0.7.3-build20220613   38b3b9ad736af       83MB
@@ -122,12 +123,11 @@ sudo docker save IMAGE -o image.tar
 sudo k3s ctr -n k8s.io images import image.tar
 ```
 
-
 ## Appendix 2: Build image for tool scripts
 
 By default the Chipster uses tool scrips from a container image. [Tool script development instructions](tool-script-dev.md) show how to easily modify tool scripts on one or small number of servers. This example tries to mimic how the original Chipster image was build, in case you want to build your own set of container images, for example to put together your own special distribution of Chipster.
 
-For example, let's assume that you have forked [our chipster-tools](https://github.com/chipster/chipster-tools) repository to make your own changes to these scripts. 
+For example, let's assume that you have forked [our chipster-tools](https://github.com/chipster/chipster-tools) repository to make your own changes to these scripts.
 
 Change the GitHub url in the buildconfig file to point to your repository. This same process would work also if you wanted to change the `Dockerfile` next to the buildconfig.
 
@@ -153,12 +153,11 @@ When developing the server code you want to test changes as quickly as possible,
 
 Building a container image will accomplish the following tasks:
 
-* Checkout code repositories
-* Compile code
-* Install operating system packages
+- Checkout code repositories
+- Compile code
+- Install operating system packages
 
 In effect we are executing commands defined in Dockerfiles. Most services will run with a minimal image with only Java and Chipster installed on top of Ubuntu, whereas some analysis tool containers require a huge number of operating system packages.
-
 
 This example assumes that you want to make a change to the Java code in chipster-web-server repository.
 
@@ -188,7 +187,7 @@ Run the command, but replace the repository URL in the end with a path to your l
 cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f -  ~/git/chipster-web-server
 ```
 
-The latest image in K3s image repository is now the locally build image. Simply restart a pod to take it in use. For example, to restart the API server `session-db`: 
+The latest image in K3s image repository is now the locally build image. Simply restart a pod to take it in use. For example, to restart the API server `session-db`:
 
 ```bash
 kubectl rollout restart session-db
