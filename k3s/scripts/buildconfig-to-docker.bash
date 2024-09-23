@@ -32,7 +32,7 @@ fi
 
 build="$(basename $dir)"
 
-image_repository="registry.apps.2.rahti.csc.fi/chipster-images-release/"
+image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
 
 cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\""
 

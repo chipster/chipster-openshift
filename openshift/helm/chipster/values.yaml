@@ -187,7 +187,7 @@ db:
 
 image:
   repository: docker-registry.default.svc:5000
-  namespace: chipster-images-release
+  namespace: chipster-images
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
