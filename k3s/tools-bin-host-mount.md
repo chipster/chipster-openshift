@@ -12,18 +12,20 @@ Use to following command to check the available tools-bin versions. Don't worry 
 curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | cut -d "/" -f 1 | sort | uniq
 ```
 
-Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. Replace the version numbers in this example (4.5.2) with the latest version number.
+Make a directory for the tools-bin on the host. Let's make it on the volume in `/mnt/data` to have enough space. Replace the version numbers in this example (4.9.0) with the latest version number.
 
 ```bash
-sudo mkdir -p /mnt/data/tools-bin/chipster-4.5.2
-sudo chown $(whoami) /mnt/data/tools-bin/chipster-4.5.2
+TOOLS_BIN_VERSION="chipster-4.9.0"
+
+sudo mkdir -p /mnt/data/tools-bin/$TOOLS_BIN_VERSION
+sudo chown $(whoami) /mnt/data/tools-bin/$TOOLS_BIN_VERSION
 ```
 
 Change your `~/values.yaml` to mount tools-bin from this host directory. The tools-bin version number in the configuration file must match with the directory name above.
 
 ```yaml
 toolsBin:
-  version: chipster-4.5.2
+  version: chipster-4.9.0
   hostPath: /mnt/data/tools-bin
 ```
 
@@ -33,34 +35,63 @@ Deploy changes.
 bash deploy.bash -f ~/values.yaml
 ```
 
-Now you would have to download and extract the tools-bin packages. Replace all occurrances of "chipster-4.5.2" with the latest tools-bin version.
+Soon we will download and extract the tools-bin packages. Let's prepare a few folders for it and install a program for extracting .lz4 compressed files.
 
-```
+```bash
 # make a temporary directory for the download packages
 cd /mnt/data
 sudo mkdir temp
 sudo chown $(whoami) temp
+
+# install lz4
+sudo apt install -y liblz4-tool
+```
+
+Downlaod the list of packages. Variable $TOOLS_BIN_VERSION must be set beforehand.
+
+```bash
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/files.txt | grep .tar.lz4$ > temp/files.txt
+
+# stop if any error happens during the dowload
+set -e
+
+```
+
+If you have lot of free disk space, you can first download all files and then extract them. Variable $TOOLS_BIN_VERSION must be set beforehand.
+
+```bash
 cd temp
 
-# get a list of packages
-curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.5.2 | grep .tar.lz4$ > files.txt
 # download packages
 for f in $(cat files.txt); do wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$f; done
 cd ..
 
-# install lz4
-sudo apt install -y liblz4-tool
-
 # extract packages
-for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
+for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/$TOOLS_BIN_VERSION; done
 
 # remove packages
 rm -rf temp
 ```
 
+Or if you are tight on disk space, you can downlaod and extract the files one by one. Variable $TOOLS_BIN_VERSION must be set beforehand.
+
+```bash
+
+for f in $(cat temp/files.txt); do
+  # download
+  wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f -O temp/$f
+
+  # extract
+  lz4 -d temp/$f -c - | tar -x -C tools-bin/$TOOLS_BIN_VERSION
+
+  # remove
+  rm temp/$f
+done
+```
+
 Finally restart pods to enable all tools that were disabled before because of the missing files.
 
-```
+```bash
 cd ~/git/chipster-openshift/k3s/
 bash restart.bash
 watch kubectl get pod
