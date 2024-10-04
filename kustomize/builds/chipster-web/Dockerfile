@@ -9,7 +9,7 @@ RUN cd /home/user/chipster-web/build \
 	&& npm ci \
 	&& rm -rf src/assets/manual \
 	&& npm run build -- --no-progress || true \
-	&& cp -r dist/* ../ \
+	&& cp -r dist/browser/* ../ \
 	&& cd .. \
 	&& rm -rf build \
 	&& ls -lah
