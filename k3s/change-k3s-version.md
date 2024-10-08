@@ -1,4 +1,5 @@
 # Change K3s version
+
 ## Host path volumes
 
 By default Chipster's storage volumes (PersistenVolumeClaim, PVC) are managed by the K3s. If you uninstalled and reinstalled K3s, the new installation would not find the data on your old volumes. When running Chipster on a single node K3s, you may
@@ -16,7 +17,7 @@ Take copy of the current passwords. We will need the database passwords when we 
 kubectl get secret passwords -o yaml > ~/chipster-passwords.yaml
 ```
 
-Chipster must be uninstalled first, because Kubernetes doesn't allow you to change the volume type of `statefulset`. We can still move the data from the volumes later, because this doesn't delete the volumes. 
+Chipster must be uninstalled first, because Kubernetes doesn't allow you to change the volume type of `statefulset`. We can still move the data from the volumes later, because this doesn't delete the volumes.
 
 ```bash
 helm uninstall chipster
@@ -49,22 +50,25 @@ databases:
     hostPath: "/mnt/data/job-history-postgresql"
 
 auth-postgresql:
-  persistence:
-    existingClaim: "auth-pvc-volume-postgres"
+  primary:
+    persistence:
+      existingClaim: "auth-pvc-volume-postgres"
 
 session-db-postgresql:
-  persistence:
-    existingClaim: "session-db-pvc-volume-postgres"
+  primary:
+    persistence:
+      existingClaim: "session-db-pvc-volume-postgres"
 
 job-history-postgresql:
-  persistence:
-    existingClaim: "job-history-pvc-volume-postgres"
+  primary:
+    persistence:
+      existingClaim: "job-history-pvc-volume-postgres"
 ```
 
 ## Migrate data
 
 We have to move the data from the old volume directories in `/mnt/data/k3s/storage/` to the new hostPath directories in `/mnt/data`.
-Unfortunately each old volume directory has an unieque VOLUME_ID in its name. Check the directory names and adjust the `mv` commands accordingly:
+Unfortunately each old volume directory has an unique VOLUME_ID in its name. Check the directory names and adjust the `mv` commands accordingly:
 
 ```bash
 pushd /mnt/data

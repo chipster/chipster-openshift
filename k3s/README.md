@@ -166,7 +166,7 @@ If you plan to maintain a single node Chipster server for a longer period of tim
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
-> 2021-06-04 Note! The reverse proxy of the K3s called Traefik was updated in K3s version 1.21 requiring different configuration. This repository is now compatible only with K3s version 1.21 and newer. Check your K3s version with a command `k3s --version`. If it is older than 1.21, please update K3s first before updating Chipster. The instructinos below do these updates in the correct order, just be careful not to skip those steps.
+> 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
 
 Pull latest changes from the deployment repository.
 

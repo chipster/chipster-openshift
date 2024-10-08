@@ -20,20 +20,37 @@ version: 0.1.0
 # incremented each time you make changes to the application.
 appVersion: 4.1.0
 
-# postgresql 8.1.5 is broken: "sed: can't read /opt/bitnami/postgresql/conf/postgresql.conf: Permission denied"
+# is there better place to find releases except commits in https://github.com/bitnami/charts/tree/main/bitnami/postgresql ?
 dependencies:
   - name: postgresql
-    version: 8.1.4
-    repository: "https://charts.helm.sh/stable"
+    version: 16.0.1
+    repository: "https://charts.bitnami.com/bitnami"
     alias: auth-postgresql
     condition: databases.auth.enabled
   - name: postgresql
-    version: 8.1.4
-    repository: "https://charts.helm.sh/stable"
+    version: 16.0.1
+    repository: "https://charts.bitnami.com/bitnami"
     alias: session-db-postgresql
     condition: databases.sessionDb.enabled
   - name: postgresql
-    version: 8.1.4
-    repository: "https://charts.helm.sh/stable"
+    version: 16.0.1
+    repository: "https://charts.bitnami.com/bitnami"
     alias: job-history-postgresql
     condition: databases.jobHistory.enabled
+
+# dependencies:
+#   - name: postgresql
+#     version: 8.1.4
+#     repository: "https://charts.helm.sh/stable"
+#     alias: auth-postgresql
+#     condition: databases.auth.enabled
+#   - name: postgresql
+#     version: 8.1.4
+#     repository: "https://charts.helm.sh/stable"
+#     alias: session-db-postgresql
+#     condition: databases.sessionDb.enabled
+#   - name: postgresql
+#     version: 8.1.4
+#     repository: "https://charts.helm.sh/stable"
+#     alias: job-history-postgresql
+#     condition: databases.jobHistory.enabled
