@@ -119,7 +119,7 @@ rm ~/session-db.sql
 
 ## Recovering from accidental update
 
-If you tried to update Chipster from version v4.11.1 (or older) to v4.12.0 (or newer) without following instructions on this apge first, your Chipster won't start. If you check the output of command `kubectl get pod`, you will notice that instead of three database pods `chipster-auth-postgresql-0`, `chipster-session-db-postgresql-0` and `chipster-job-history-postgresql-0`, you only have one, called `chipster-postgresql-0`. This is because your old PostgreSQL Helm template doesn't understand the new configuration option names. In this case, get old deployment scripts:
+If you tried to update Chipster from version v4.11.1 (or older) to v4.12.0 (or newer) without following instructions on this page first, your Chipster won't start. If you check the output of command `kubectl get pod`, you will notice that instead of three database pods `chipster-auth-postgresql-0`, `chipster-session-db-postgresql-0` and `chipster-job-history-postgresql-0`, you only have one, called `chipster-postgresql-0`. This is because your old PostgreSQL Helm template doesn't understand the new configuration option names. In this case, get old deployment scripts:
 
 ```bash
 git checkout v4.11.1
