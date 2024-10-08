@@ -16,9 +16,9 @@ psql (PostgreSQL) 11.6
 Dump old databases to sql files. In this exmample the files are saved in the home directory. Use other location if you need more storage space.
 
 ```bash
-kubectl exec -it chipster-auth-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres auth_db' > ~/auth.sql
-kubectl exec -it chipster-job-history-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres job_history_db' > ~/job-history.sql
-kubectl exec -it chipster-session-db-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres session_db_db' > ~/session-db.sql
+kubectl exec -i chipster-auth-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres auth_db' > ~/auth.sql
+kubectl exec -i chipster-job-history-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres job_history_db' > ~/job-history.sql
+kubectl exec -i chipster-session-db-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres session_db_db' > ~/session-db.sql
 ```
 
 ## Install new PostgreSQL
