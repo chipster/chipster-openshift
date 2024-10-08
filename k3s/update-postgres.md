@@ -22,14 +22,49 @@ kubectl exec -i chipster-job-history-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGR
 kubectl exec -i chipster-session-db-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres session_db_db' > ~/session-db.sql
 ```
 
-## Install new PostgreSQL
+## Fix optional hostPath volume configuration
 
-TODO replace "git switch" with "git pull" after the branch has been merged
+If you have configured [hostPath volumes](change-k3s-version.md) to store your databases on host directoriess, the configuration must be updated a bit. The old configuration looked like this. If you don't have this in your `~/values.yaml`, you are not using hostPath volumes for databases and can skip directly to the next chapter.
+
+```yaml
+auth-postgresql:
+  persistence:
+    existingClaim: "auth-pvc-volume-postgres"
+
+session-db-postgresql:
+  persistence:
+    existingClaim: "session-db-pvc-volume-postgres"
+
+job-history-postgresql:
+  persistence:
+    existingClaim: "job-history-pvc-volume-postgres"
+```
+
+The following is the new configuration for this. All three configuration items have been moved under an object called `primary`:
+
+```yaml
+auth-postgresql:
+  primary:
+    persistence:
+      existingClaim: "auth-pvc-volume-postgres"
+
+session-db-postgresql:
+  primary:
+    persistence:
+      existingClaim: "session-db-pvc-volume-postgres"
+
+job-history-postgresql:
+  primary:
+    persistence:
+      existingClaim: "job-history-pvc-volume-postgres"
+```
+
+## Install new PostgreSQL
 
 Download the new PostgreSQL Helm Chart and deploy it. The command `helm uninstall chipster` doesn't delete volumes, so the users' files on file-storage service are safe. Deploy Chipster with the new version and wait until all pods are running again.
 
 ```bash
-git switch postgres14
+git pull
 helm dependencies update helm/chipster
 helm uninstall chipster
 bash generate-passwords.bash
