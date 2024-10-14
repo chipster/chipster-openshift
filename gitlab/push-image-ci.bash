@@ -23,11 +23,3 @@ time sudo docker run \
         --dest-creds $username:$password \
         docker-daemon:$image_repository/$image_namespace/$image:$tag \
         docker://$image_repository/$image_namespace/$image:$tag
-
-# delete local image
-time sudo docker run \
-    --privileged \
-    --volume /var/run:/var/run \
-    quay.io/skopeo/stable:latest \
-        delete \
-        docker-daemon:$image_repository/$image_namespace/$image:$tag

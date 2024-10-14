@@ -28,3 +28,8 @@ bash -c "$cmd"
 
 echo "** push image"
 bash push-image-ci.bash $dest_repo $dest_ns $build $tag
+
+echo "** delete local image"
+sudo docker image rm $dest_repo/$dest_ns/$build:latest
+sudo docker image rm $dest_repo/$dest_ns/$build:$tag
+
