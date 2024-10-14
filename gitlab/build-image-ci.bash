@@ -13,14 +13,18 @@ fi
 
 build="$1"
 tag="$2"
+src_repo="image-registry.apps.2.rahti.csc.fi"
+src_ns="chipster-images-dev"
+dest_repo="image-registry.apps.2.rahti.csc.fi"
+dest_ns="chipster-images-dev"
 
 # transform unallowed characters
 tag=$(echo $tag | tr ":" "-" | tr "+" "_")
 
 echo "** build $build"
-cmd="$(bash ../k3s/scripts/buildconfig-to-docker.bash ../kustomize/builds/$build) -t image-registry.apps.2.rahti.csc.fi/chipster-images/$build:$tag"
+cmd="$(bash ../k3s/scripts/buildconfig-to-docker.bash ../kustomize/builds/$build $src_repo/$src_ns/) -t $dest_repo/$dest_ns/$build:$tag"
 #echo "build command: $cmd"
 bash -c "$cmd"
 
 echo "** push image"
-bash push-image-ci-bash $build
+bash push-image-ci-bash $dest_repo $dest_ns $build $tag
