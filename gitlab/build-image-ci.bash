@@ -23,4 +23,4 @@ cmd="$(bash ../k3s/scripts/buildconfig-to-docker.bash ../kustomize/builds/$build
 bash -c "$cmd"
 
 echo "** push image"
-bash push-image-ci-bash $build
+bash push-image-ci.bash $build
