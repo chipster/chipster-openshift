@@ -24,15 +24,18 @@ set -e
 #set -x
 
 dir="$1"
+image_repository="$2"
 
 if [[ -z $dir ]]; then
-  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR"
+  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY ]"
   exit 1
 fi
 
-build="$(basename $dir)"
+if [[ -z $image_repository ]]; then
+  image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
+fi
 
-image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
+build="$(basename $dir)"
 
 cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\""
 
