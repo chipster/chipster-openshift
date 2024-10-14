@@ -21,3 +21,6 @@ echo "** build $build"
 cmd="$(bash ../k3s/scripts/buildconfig-to-docker.bash ../kustomize/builds/$build) -t image-registry.apps.2.rahti.csc.fi/chipster-images/$build:$tag"
 #echo "build command: $cmd"
 bash -c "$cmd"
+
+echo "** push image"
+bash push-image-ci-bash $build
