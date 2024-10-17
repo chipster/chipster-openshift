@@ -14,163 +14,164 @@ build-base:
   needs: []
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-base-16-04:
   needs: []
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base-16-04 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-base-java:
   needs:
   - build-base
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base-java $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base-java $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-base-java-16-04:
   needs:
   - build-base-16-04
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base-java-16-04 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base-java-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-base-java-comp:
   needs:
   - build-base-java-16-04
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base-java-comp $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base-java-comp $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-base-java-utils:
   needs:
   - build-base-java
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base-java-utils $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base-java-utils $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-base-node:
   needs:
   - build-base
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash base-node $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash base-node $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-chipster-tools:
   needs:
   - build-base
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash chipster-tools $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash chipster-tools $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-chipster-web:
   needs:
   - build-base-node
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash chipster-web $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash chipster-web $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-chipster-web-server:
   needs:
   - build-base-java-utils
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash chipster-web-server $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash chipster-web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-chipster-web-server-js:
   needs:
   - build-base-node
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash chipster-web-server-js $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash chipster-web-server-js $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-ci-test:
   needs:
   - build-chipster-tools
+  - build-chipster-web-server-js
   - build-web-server
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash ci-test $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash ci-test $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-cli-client:
   needs:
   - build-base-node
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash cli-client $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash cli-client $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-16-04:
   needs:
-  - build-base-java-comp
   - build-chipster-web-server
+  - build-base-java-comp
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-16-04 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04:
   needs:
-  - build-chipster-web-server
   - build-base-java
+  - build-chipster-web-server
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04-asv:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04-asv $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04-asv $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04-fastqc:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04-fastqc $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04-fastqc $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04-phyloseq:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04-phyloseq $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04-phyloseq $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04-python:
   needs:
   - build-comp-20-04
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04-python $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04-python $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04-r-deps:
   needs:
   - build-comp-20-04
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04-r-deps $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04-r-deps $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-20-04-single-cell:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-20-04-single-cell $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-20-04-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-2-3:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-2-3 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-2-3 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-2-3-cellbender:
   needs:
   - build-comp-r-4-2-3
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-2-3-cellbender $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-2-3-cellbender $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-2-3-enabrowsertools:
   needs:
@@ -178,69 +179,70 @@ build-comp-r-4-2-3-enabrowsertools:
   script:
   - cd gitlab/pipelines/build
   - bash build-image-ci.bash comp-r-4-2-3-enabrowsertools $CI_PIPELINE_CREATED_AT
+    $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-2-3-seurat5:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-2-3-seurat5 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-2-3-seurat5 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-2-3-single-cell:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-2-3-single-cell $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-2-3-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-3-1-single-cell:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-3-1-single-cell $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-3-1-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-3-2:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-3-2 $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-3-2 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-comp-r-4-3-2-single-cell:
   needs:
   - build-comp-20-04-r-deps
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash comp-r-4-3-2-single-cell $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash comp-r-4-3-2-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-grafana:
   needs: []
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash grafana $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash grafana $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-monitoring:
   needs:
   - build-base
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash monitoring $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash monitoring $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-toolbox:
   needs:
-  - build-chipster-web-server
   - build-chipster-tools
+  - build-chipster-web-server
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-web-server:
   needs:
-  - build-chipster-web
-  - build-chipster-web-server
   - build-chipster-tools
+  - build-chipster-web-server
+  - build-chipster-web
   script:
   - cd gitlab/pipelines/build
-  - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT
+  - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build

@@ -53,7 +53,7 @@ def get_gitlab_ci(path):
                 "stage": "build",
                 "needs": needs,
                 "script": [
-                    "cd gitlab/pipelines/build", "bash build-image-ci.bash " + buildDir + " $CI_PIPELINE_CREATED_AT"
+                    "cd gitlab/pipelines/build", "bash build-image-ci.bash " + buildDir + " $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH"
                 ]
             }
     return gitlab_ci

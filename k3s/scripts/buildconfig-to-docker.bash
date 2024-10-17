@@ -25,9 +25,10 @@ set -e
 
 dir="$1"
 image_repository="$2"
+source_tag="$3"
 
 if [[ -z $dir ]]; then
-  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY ]"
+  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY [ SOURCE_TAG ]]"
   exit 1
 fi
 
@@ -35,9 +36,13 @@ if [[ -z $image_repository ]]; then
   image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
 fi
 
+if [[ -z $source_tag ]]; then
+  source_tag="latest"
+fi
+
 build="$(basename $dir)"
 
-cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\""
+cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\" | sed \"s/$/:${source_tag}/\""
 
 uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
 branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
@@ -55,9 +60,9 @@ if [[ $image_count != 0 ]]; then
             copy_line=$(cat $dir/Dockerfile | grep "COPY . ")
         fi
         copy_destination="$(echo "$copy_line" | cut -d " " -f 3)"
-        docker_copy_line="COPY --from=$image_repository$image $source $copy_destination/$source_basename"
+        docker_copy_line="COPY --from=$image_repository$image:$source_tag $source $copy_destination/$source_basename"
 
-        >&2 echo "copy from image:                      $image"
+        >&2 echo "copy from image:                      $image:$source_tag"
         >&2 echo "path:                                 $source"
         >&2 echo "to build context path:                $destination"
         >&2 echo "original COPY line in Dockerfile:     $copy_line"
