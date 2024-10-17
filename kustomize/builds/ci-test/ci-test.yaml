@@ -1,0 +1,46 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: ci-test
+  name: ci-test
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: ci-test:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+    images:
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-tools:latest
+        paths:
+          - destinationDir: tools
+            sourcePath: /home/user/chipster-tools/tools
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: web-server:latest
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: web-server:latest
+      type: ImageChange
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: chipster-tools:latest
+      type: ImageChange

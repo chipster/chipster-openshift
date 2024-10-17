@@ -85,6 +85,14 @@ build-chipster-web-server-js:
   - cd gitlab/pipelines/build
   - bash build-image-ci.bash chipster-web-server-js $CI_PIPELINE_CREATED_AT
   stage: build
+build-ci-test:
+  needs:
+  - build-chipster-tools
+  - build-web-server
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash ci-test $CI_PIPELINE_CREATED_AT
+  stage: build
 build-cli-client:
   needs:
   - build-base-node
@@ -102,8 +110,8 @@ build-comp-16-04:
   stage: build
 build-comp-20-04:
   needs:
-  - build-base-java
   - build-chipster-web-server
+  - build-base-java
   script:
   - cd gitlab/pipelines/build
   - bash build-image-ci.bash comp-20-04 $CI_PIPELINE_CREATED_AT
@@ -221,17 +229,17 @@ build-monitoring:
   stage: build
 build-toolbox:
   needs:
-  - build-chipster-tools
   - build-chipster-web-server
+  - build-chipster-tools
   script:
   - cd gitlab/pipelines/build
   - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT
   stage: build
 build-web-server:
   needs:
-  - build-chipster-tools
-  - build-chipster-web-server
   - build-chipster-web
+  - build-chipster-web-server
+  - build-chipster-tools
   script:
   - cd gitlab/pipelines/build
   - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT
