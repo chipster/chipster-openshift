@@ -42,7 +42,9 @@ fi
 
 build="$(basename $dir)"
 
-cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\" | sed \"s/$/:${source_tag}/\""
+base_image=${image_repository}$(cat $dir/*.yaml | yq e .spec.strategy.dockerStrategy.from.name - | sed "s/:latest$/:$source_tag/")
+
+cmd="cat $dir/Dockerfile | sed \"s#FROM.*#FROM ${base_image}#\""
 
 uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
 branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
@@ -52,7 +54,7 @@ image_count=$(cat $dir/*.yaml | yq e .spec.source.images - -o=json | jq '. | len
 if [[ $image_count != 0 ]]; then 
     last_index=$(($image_count - 1))
     for i in $(seq 0 $last_index); do
-        image=$(cat $dir/*.yaml | yq e .spec.source.images[$i].from.name -)
+        image=$(cat $dir/*.yaml | yq e .spec.source.images[$i].from.name - | sed "s/:latest$/:$source_tag/")
         destination=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].destinationDir -)
         source=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].sourcePath -)
         source_basename=$(basename $source)
@@ -60,9 +62,9 @@ if [[ $image_count != 0 ]]; then
             copy_line=$(cat $dir/Dockerfile | grep "COPY . ")
         fi
         copy_destination="$(echo "$copy_line" | cut -d " " -f 3)"
-        docker_copy_line="COPY --from=$image_repository$image:$source_tag $source $copy_destination/$source_basename"
+        docker_copy_line="COPY --from=$image_repository$image $source $copy_destination/$source_basename"
 
-        >&2 echo "copy from image:                      $image:$source_tag"
+        >&2 echo "copy from image:                      $image"
         >&2 echo "path:                                 $source"
         >&2 echo "to build context path:                $destination"
         >&2 echo "original COPY line in Dockerfile:     $copy_line"
