@@ -35,8 +35,28 @@ def get_needs(buildconfig, build_name):
     return list(set(needs))
 
 def get_gitlab_ci(path):
+
+    pg_name = "postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}"
     gitlab_ci = {
-        "stages": ["build"]
+        "stages": ["build", "test"],
+        "ci-test": {
+            "stage": "test",
+            "script": [
+                "sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name " + pg_name + " postgres:14",
+                "sudo docker run -e PGPASSWORD=chipster --link " + pg_name + " postgres:14 createdb -h " + pg_name + " -U user auth_db ",
+                "sudo docker run -e PGPASSWORD=chipster --link " + pg_name + " postgres:14 createdb -h " + pg_name + " -U user session_db_db ",
+                "sudo docker run -e PGPASSWORD=chipster --link " + pg_name + " postgres:14 createdb -h " + pg_name + " -U user job_history_db ",
+                "sudo docker run \
+                    -e db_pass_auth=chipster \
+                    -e db_url_auth=jdbc:postgresql://" + pg_name + ":5432/auth_db  \
+                    -e db_url_session_db=jdbc:postgresql://" + pg_name + ":5432/session_db_db  \
+                    -e db_url_job_history=jdbc:postgresql://" + pg_name + ":5432/job_history_db  \
+                    --link " + pg_name + " image-registry.apps.2.rahti.csc.fi/chipster-images-dev/chipster-web-server java \
+                    -cp lib/*: fi.csc.chipster.rest.ServerLauncher"
+                # "sudo docker stop " + pg_name,
+                # "sudo docker rm " + pg_name,
+            ]
+        } 
     }
     
     dir_list = os.listdir(path)
@@ -73,6 +93,7 @@ def main() -> int:
 # pip3 install -r requirements.txt
 # ./generate-gitlab-ci.py
 # 
+
 """
 
     with open("..//..//.gitlab-ci.yml", 'w') as file:
