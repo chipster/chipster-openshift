@@ -22,7 +22,7 @@ dest_ns="chipster-images-dev"
 tag=$(echo $tag | tr ":" "-" | tr "+" "_")
 
 echo "** build $build"
-cmd="$(bash ../k3s/scripts/buildconfig-to-docker.bash ../kustomize/builds/$build $src_repo/$src_ns/) -t $dest_repo/$dest_ns/$build:$tag"
+cmd="$(bash ../../../k3s/scripts/buildconfig-to-docker.bash ../../../kustomize/builds/$build $src_repo/$src_ns/) -t $dest_repo/$dest_ns/$build:$tag"
 #echo "build command: $cmd"
 bash -c "$cmd"
 
