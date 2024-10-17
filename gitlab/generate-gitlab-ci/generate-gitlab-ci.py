@@ -36,23 +36,38 @@ def get_needs(buildconfig, build_name):
 
 def get_gitlab_ci(path):
 
-    pg_name = "postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}"
     gitlab_ci = {
         "stages": ["build", "test"],
-        "ci-test": {
+
+        "db_name": {
             "stage": "test",
             "script": [
-                "sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name " + pg_name + " postgres:14",
-                "sudo docker run -e PGPASSWORD=chipster --link " + pg_name + " postgres:14 createdb -h " + pg_name + " -U user auth_db ",
-                "sudo docker run -e PGPASSWORD=chipster --link " + pg_name + " postgres:14 createdb -h " + pg_name + " -U user session_db_db ",
-                "sudo docker run -e PGPASSWORD=chipster --link " + pg_name + " postgres:14 createdb -h " + pg_name + " -U user job_history_db ",
+                "echo DB_NAME=postgres_$(echo $CI_PIPELINE_CREATED_AT | tr ':' '-') >> build.env"
+            ],
+            "artifacts": {
+                "reports": {
+                    "dotenv": "build.env"
+                }
+            }
+        },
+        "ci-test": {
+            "stage": "test",
+            "needs": [
+                "db_name"
+            ],
+            "script": [
+                ""
+                "sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14",
+                "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user auth_db ",
+                "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user session_db_db ",
+                "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db ",
                 "sudo docker run \
-                    -e db_pass_auth=chipster \
-                    -e db_url_auth=jdbc:postgresql://" + pg_name + ":5432/auth_db  \
-                    -e db_url_session_db=jdbc:postgresql://" + pg_name + ":5432/session_db_db  \
-                    -e db_url_job_history=jdbc:postgresql://" + pg_name + ":5432/job_history_db  \
-                    --link " + pg_name + " image-registry.apps.2.rahti.csc.fi/chipster-images-dev/chipster-web-server java \
-                    -cp lib/*: fi.csc.chipster.rest.ServerLauncher"
+-e db_pass_auth=chipster \
+-e db_url_auth=jdbc:postgresql://$DB_NAME:5432/auth_db  \
+-e db_url_session_db=jdbc:postgresql://$DB_NAME:5432/session_db_db  \
+-e db_url_job_history=jdbc:postgresql://$DB_NAME:5432/job_history_db  \
+--link $DB_NAME image-registry.apps.2.rahti.csc.fi/chipster-images-dev/chipster-web-server java \
+-cp lib/*: fi.csc.chipster.rest.ServerLauncher"
                 # "sudo docker stop " + pg_name,
                 # "sudo docker rm " + pg_name,
             ]

@@ -93,8 +93,8 @@
 #   stage: build
 # build-comp-16-04:
 #   needs:
-#   - build-chipster-web-server
 #   - build-base-java-comp
+#   - build-chipster-web-server
 #   script:
 #   - cd gitlab
 #   - bash build-image-ci.bash comp-16-04 $CI_PIPELINE_CREATED_AT
@@ -220,8 +220,8 @@
 #   stage: build
 # build-toolbox:
 #   needs:
-#   - build-chipster-tools
 #   - build-chipster-web-server
+#   - build-chipster-tools
 #   script:
 #   - cd gitlab
 #   - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT
@@ -229,31 +229,35 @@
 # build-web-server:
 #   needs:
 #   - build-chipster-web
-#   - build-chipster-tools
 #   - build-chipster-web-server
+#   - build-chipster-tools
 #   script:
 #   - cd gitlab
 #   - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT
 #   stage: build
 ci-test:
+  needs:
+    - db_name
   script:
     - sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name
-      postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID} postgres:14
-    - "sudo docker run -e PGPASSWORD=chipster --link postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}
-      postgres:14 createdb -h postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID} -U user
-      auth_db "
-    - "sudo docker run -e PGPASSWORD=chipster --link postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}
-      postgres:14 createdb -h postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID} -U user
-      session_db_db "
-    - "sudo docker run -e PGPASSWORD=chipster --link postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}
-      postgres:14 createdb -h postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID} -U user
-      job_history_db "
-    - "sudo docker run                     -e db_pass_auth=chipster                     -e
-      db_url_auth=jdbc:postgresql://postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}:5432/auth_db                      -e
-      db_url_session_db=jdbc:postgresql://postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}:5432/session_db_db                      -e
-      db_url_job_history=jdbc:postgresql://postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID}:5432/job_history_db                      --link
-      postgres_${CI_PIPELINE_CREATED_AT}_${CI_JOB_ID} image-registry.apps.2.rahti.csc.fi/chipster-images-dev/chipster-web-server
-      java                     -cp lib/*: fi.csc.chipster.rest.ServerLauncher"
+      $DB_NAME postgres:14
+    - "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h
+      $DB_NAME -U user auth_db "
+    - "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h
+      $DB_NAME -U user session_db_db "
+    - "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h
+      $DB_NAME -U user job_history_db "
+    - "sudo docker run -e db_pass_auth=chipster -e db_url_auth=jdbc:postgresql://$DB_NAME:5432/auth_db  -e
+      db_url_session_db=jdbc:postgresql://$DB_NAME:5432/session_db_db  -e db_url_job_history=jdbc:postgresql://$DB_NAME:5432/job_history_db  --link
+      $DB_NAME image-registry.apps.2.rahti.csc.fi/chipster-images-dev/chipster-web-server
+      java -cp lib/*: fi.csc.chipster.rest.ServerLauncher"
+  stage: test
+db_name:
+  artifacts:
+    reports:
+      dotenv: build.env
+  script:
+    - echo DB_NAME=postgres_$(echo $CI_PIPELINE_CREATED_AT | tr ':' '-') >> build.env
   stage: test
 stages:
   # - build
