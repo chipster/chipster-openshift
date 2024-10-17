@@ -11,6 +11,7 @@ ci-test:
     - db_name
   script:
     - sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
+    - "sleep 10"
     - "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user auth_db "
     - "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user session_db_db "
     - "sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db "
