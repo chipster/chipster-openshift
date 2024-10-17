@@ -23,6 +23,13 @@ spec:
         paths:
           - destinationDir: tools
             sourcePath: /home/user/chipster-tools/tools
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server-js:latest
+        paths:
+          - destinationDir: js
+            sourcePath: /opt/chipster/js
   strategy:
     dockerStrategy:
       from:
@@ -37,10 +44,9 @@ spec:
     - imageChange:
         from:
           kind: ImageStreamTag
-          name: web-server:latest
-      type: ImageChange
+          name: chipster-tools:latest
     - imageChange:
         from:
           kind: ImageStreamTag
-          name: chipster-tools:latest
+          name: chipster-web-server-js:latest
       type: ImageChange
