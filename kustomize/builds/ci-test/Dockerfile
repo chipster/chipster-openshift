@@ -2,6 +2,7 @@ FROM web-server
 
 COPY tools /opt/chipster/tools
 COPY js /opt/chipster/js
+COPY src/main/resources/chipster-defaults.yaml /opt/chipster/src/main/resources/chipster-defaults.yaml
 
 RUN apt-get update -y \
 	&& apt-get install -y build-essential \
