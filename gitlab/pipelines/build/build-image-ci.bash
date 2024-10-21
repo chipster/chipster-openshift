@@ -20,11 +20,12 @@ src_ns="chipster-images-dev"
 dest_repo="image-registry.apps.2.rahti.csc.fi"
 dest_ns="chipster-images-dev"
 
-echo "** make sure there is no old image with this tag"
-sudo docker image rm $dest_repo/$dest_ns/$build:$tag || true
 
 # transform unallowed characters
 tag=$(echo $tag | tr ":" "-" | tr "+" "_")
+
+echo "** make sure there is no old image with this tag"
+sudo docker image rm $dest_repo/$dest_ns/$build:$tag || true
 
 echo "** build $build"
 # use branch as source image tag
