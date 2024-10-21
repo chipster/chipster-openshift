@@ -1,7 +1,7 @@
 FROM web-server
 
 COPY tools /opt/chipster/tools
-COPY js /opt/chipster
+COPY js /opt/chipster/js
 
 RUN ls -lah /opt/chipster || true \
 	&& ls -lah /opt/chipster/tools || true \
