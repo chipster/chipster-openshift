@@ -14,7 +14,10 @@ spec:
   runPolicy: Serial
   source:
     dockerfile: ""
-    type: Dockerfile
+    git:
+      ref: master
+      uri: https://github.com/chipster/chipster-web-server.git
+    type: Git
     images:
       - as: null
         from:
@@ -23,13 +26,6 @@ spec:
         paths:
           - destinationDir: tools
             sourcePath: /home/user/chipster-tools/tools
-      - as: null
-        from:
-          kind: ImageStreamTag
-          name: chipster-web-server-js:latest
-        paths:
-          - destinationDir: js
-            sourcePath: /opt/chipster/js
   strategy:
     dockerStrategy:
       from:
@@ -45,8 +41,3 @@ spec:
         from:
           kind: ImageStreamTag
           name: chipster-tools:latest
-    - imageChange:
-        from:
-          kind: ImageStreamTag
-          name: chipster-web-server-js:latest
-      type: ImageChange
