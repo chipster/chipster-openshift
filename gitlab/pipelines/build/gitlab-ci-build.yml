@@ -70,13 +70,13 @@
 #   - cd gitlab/pipelines/build
 #   - bash build-image-ci.bash chipster-web $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
-# build-chipster-web-server:
-#   needs:
-#   - build-base-java-utils
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash chipster-web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
+build-chipster-web-server:
+  needs:
+    - build-base-java-utils
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash chipster-web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
 # build-chipster-web-server-js:
 #   needs:
 #   - build-base-node
@@ -85,10 +85,10 @@
 #   - bash build-image-ci.bash chipster-web-server-js $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
 build-ci-test:
-  # needs:
-  # - build-chipster-tools
-  # - build-chipster-web-server-js
-  # - build-web-server
+  needs:
+    # - build-chipster-tools
+    # - build-chipster-web-server-js
+    - build-web-server
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash ci-test $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
