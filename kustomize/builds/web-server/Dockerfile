@@ -1,4 +1,4 @@
-FROM chipster-web-server
+FROM chipster-web-server-build
 
 COPY chipster-web /opt/chipster
 # copy html separately so that the BuildConfig can be patched to take it from another image

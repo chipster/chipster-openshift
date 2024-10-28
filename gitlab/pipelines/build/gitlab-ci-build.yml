@@ -9,101 +9,116 @@
 # ./generate-gitlab-ci.py
 #
 
-# build-base:
-#   needs: []
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-base-16-04:
-#   needs: []
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-base-java:
-#   needs:
-#   - build-base
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base-java $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-base-java-16-04:
-#   needs:
-#   - build-base-16-04
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base-java-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-base-java-comp:
-#   needs:
-#   - build-base-java-16-04
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base-java-comp $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-base-java-utils:
-#   needs:
-#   - build-base-java
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base-java-utils $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-base-node:
-#   needs:
-#   - build-base
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash base-node $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-chipster-tools:
-#   needs:
-#   - build-base
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash chipster-tools $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
-# build-chipster-web:
-#   needs:
-#   - build-base-node
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash chipster-web $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
+build-base:
+  needs: []
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-16-04:
+  needs: []
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-ci-test:
+  needs:
+    - build-base-java
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-ci-test $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-java:
+  needs:
+    - build-base
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-java $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-java-16-04:
+  needs:
+    - build-base-16-04
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-java-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-java-comp:
+  needs:
+    - build-base-java-16-04
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-java-comp $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-java-utils:
+  needs:
+    - build-base-java
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-java-utils $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-base-node:
+  needs:
+    - build-base
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash base-node $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-chipster-tools:
+  needs:
+    - build-base
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash chipster-tools $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-chipster-web:
+  needs:
+    - build-base-node
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash chipster-web $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
 build-chipster-web-server:
-  # needs:
-  #   - build-base-java-utils
+  needs:
+    - build-base-java-utils
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash chipster-web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
-# build-chipster-web-server-js:
-#   needs:
-#   - build-base-node
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash chipster-web-server-js $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
+build-chipster-web-server-build:
+  needs:
+    - build-chipster-web-server
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash chipster-web-server-build $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
+build-chipster-web-server-js:
+  needs:
+    - build-chipster-web-server
+    - build-base-node
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash chipster-web-server-js $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
 build-ci-test:
   needs:
-    # - build-chipster-tools
-    # - build-chipster-web-server-js
-    - build-web-server
+    - build-chipster-web-server
+    - build-chipster-tools
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash ci-test $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
-# build-cli-client:
-#   needs:
-#   - build-base-node
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash cli-client $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
+build-cli-client:
+  needs:
+    - build-chipster-web-server
+    - build-base-node
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash cli-client $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
 # build-comp-16-04:
 #   needs:
 #   - build-base-java-comp
-#   - build-chipster-web-server
+#   - build-chipster-web-server-build
 #   script:
 #   - cd gitlab/pipelines/build
 #   - bash build-image-ci.bash comp-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
@@ -111,7 +126,7 @@ build-ci-test:
 # build-comp-20-04:
 #   needs:
 #   - build-base-java
-#   - build-chipster-web-server
+#   - build-chipster-web-server-build
 #   script:
 #   - cd gitlab/pipelines/build
 #   - bash build-image-ci.bash comp-20-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
@@ -218,29 +233,29 @@ build-ci-test:
 # build-grafana:
 #   needs: []
 #   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash grafana $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+#     - cd gitlab/pipelines/build
+#     - bash build-image-ci.bash grafana $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
 # build-monitoring:
 #   needs:
-#   - build-base
+#     - build-base
 #   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash monitoring $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+#     - cd gitlab/pipelines/build
+#     - bash build-image-ci.bash monitoring $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
-# build-toolbox:
-#   needs:
-#   - build-chipster-tools
-#   - build-chipster-web-server
-#   script:
-#   - cd gitlab/pipelines/build
-#   - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-#   stage: build
+build-toolbox:
+  needs:
+    - build-chipster-web-server-build
+    - build-chipster-tools
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
 build-web-server:
   needs:
-    #   - build-chipster-tools
-    #   - build-chipster-web
-    - build-chipster-web-server
+    - build-chipster-web
+    - build-chipster-web-server-build
+    - build-chipster-tools
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH

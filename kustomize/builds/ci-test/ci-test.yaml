@@ -14,11 +14,15 @@ spec:
   runPolicy: Serial
   source:
     dockerfile: ""
-    git:
-      ref: master
-      uri: https://github.com/chipster/chipster-web-server.git
-    type: Git
+    type: Dockerfile
     images:
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server:latest
+        paths:
+          - destinationDir: chipster-web-server
+            sourcePath: /home/user/chipster-web-server
       - as: null
         from:
           kind: ImageStreamTag
@@ -30,13 +34,17 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: web-server:latest
+        name: chipster-web-server:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
     - type: ConfigChange
     - imageChange:
       type: ImageChange
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server:latest
     - imageChange:
         from:
           kind: ImageStreamTag

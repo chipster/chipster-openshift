@@ -15,13 +15,13 @@ spec:
   source:
     dockerfile: ""
     images:
-    - as: null
-      from:
-        kind: ImageStreamTag
-        name: chipster-web-server:latest
-      paths:
-      - destinationDir: chipster-web-server
-        sourcePath: /opt/chipster
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server-build:latest
+        paths:
+          - destinationDir: chipster-web-server-build
+            sourcePath: /opt/chipster
     type: Dockerfile
   strategy:
     dockerStrategy:
@@ -31,11 +31,11 @@ spec:
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
-  - imageChange:
-      from:
-        kind: ImageStreamTag
-        name: chipster-web-server:latest
-    type: ImageChange
-  - type: ConfigChange
-  - imageChange:
-    type: ImageChange
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server-build:latest
+      type: ImageChange
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange
