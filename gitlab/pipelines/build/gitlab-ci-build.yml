@@ -241,7 +241,7 @@ build-web-server:
     #   - build-chipster-tools
     #   - build-chipster-web
     - build-chipster-web-server
-script:
-  - cd gitlab/pipelines/build
-  - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
-stage: build
+  script:
+    - cd gitlab/pipelines/build
+    - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build
