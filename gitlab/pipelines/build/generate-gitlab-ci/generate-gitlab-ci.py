@@ -48,6 +48,9 @@ def get_gitlab_ci(path):
             buildconfig = yaml.safe_load(buildconfig_file)
 
             needs = get_needs(buildconfig, buildDir)
+            
+            # sort needs to avoid churn in version control
+            needs.sort()
 
             gitlab_ci["build-" + buildDir] = {
                 "stage": "build",
