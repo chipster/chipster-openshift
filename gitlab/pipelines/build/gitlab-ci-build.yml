@@ -23,7 +23,7 @@ build-base-16-04:
   stage: build
 build-base-ci-test:
   needs:
-    - build-base-java
+    - build-base-java-utils
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash base-ci-test $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
@@ -101,8 +101,8 @@ build-chipster-web-server-js:
   stage: build
 build-ci-test:
   needs:
-    - build-chipster-web-server
     - build-chipster-tools
+    - build-chipster-web-server
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash ci-test $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
@@ -117,8 +117,8 @@ build-cli-client:
   stage: build
 # build-comp-16-04:
 #   needs:
-#   - build-base-java-comp
 #   - build-chipster-web-server-build
+#   - build-base-java-comp
 #   script:
 #   - cd gitlab/pipelines/build
 #   - bash build-image-ci.bash comp-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
@@ -233,29 +233,29 @@ build-cli-client:
 # build-grafana:
 #   needs: []
 #   script:
-#     - cd gitlab/pipelines/build
-#     - bash build-image-ci.bash grafana $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+#   - cd gitlab/pipelines/build
+#   - bash build-image-ci.bash grafana $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
 # build-monitoring:
 #   needs:
-#     - build-base
+#   - build-base
 #   script:
-#     - cd gitlab/pipelines/build
-#     - bash build-image-ci.bash monitoring $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+#   - cd gitlab/pipelines/build
+#   - bash build-image-ci.bash monitoring $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
 build-toolbox:
   needs:
-    - build-chipster-web-server-build
     - build-chipster-tools
+    - build-chipster-web-server-build
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash toolbox $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
   stage: build
 build-web-server:
   needs:
-    - build-chipster-web
-    - build-chipster-web-server-build
     - build-chipster-tools
+    - build-chipster-web-server-build
+    - build-chipster-web
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH

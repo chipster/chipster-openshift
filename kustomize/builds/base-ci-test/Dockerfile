@@ -1,4 +1,4 @@
-FROM base-java
+FROM base-java-utils
 
 # CI tests need both Java and NodeJS
 # TODO how to copy node from base-node ta avoid installing it twice?
