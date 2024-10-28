@@ -71,8 +71,8 @@
 #   - bash build-image-ci.bash chipster-web $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
 #   stage: build
 build-chipster-web-server:
-  needs:
-    - build-base-java-utils
+  # needs:
+  #   - build-base-java-utils
   script:
     - cd gitlab/pipelines/build
     - bash build-image-ci.bash chipster-web-server $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
