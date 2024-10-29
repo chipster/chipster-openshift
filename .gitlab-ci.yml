@@ -2,8 +2,12 @@
 #
 
 include:
+  # - gitlab/pipelines/build/gitlab-ci-build-base.yml
   - gitlab/pipelines/build/gitlab-ci-build.yml
+  # - gitlab/pipelines/build/gitlab-ci-build-comp.yml
   - gitlab/pipelines/test/gitlab-ci-test.yml
 stages:
+  # - build-base
   - build
+  # - build-comp
   - test

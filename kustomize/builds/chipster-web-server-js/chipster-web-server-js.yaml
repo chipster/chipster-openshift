@@ -14,7 +14,6 @@ spec:
   runPolicy: Serial
   source:
     dockerfile: ""
-    type: Dockerfile
     images:
       - as: null
         from:
@@ -23,6 +22,7 @@ spec:
         paths:
           - destinationDir: chipster-web-server
             sourcePath: /home/user/chipster-web-server
+    type: Dockerfile
   strategy:
     dockerStrategy:
       from:
@@ -30,6 +30,11 @@ spec:
         name: base-node:latest
     type: Docker
   triggers:
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: chipster-web-server:latest
+      type: ImageChange
     - type: ConfigChange
     - imageChange:
       type: ImageChange

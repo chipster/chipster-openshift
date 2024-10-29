@@ -1,0 +1,123 @@
+
+# Chipster CI/CD configuration
+# 
+# Changes in this file will be overwritten! Make changes in BuildConfigs under kustomize/builds and run
+# 
+# cd generate-gitlab-ci
+# python3 -m venv venv
+# source venv/bin/activate
+# pip3 install -r requirements.txt
+# ./generate-gitlab-ci.py
+# 
+
+build-comp-16-04:
+  needs: []
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-16-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04:
+  needs: []
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04-asv:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04-asv $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04-fastqc:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04-fastqc $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04-phyloseq:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04-phyloseq $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04-python:
+  needs:
+  - build-comp-20-04
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04-python $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04-r-deps:
+  needs:
+  - build-comp-20-04
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04-r-deps $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-20-04-single-cell:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-20-04-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-2-3:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-2-3 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-2-3-cellbender:
+  needs:
+  - build-comp-r-4-2-3
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-2-3-cellbender $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-2-3-enabrowsertools:
+  needs:
+  - build-comp-r-4-2-3
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-2-3-enabrowsertools $CI_PIPELINE_CREATED_AT
+    $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-2-3-seurat5:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-2-3-seurat5 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-2-3-single-cell:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-2-3-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-3-1-single-cell:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-3-1-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-3-2:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-3-2 $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
+build-comp-r-4-3-2-single-cell:
+  needs:
+  - build-comp-20-04-r-deps
+  script:
+  - cd gitlab/pipelines/build
+  - bash build-image-ci.bash comp-r-4-3-2-single-cell $CI_PIPELINE_CREATED_AT $CI_COMMIT_BRANCH
+  stage: build-comp
