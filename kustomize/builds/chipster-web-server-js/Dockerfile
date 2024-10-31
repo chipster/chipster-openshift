@@ -2,10 +2,6 @@ FROM base-node
 
 COPY chipster-web-server /tmp/build/
 
-RUN ls -lah /tmp/build
-
-RUN ls -lah /tmp/build/chipster-web-server
-
 # build typescript server components
 # config.ts assumes it's running in the js/type-service folder when it's finding the configs
 # remove .npm directory to avoid file permission problems (see also ../base-node/Dockerfile)
