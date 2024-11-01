@@ -21,8 +21,7 @@ ci-test:
       -e db_pass_job_history=chipster -e db_url_job_history=jdbc:postgresql://$DB_NAME:5432/job_history_db
       --link $DB_NAME
       image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH
-      echo $SHELL; java -cp lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50;
-      ./gradlew test"
+      bash -c 'java -cp lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50; ./gradlew test'"
       # "sudo docker stop " + pg_name,
       # "sudo docker rm " + pg_name,
   stage: test
