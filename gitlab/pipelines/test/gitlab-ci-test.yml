@@ -26,7 +26,7 @@ ci-test:
     - sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user session_db_db
     - sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db
     # we could just --detach, but then we don't see the output
-    - "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50'"
+    - "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50'"
     - sudo docker exec $CONTAINER_NAME ./gradlew test
       # "sudo docker stop " + pg_name,
       # "sudo docker rm " + pg_name,
