@@ -12,7 +12,8 @@ ci-test:
     - db_name
   script:
     - sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
-    - sudo docker run --link $DB_NAME --name $CONTAINER_NAME image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH sleep inf
+    # start container first to keep the length of these commands manageable
+    - sudo docker run --detach --link $DB_NAME --name $CONTAINER_NAME image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH sleep inf
     - sudo docker exec $CONTAINER_NAME ./gradlew distTar
     - sudo docker exec $CONTAINER_NAME bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
     #- "sleep 10" # wait for DB to start
