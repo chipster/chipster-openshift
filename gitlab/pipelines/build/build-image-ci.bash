@@ -36,8 +36,6 @@ bash -c "$cmd"
 echo "** push image"
 bash push-image-ci.bash $dest_repo $dest_ns $build $tag $branch
 
-sudo docker image list
-
 # Keep only the image with tag "latest". Next build job has to check from 
 # remote repository whether the image is the latest, but at least we already have
 # its layers. Next pipeline will reuse this tag, so we always store only 
