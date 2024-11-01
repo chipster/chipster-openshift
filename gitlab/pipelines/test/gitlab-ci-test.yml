@@ -28,6 +28,13 @@ ci-test:
     # we could just --detach, but then we don't see the output
     - "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50'"
     - sudo docker exec $CONTAINER_NAME ./gradlew test
+    - sudo docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
       # "sudo docker stop " + pg_name,
       # "sudo docker rm " + pg_name,
   stage: test
+  artifacts:
+    when: always
+    paths:
+      - test-results/TEST-fi.csc.chipster.auth.AuthAdminResourceTest.xml
+    reports:
+      junit: test-results/TEST-fi.csc.chipster.auth.AuthAdminResourceTest.xml
