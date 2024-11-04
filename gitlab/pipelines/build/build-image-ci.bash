@@ -30,7 +30,8 @@ echo "** build $build"
 cmd="$(bash ../../../k3s/scripts/buildconfig-to-docker.bash ../../../kustomize/builds/$build $src_repo/$src_ns/ $branch) \
   -t $dest_repo/$dest_ns/$build:$tag \
   -t $dest_repo/$dest_ns/$build:$branch"
-#echo "build command: $cmd"
+
+echo "build command: $cmd"
 bash -c "$cmd"
 
 echo "** push image"
