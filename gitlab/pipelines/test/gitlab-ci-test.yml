@@ -31,6 +31,7 @@ ci-test:
     - exit_status=0
     - sudo docker exec $CONTAINER_NAME ./gradlew test || exit_status=$?
     - sudo docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
+    - sudo chown -R gitlab-runner:gitlab-runner test-results
     - exit "$exit_status"
       # "sudo docker stop " + pg_name,
       # "sudo docker rm " + pg_name,
