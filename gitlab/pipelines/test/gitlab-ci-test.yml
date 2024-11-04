@@ -39,6 +39,6 @@ ci-test:
   artifacts:
     when: always
     paths:
-      - test-results/TEST-fi.csc.chipster.auth.AuthAdminResourceTest.xml
+      - "test-results/TEST-*.xml"
     reports:
-      junit: test-results/TEST-fi.csc.chipster.auth.AuthAdminResourceTest.xml
+      junit: "test-results/TEST-*.xml"
