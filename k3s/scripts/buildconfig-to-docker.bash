@@ -58,8 +58,13 @@ if [[ $image_count != 0 ]]; then
         destination=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].destinationDir -)
         source=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].sourcePath -)
         source_basename=$(basename $source)
-        if ! copy_line="$(cat $dir/Dockerfile | grep "COPY $destination")"; then 
-            copy_line=$(cat $dir/Dockerfile | grep "COPY . ")
+        if copy_line="$(cat $dir/Dockerfile | grep "COPY $destination")"; then 
+            true # pass
+        elif copy_line=$(cat $dir/Dockerfile | grep "COPY . "); then
+            true # pass
+        else
+            >&2 echo "ERROR: destination ´$destination´ was found from BuildConfig, but there is no COPY for it or . in Dockerfile"
+            exit 1
         fi
         copy_destination="$(echo "$copy_line" | cut -d " " -f 3)"
         docker_copy_line="COPY --from=$image_repository$image $source $copy_destination/$source_basename"

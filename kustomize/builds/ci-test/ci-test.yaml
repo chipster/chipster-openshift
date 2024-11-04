@@ -28,8 +28,8 @@ spec:
           kind: ImageStreamTag
           name: chipster-tools:latest
         paths:
-          - destinationDir: tools
-            sourcePath: /home/user/chipster-tools/tools
+          - destinationDir: chipster-tools
+            sourcePath: /home/user/chipster-tools
   strategy:
     dockerStrategy:
       from:
