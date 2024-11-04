@@ -1,7 +1,7 @@
 FROM base-ci-test
 
 COPY chipster-web-server /home/user/
-COPY tools /home/user/chipster-web-server/
+COPY chipster-tools /home/user/
 
 WORKDIR /home/user/chipster-web-server
 
