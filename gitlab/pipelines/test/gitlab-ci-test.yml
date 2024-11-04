@@ -27,10 +27,14 @@ ci-test:
     - sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db
     # we could just --detach, but then we don't see the output
     - "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50'"
-    - sudo docker exec $CONTAINER_NAME ./gradlew test
+    # store exit_status of the junit tests, copy results in any case, and then exit this job with the original status
+    - exit_status=0
+    - sudo docker exec $CONTAINER_NAME ./gradlew test || exit_status=$?
     - sudo docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
+    - exit "$exit_status"
       # "sudo docker stop " + pg_name,
       # "sudo docker rm " + pg_name,
+
   stage: test
   artifacts:
     when: always
