@@ -32,11 +32,11 @@ ci-test:
     - sudo docker exec $CONTAINER_NAME ./gradlew test || exit_status=$?
     - sudo docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
     - sudo chown -R gitlab-runner:gitlab-runner test-results
-    - sudo docker stop $DB_NAME
-    - sudo docker rm $DB_NAME
-    - sudo docker stop $CONTAINER_NAME
-    - sudo docker rm $CONTAINER_NAME
-    - sudo docker image rm $image
+    # - sudo docker stop $DB_NAME
+    # - sudo docker rm $DB_NAME
+    # - sudo docker stop $CONTAINER_NAME
+    # - sudo docker rm $CONTAINER_NAME
+    # - sudo docker image rm $image
     - exit "$exit_status"
 
   stage: test
