@@ -27,10 +27,9 @@ tag=$(echo $tag | tr ":" "-" | tr "+" "_")
 echo "** build $build"
 # use branch as source image tag
 # this allows us to skip build jobs easily, but will break if we are able run parallel build pipelines of same branch some day
-cmd="$(bash ../../../k3s/scripts/buildconfig-to-docker.bash ../../../kustomize/builds/$build $src_repo/$src_ns/ $branch) \
+cmd="$(bash ../../../k3s/scripts/buildconfig-to-docker.bash ../../../kustomize/builds/$build $src_repo/$src_ns/ $branch | sed 's/sudo docker build/docker build/g') \
   -t $dest_repo/$dest_ns/$build:$tag \
-  -t $dest_repo/$dest_ns/$build:$branch | \
-  sed 's/sudo docker build/docker build/g'"
+  -t $dest_repo/$dest_ns/$build:$branch"
 
 echo "build command: $cmd"
 bash -c "$cmd"
