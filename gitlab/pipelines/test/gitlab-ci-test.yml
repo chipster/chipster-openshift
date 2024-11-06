@@ -41,7 +41,7 @@ ci-test:
     # run tests
     # store exit_status of the junit tests, copy results in any case, and then exit this job with the original status
     - exit_status=0
-    - ./gradlew test
+    - ./gradlew test || exit_status=$?
     # go back to job directory
     - popd
     # move test results
