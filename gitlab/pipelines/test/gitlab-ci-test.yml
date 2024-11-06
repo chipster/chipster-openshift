@@ -1,14 +1,3 @@
-db_name:
-  artifacts:
-    reports:
-      dotenv: build.env
-  script:
-    - echo CONTAINER_NAME=chipster-ci_$(echo $CI_PIPELINE_CREATED_AT | tr ':' '-') >> build.env
-    - echo DB_NAME=postgres_$(echo $CI_PIPELINE_CREATED_AT | tr ':' '-') >> build.env
-  stage: test
-  tags:
-    - docker
-
 variables:
   # db
   POSTGRES_PASSWORD: chipster
@@ -18,8 +7,6 @@ variables:
 
 ci-test:
   image: image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH
-  needs:
-    - db_name
   services:
     - postgres:14
   script:
@@ -33,7 +20,7 @@ ci-test:
     # extract jar files
     - bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
     # start Chipster backend
-    # type-service dies if it tries to write log to missing stdout. Is tee enough?
+    # type-service dies if it tries to write a log to missing stdout. 'tee' command seems to be enough to protect it from this
     - "db_pass_auth=chipster db_url_auth=jdbc:postgresql://postgres:5432/auth_db
       db_pass_session_db=chipster db_url_session_db=jdbc:postgresql://postgres:5432/session_db_db
       db_pass_job_history=chipster db_url_job_history=jdbc:postgresql://postgres:5432/job_history_db
@@ -51,17 +38,6 @@ ci-test:
     - ls -lah test || true
     - exit "$exit_status"
 
-    # - exit_status=0
-    # - ./gradlew test || exit_status=$?
-    #- docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
-    # - chown -R gitlab-runner:gitlab-runner test-results
-    # - docker stop $DB_NAME
-    # - docker rm $DB_NAME
-    # - docker stop $CONTAINER_NAME
-    # - docker rm $CONTAINER_NAME
-    # - docker image rm $image
-    # - exit "$exit_status"
-
   stage: test
   artifacts:
     when: always
@@ -70,4 +46,5 @@ ci-test:
     reports:
       junit: "test/TEST-*.xml"
   tags:
+    # run in docker executor to be able to start DB easily
     - docker
