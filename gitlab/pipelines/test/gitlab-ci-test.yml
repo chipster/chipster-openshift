@@ -26,6 +26,7 @@ ci-test:
     - image="image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH"
     #- docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
     # start container first to keep the length of these commands manageable
+    - pushd /home/user/chipster-web-server
     - pwd
     - ls -lah
     - "db_pass_auth=chipster db_url_auth=jdbc:postgresql://postgres:5432/auth_db
@@ -34,12 +35,15 @@ ci-test:
       java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher >> stdout.log 2>&1 &"
     - sleep 50
     - ./gradlew distTar
-    - bash -c 'mkdir lib; pushd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz; popd'
+    - bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
+    - pwd
     - createdb -h postgres -U user auth_db
     - createdb -h postgres -U user session_db_db
     - createdb -h postgres -U user job_history_db
     - sleep 60
     - ./gradlew test
+    - popd
+    - mv /home/user/chipster-web-server/build/test-results/test .
     # store exit_status of the junit tests, copy results in any case, and then exit this job with the original status
     # - exit_status=0
     # - ./gradlew test || exit_status=$?
@@ -56,8 +60,8 @@ ci-test:
   artifacts:
     when: always
     paths:
-      - "build/test-results/test/TEST-*.xml"
+      - "test/TEST-*.xml"
     reports:
-      junit: "build/test-results/test/TEST-*.xml"
+      junit: "test/TEST-*.xml"
   tags:
     - docker
