@@ -17,7 +17,7 @@ username="$(cat $HOME/.docker/config.json | jq '."'$image_repository'".username'
 password="$(cat $HOME/.docker/config.json | jq '."'$image_repository'".password' -r)"
 
 # push image
-time sudo docker run \
+time docker run \
     --privileged \
     --volume /var/run:/var/run \
     quay.io/skopeo/stable:latest \
@@ -27,7 +27,7 @@ time sudo docker run \
         docker://$image_repository/$image_namespace/$image:$tag
 
 # tag with branch name
-time sudo docker run \
+time docker run \
     quay.io/skopeo/stable:latest \
         copy \
         --dest-creds $username:$password \

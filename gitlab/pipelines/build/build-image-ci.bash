@@ -29,7 +29,8 @@ echo "** build $build"
 # this allows us to skip build jobs easily, but will break if we are able run parallel build pipelines of same branch some day
 cmd="$(bash ../../../k3s/scripts/buildconfig-to-docker.bash ../../../kustomize/builds/$build $src_repo/$src_ns/ $branch) \
   -t $dest_repo/$dest_ns/$build:$tag \
-  -t $dest_repo/$dest_ns/$build:$branch"
+  -t $dest_repo/$dest_ns/$build:$branch | \
+  sed 's/sudo docker build/docker build/g'"
 
 echo "build command: $cmd"
 bash -c "$cmd"
@@ -45,6 +46,6 @@ bash push-image-ci.bash $dest_repo $dest_ns $build $tag $branch
 # Delete the timestamp and branch tags, because those are not always
 # overwritten and would consume too much space over time.
 echo "** delete local image"
-sudo docker image rm $dest_repo/$dest_ns/$build:$tag
-sudo docker image rm $dest_repo/$dest_ns/$build:$branch
+docker image rm $dest_repo/$dest_ns/$build:$tag
+docker image rm $dest_repo/$dest_ns/$build:$branch
 

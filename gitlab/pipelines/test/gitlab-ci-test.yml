@@ -12,32 +12,32 @@ ci-test:
     - db_name
   script:
     - image="image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH"
-    - sudo docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
+    - docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
     # start container first to keep the length of these commands manageable
-    - "sudo docker run --detach --link $DB_NAME --name $CONTAINER_NAME
+    - "docker run --detach --link $DB_NAME --name $CONTAINER_NAME
       -e db_pass_auth=chipster -e db_url_auth=jdbc:postgresql://$DB_NAME:5432/auth_db
       -e db_pass_session_db=chipster -e db_url_session_db=jdbc:postgresql://$DB_NAME:5432/session_db_db
       -e db_pass_job_history=chipster -e db_url_job_history=jdbc:postgresql://$DB_NAME:5432/job_history_db
       $image sleep inf"
-    - sudo docker exec $CONTAINER_NAME ./gradlew distTar
-    - sudo docker exec $CONTAINER_NAME bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
+    - docker exec $CONTAINER_NAME ./gradlew distTar
+    - docker exec $CONTAINER_NAME bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
     #- "sleep 10" # wait for DB to start
-    - sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user auth_db
-    - sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user session_db_db
-    - sudo docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db
+    - docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user auth_db
+    - docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user session_db_db
+    - docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db
     # we could just --detach, but then we don't see the output
-    - "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher >> stdout.log 2>&1 & sleep 50'"
+    - "docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher >> stdout.log 2>&1 & sleep 50'"
     #- "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50'"
     # store exit_status of the junit tests, copy results in any case, and then exit this job with the original status
     - exit_status=0
-    - sudo docker exec $CONTAINER_NAME ./gradlew test || exit_status=$?
-    - sudo docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
-    - sudo chown -R gitlab-runner:gitlab-runner test-results
-    # - sudo docker stop $DB_NAME
-    # - sudo docker rm $DB_NAME
-    # - sudo docker stop $CONTAINER_NAME
-    # - sudo docker rm $CONTAINER_NAME
-    # - sudo docker image rm $image
+    - docker exec $CONTAINER_NAME ./gradlew test || exit_status=$?
+    - docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
+    - chown -R gitlab-runner:gitlab-runner test-results
+    - docker stop $DB_NAME
+    - docker rm $DB_NAME
+    - docker stop $CONTAINER_NAME
+    - docker rm $CONTAINER_NAME
+    - docker image rm $image
     - exit "$exit_status"
 
   stage: test
