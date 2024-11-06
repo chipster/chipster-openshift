@@ -33,9 +33,7 @@ ci-test:
     - popd
     # move test results
     - mv /home/user/chipster-web-server/build/test-results/test .
-    - pwd
-    - ls -lah
-    - ls -lah test || true
+
     - exit "$exit_status"
 
   stage: test
