@@ -32,7 +32,7 @@ ci-test:
       java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher >> stdout.log 2>&1 &"
     - sleep 50
     - ./gradlew distTar
-    - bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
+    - bash -c 'mkdir lib; pushd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz; popd'
     - createdb -h postgres -U user auth_db
     - createdb -h postgres -U user session_db_db
     - createdb -h postgres -U user job_history_db
@@ -53,8 +53,8 @@ ci-test:
   artifacts:
     when: always
     paths:
-      - "/home/user/chipster-web-server/build/test-results/test/TEST-*.xml"
+      - "build/test-results/test/TEST-*.xml"
     reports:
-      junit: "/home/user/chipster-web-server/build/test-results/test/TEST-*.xml"
+      junit: "build/test-results/test/TEST-*.xml"
   tags:
     - docker
