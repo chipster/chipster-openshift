@@ -6,44 +6,55 @@ db_name:
     - echo CONTAINER_NAME=chipster-ci_$(echo $CI_PIPELINE_CREATED_AT | tr ':' '-') >> build.env
     - echo DB_NAME=postgres_$(echo $CI_PIPELINE_CREATED_AT | tr ':' '-') >> build.env
   stage: test
+  tags:
+    - docker
+
+variables:
+  # db
+  POSTGRES_PASSWORD: chipster
+  # psql
+  PGPASSWORD: chipster
+  POSTGRES_USER: user
 
 ci-test:
+  image: image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH
   needs:
     - db_name
+  services:
+    - postgres:14
   script:
     - image="image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH"
-    - docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
+    #- docker run --detach -e POSTGRES_PASSWORD=chipster -e POSTGRES_USER=user --name $DB_NAME postgres:14
     # start container first to keep the length of these commands manageable
-    - "docker run --detach --link $DB_NAME --name $CONTAINER_NAME
-      -e db_pass_auth=chipster -e db_url_auth=jdbc:postgresql://$DB_NAME:5432/auth_db
-      -e db_pass_session_db=chipster -e db_url_session_db=jdbc:postgresql://$DB_NAME:5432/session_db_db
-      -e db_pass_job_history=chipster -e db_url_job_history=jdbc:postgresql://$DB_NAME:5432/job_history_db
-      $image sleep inf"
-    - docker exec $CONTAINER_NAME ./gradlew distTar
-    - docker exec $CONTAINER_NAME bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
-    #- "sleep 10" # wait for DB to start
-    - docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user auth_db
-    - docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user session_db_db
-    - docker run -e PGPASSWORD=chipster --link $DB_NAME postgres:14 createdb -h $DB_NAME -U user job_history_db
-    # we could just --detach, but then we don't see the output
-    - "docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher >> stdout.log 2>&1 & sleep 50'"
-    #- "sudo docker exec $CONTAINER_NAME bash -c 'java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher & sleep 50'"
+    - "db_pass_auth=chipster db_url_auth=jdbc:postgresql://postgres:5432/auth_db
+      db_pass_session_db=chipster db_url_session_db=jdbc:postgresql://postgres:5432/session_db_db
+      db_pass_job_history=chipster db_url_job_history=jdbc:postgresql://postgres:5432/job_history_db
+      java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher >> stdout.log 2>&1 &"
+    - sleep 50
+    - ./gradlew distTar
+    - bash -c 'mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz'
+    - createdb -h postgres -U user auth_db
+    - createdb -h postgres -U user session_db_db
+    - createdb -h postgres -U user job_history_db
+    - ./gradlew test
     # store exit_status of the junit tests, copy results in any case, and then exit this job with the original status
-    - exit_status=0
-    - docker exec $CONTAINER_NAME ./gradlew test || exit_status=$?
-    - docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
-    - chown -R gitlab-runner:gitlab-runner test-results
-    - docker stop $DB_NAME
-    - docker rm $DB_NAME
-    - docker stop $CONTAINER_NAME
-    - docker rm $CONTAINER_NAME
-    - docker image rm $image
-    - exit "$exit_status"
+    # - exit_status=0
+    # - ./gradlew test || exit_status=$?
+    #- docker cp $CONTAINER_NAME:/home/user/chipster-web-server/build/test-results/test test-results
+    # - chown -R gitlab-runner:gitlab-runner test-results
+    # - docker stop $DB_NAME
+    # - docker rm $DB_NAME
+    # - docker stop $CONTAINER_NAME
+    # - docker rm $CONTAINER_NAME
+    # - docker image rm $image
+    # - exit "$exit_status"
 
   stage: test
   artifacts:
     when: always
     paths:
-      - "test-results/TEST-*.xml"
+      - "/home/user/chipster-web-server/build/test-results/test/TEST-*.xml"
     reports:
-      junit: "test-results/TEST-*.xml"
+      junit: "/home/user/chipster-web-server/build/test-results/test/TEST-*.xml"
+  tags:
+    - docker
