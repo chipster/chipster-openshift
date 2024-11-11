@@ -15,11 +15,12 @@ ci-test:
     - createdb -h postgres -U user session_db_db
     - createdb -h postgres -U user job_history_db
     # compile
+    - pwd
     - pushd /home/user/chipster-web-server
+    - pwd
     - ./gradlew distTar
     # extract jar files
     - mkdir lib; pushd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz; popd
-    - mkdir conf
     - pwd
     - |
       echo "db_pass_auth: chipster
@@ -47,7 +48,7 @@ ci-test:
     - pwd
     - mv /home/user/chipster-web-server/build/test-results/test .
 
-    - exit "$exit_status"
+    # - exit "$exit_status"
 
   stage: test
   artifacts:
