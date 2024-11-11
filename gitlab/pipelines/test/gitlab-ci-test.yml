@@ -18,8 +18,9 @@ ci-test:
     - pushd /home/user/chipster-web-server
     - ./gradlew distTar
     # extract jar files
-    - mkdir lib; cd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz
+    - mkdir lib; pushd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz; popd
     - mkdir conf
+    - pwd
     - |
       echo "db_pass_auth: chipster
       db_url_auth: jdbc:postgresql://postgres:5432/auth_db
@@ -43,6 +44,7 @@ ci-test:
     # go back to job directory
     # - popd
     # move test results
+    - pwd
     - mv /home/user/chipster-web-server/build/test-results/test .
 
     - exit "$exit_status"
