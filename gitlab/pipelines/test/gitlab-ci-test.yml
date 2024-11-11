@@ -15,13 +15,11 @@ ci-test:
     - createdb -h postgres -U user session_db_db
     - createdb -h postgres -U user job_history_db
     # compile
-    - pwd
-    - pushd /home/user/chipster-web-server
-    - pwd
+    - cd /home/user/chipster-web-server
     - ./gradlew distTar
     # extract jar files
     - mkdir lib; pushd lib; tar -xf ../build/distributions/chipster-web-server.tar.gz; popd
-    - pwd
+    # write configuration
     - |
       echo "db-pass-auth: chipster
       db-url-auth: jdbc:postgresql://postgres:5432/auth_db
@@ -35,26 +33,17 @@ ci-test:
     # ´&´ runs ServerLauncher in the background
     # 'tail +1f' follows the file starting from the line 1, until sed quits it
     - "java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher > stdout.log & tail +1f stdout.log | sed '/INFO: press Ctrl + C to stop/q' || true"
-    # run tests
-    # store exit_status of the junit tests, copy results in any case, and then exit this job with the original status
-    # - exit_status=0
   script:
-    - ./gradlew test
-    # - ./gradlew test || exit_status=$?
-  after_script:
-    # go back to job directory
-    # - popd
-    # move test results
     - pwd
+    # run tests
+    - ./gradlew test
+  after_script:
+    # move test results
     - mv /home/user/chipster-web-server/build/test-results/test .
-
-    # - exit "$exit_status"
 
   stage: test
   artifacts:
     when: always
-    # paths:
-    #   - "test/TEST-*.xml"
     reports:
       junit: "test/TEST-*.xml"
   tags:
