@@ -4,8 +4,6 @@ variables:
   # psql
   PGPASSWORD: chipster
   POSTGRES_USER: user
-  # show duration of script lines
-  FF_TIMESTAMPS: true
 
 ci-test:
   image: image-registry.apps.2.rahti.csc.fi/chipster-images-dev/ci-test:$CI_COMMIT_BRANCH
@@ -37,10 +35,11 @@ ci-test:
     - "java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher > stdout.log & tail +1f stdout.log | sed '/INFO: press Ctrl + C to stop/q' || true"
   script:
     # run tests
+    # the same shell context with before_script
     - ./gradlew test
   after_script:
-    - pwd
-    # move test results to $CI_PROJECT_DIR
+    # working directory is back in $CI_PROJECT_DIR, because GitLab creates a new shell context for after_script
+    # GitLab accepts test results only under $CI_PROJECT_DIR
     - mv /home/user/chipster-web-server/build/test-results/test .
 
   stage: test
