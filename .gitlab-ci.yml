@@ -11,3 +11,7 @@ stages:
   # - build
   # - build-comp
   - test
+
+trigger_job:
+  trigger:
+    project: chipster/chipster-csc
