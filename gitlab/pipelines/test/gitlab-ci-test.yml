@@ -34,6 +34,7 @@ ci-test:
     # 'tail +1f' follows the file starting from the line 1, until sed quits it
     - "java -cp lib/chipster-web-server/lib/*: fi.csc.chipster.rest.ServerLauncher > stdout.log & tail +1f stdout.log | sed '/INFO: press Ctrl + C to stop/q' || true"
   script:
+    - echo "CI_PIPELINE_CREATED_AT: $CI_PIPELINE_CREATED_AT"
     # run tests
     # the same shell context with before_script
     - ./gradlew test

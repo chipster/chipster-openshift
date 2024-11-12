@@ -10,11 +10,13 @@ stages:
   # - build-base
   # - build
   # - build-comp
-  - test
   - csc
+  - test
 
 trigger_job:
   stage: csc
+  variables:
+    PARENT_CI_PIPELINE_CREATED_AT: $CI_PIPELINE_CREATED_AT
   trigger:
     project: chipster/chipster-csc
     branch: $CI_COMMIT_BRANCH
