@@ -1,6 +1,9 @@
 # Chipster CI/CD configuration
 #
 
+default:
+  timeout: 10 minutes
+
 variables:
   RUN_BASE_BUILDS:
     value: false
