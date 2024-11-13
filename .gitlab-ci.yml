@@ -1,15 +1,33 @@
 # Chipster CI/CD configuration
 #
 
+variables:
+  RUN_BASE_BUILDS:
+    value: false
+    options:
+      - true
+      - false
+    description: "Run base builds."
+  RUN_COMP_BUILDS:
+    value: false
+    options:
+      - true
+      - false
+    description: "Run comp builds."
+
 include:
-  # - gitlab/pipelines/build/gitlab-ci-build-base.yml
-  - gitlab/pipelines/build/gitlab-ci-build.yml
-  # - gitlab/pipelines/build/gitlab-ci-build-comp.yml
-  - gitlab/pipelines/test/gitlab-ci-test.yml
+  - local: gitlab/pipelines/build/gitlab-ci-build-base.yml
+    rules:
+      - if: $RUN_BASE_BUILDS == true
+  - local: gitlab/pipelines/build/gitlab-ci-build.yml
+  - local: gitlab/pipelines/build/gitlab-ci-build-comp.yml
+    rules:
+      - if: $RUN_COMP_BUILDS == true
+  - local: gitlab/pipelines/test/gitlab-ci-test.yml
 stages:
-  # - build-base
+  - build-base
   - build
-  # - build-comp
+  - build-comp
   - test
   - csc
 
