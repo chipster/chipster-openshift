@@ -6,16 +6,16 @@ default:
 
 variables:
   RUN_BASE_BUILDS:
-    value: false
+    value: "false"
     options:
-      - true
-      - false
+      - "true"
+      - "false"
     description: "Run base builds."
   RUN_COMP_BUILDS:
-    value: false
+    value: "false"
     options:
-      - true
-      - false
+      - "true"
+      - "false"
     description: "Run comp builds."
 
 include:
