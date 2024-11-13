@@ -18,11 +18,11 @@ variables:
 include:
   - local: gitlab/pipelines/build/gitlab-ci-build-base.yml
     rules:
-      - if: $RUN_BASE_BUILDS == true
+      - if: $RUN_BASE_BUILDS == "true"
   - local: gitlab/pipelines/build/gitlab-ci-build.yml
   - local: gitlab/pipelines/build/gitlab-ci-build-comp.yml
     rules:
-      - if: $RUN_COMP_BUILDS == true
+      - if: $RUN_COMP_BUILDS == "true"
   - local: gitlab/pipelines/test/gitlab-ci-test.yml
 stages:
   - build-base
