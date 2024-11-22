@@ -35,7 +35,8 @@ spec:
           kind: ImageStreamTag
           name: chipster-web:latest
         paths:
-          - destinationDir: chipster-web
+          # add "-app" to the name to separate it from chipster-web-server (to overcome bad parsing in buildconfig-to-docker.bash)
+          - destinationDir: chipster-web-app
             sourcePath: /home/user/chipster-web
   strategy:
     dockerStrategy:
