@@ -30,6 +30,13 @@ spec:
         paths:
           - destinationDir: chipster-tools
             sourcePath: /home/user/chipster-tools
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web:latest
+        paths:
+          - destinationDir: chipster-web
+            sourcePath: /home/user/chipster-web
   strategy:
     dockerStrategy:
       from:
