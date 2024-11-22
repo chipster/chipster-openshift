@@ -19,14 +19,14 @@ spec:
       - as: null
         from:
           kind: ImageStreamTag
-          name: chipster-web:latest
+          name: chipster-web-build:latest
         paths:
           - destinationDir: chipster-web
             sourcePath: /home/user/chipster-web
       - as: null
         from:
           kind: ImageStreamTag
-          name: chipster-web:latest
+          name: chipster-web-build:latest
         paths:
           - destinationDir: html
             sourcePath: /home/user/chipster-web/assets/html
@@ -51,7 +51,7 @@ spec:
     - imageChange:
         from:
           kind: ImageStreamTag
-          name: chipster-web:latest
+          name: chipster-web-build:latest
       type: ImageChange
     - imageChange:
         from:
