@@ -48,10 +48,10 @@ fi
 
 if [[ -z $no_sudo ]]; then
     # use sudo by default
-    sudo_cmd = "sudo "
+    sudo_cmd="sudo "
 else
     # unless $no_sudo variable was set
-    sudo_cmd = ""
+    sudo_cmd=""
 fi
 
 build="$(basename $dir)"
