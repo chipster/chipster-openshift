@@ -26,9 +26,11 @@ set -e
 dir="$1"
 image_repository="$2"
 source_tag="$3"
+branch="$4"
+no_sudo="$5"
 
 if [[ -z $dir ]]; then
-  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY [ SOURCE_TAG ]]"
+  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY [ IMAGE_SOURCE_TAG [ GIT_BRANCH [ NO_SUDO ]]]]"
   exit 1
 fi
 
@@ -40,6 +42,18 @@ if [[ -z $source_tag ]]; then
   source_tag="latest"
 fi
 
+if [[ -z $branch ]]; then
+    branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)    
+fi
+
+if [[ -z $no_sudo ]]; then
+    # use sudo by default
+    sudo_cmd = "sudo "
+else
+    # unless $no_sudo variable was set
+    sudo_cmd = ""
+fi
+
 build="$(basename $dir)"
 
 base_image=${image_repository}$(cat $dir/*.yaml | yq e .spec.strategy.dockerStrategy.from.name - | sed "s/:latest$/:$source_tag/")
@@ -47,7 +61,6 @@ base_image=${image_repository}$(cat $dir/*.yaml | yq e .spec.strategy.dockerStra
 cmd="cat $dir/Dockerfile | sed \"s#FROM.*#FROM ${base_image}#\""
 
 uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
-branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
 
 image_count=$(cat $dir/*.yaml | yq e .spec.source.images - -o=json | jq '. | length')
 
@@ -86,9 +99,9 @@ fi
 # cmd="$cmd | tee /dev/tty"
 
 if [ $uri = "null" ]; then
-    cmd="$cmd | sudo docker build -t $image_repository$build -"
+    cmd="$cmd | ${sudo_cmd}docker build -t $image_repository$build -"
 else
-    cmd="$cmd | sudo docker build -t $image_repository$build -f - $uri#$branch"
+    cmd="$cmd | ${sudo_cmd}docker build -t $image_repository$build -f - $uri#$branch"
 fi
 
 echo $cmd
