@@ -78,7 +78,7 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 30          
-      - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
+      - image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat:{{$.Values.image.tag}}"
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: filebeat
         volumeMounts:

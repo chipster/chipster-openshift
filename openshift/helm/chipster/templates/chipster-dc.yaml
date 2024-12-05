@@ -94,7 +94,7 @@ spec:
                 secretKeyRef:
                   key: password
                   name: monitoring
-          image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring
+          image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring:{{$.Values.image.tag}}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: status
           readinessProbe:
@@ -115,7 +115,7 @@ spec:
               memory: 10Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-        - image: {{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat
+        - image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/filebeat:{{$.Values.image.tag}}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           name: filebeat
           volumeMounts:
