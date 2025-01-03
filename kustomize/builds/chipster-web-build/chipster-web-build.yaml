@@ -2,27 +2,30 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: chipster-web
-  name: chipster-web
+    build: chipster-web-build
+  name: chipster-web-build
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: chipster-web:latest
+      name: chipster-web-build:latest
   postCommit: {}
-  resources: {}
+  resources:
+    limits:
+      cpu: 2
+      memory: 8Gi
+    requests:
+      cpu: 500m
+      memory: 4Gi
   runPolicy: Serial
   source:
     dockerfile: ""
-    git:
-      ref: master
-      uri: https://github.com/chipster/chipster-web.git
-    type: Git
+    type: Dockerfile
   strategy:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-node:latest
+        name: chipster-web:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

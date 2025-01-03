@@ -24,32 +24,61 @@ set -e
 #set -x
 
 dir="$1"
+git_repo="$2"
+image_repository="$3"
+source_tag="$4"
+no_sudo="$5"
 
 if [[ -z $dir ]]; then
-  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR"
+  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ GIT_REPOSITORY [ IMAGE_REPOSITORY [ IMAGE_SOURCE_TAG [ NO_SUDO ]]]]"
   exit 1
+fi
+
+if [[ -z $image_repository ]]; then
+  image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
+fi
+
+if [[ -z $source_tag ]]; then
+  source_tag="latest"
+fi
+
+if [[ -z $git_repo ]]; then
+    git_uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
+    branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
+
+    git_repo=$git_uri#$branch
+fi
+
+if [[ -z $no_sudo ]]; then
+    # use sudo by default
+    sudo_cmd="sudo "
+else
+    # unless $no_sudo variable was set
+    sudo_cmd=""
 fi
 
 build="$(basename $dir)"
 
-image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
+base_image=${image_repository}$(cat $dir/*.yaml | yq e .spec.strategy.dockerStrategy.from.name - | sed "s/:latest$/:$source_tag/")
 
-cmd="cat $dir/Dockerfile | sed \"s#FROM #FROM ${image_repository}#\""
-
-uri=$(cat $dir/*.yaml | yq e .spec.source.git.uri -)
-branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
+cmd="cat $dir/Dockerfile | sed \"s#FROM.*#FROM ${base_image}#\""
 
 image_count=$(cat $dir/*.yaml | yq e .spec.source.images - -o=json | jq '. | length')
 
 if [[ $image_count != 0 ]]; then 
     last_index=$(($image_count - 1))
     for i in $(seq 0 $last_index); do
-        image=$(cat $dir/*.yaml | yq e .spec.source.images[$i].from.name -)
+        image=$(cat $dir/*.yaml | yq e .spec.source.images[$i].from.name - | sed "s/:latest$/:$source_tag/")
         destination=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].destinationDir -)
         source=$(cat $dir/*.yaml | yq e .spec.source.images[$i].paths[0].sourcePath -)
         source_basename=$(basename $source)
-        if ! copy_line="$(cat $dir/Dockerfile | grep "COPY $destination")"; then 
-            copy_line=$(cat $dir/Dockerfile | grep "COPY . ")
+        if copy_line="$(cat $dir/Dockerfile | grep "COPY $destination")"; then 
+            true # pass
+        elif copy_line=$(cat $dir/Dockerfile | grep "COPY . "); then
+            true # pass
+        else
+            >&2 echo "ERROR: destination ´$destination´ was found from BuildConfig, but there is no COPY for it or . in Dockerfile"
+            exit 1
         fi
         copy_destination="$(echo "$copy_line" | cut -d " " -f 3)"
         docker_copy_line="COPY --from=$image_repository$image $source $copy_destination/$source_basename"
@@ -70,10 +99,10 @@ fi
 
 # cmd="$cmd | tee /dev/tty"
 
-if [ $uri = "null" ]; then
-    cmd="$cmd | sudo docker build -t $image_repository$build -"
+if [ $git_repo = "null#null" ]; then
+    cmd="$cmd | ${sudo_cmd}docker build -t $image_repository$build -"
 else
-    cmd="$cmd | sudo docker build -t $image_repository$build -f - $uri#$branch"
+    cmd="$cmd | ${sudo_cmd}docker build -t $image_repository$build -f - $git_repo"
 fi
 
 echo $cmd

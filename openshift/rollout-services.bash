@@ -2,23 +2,15 @@
 # Most often the deployemnt happens after new code is pusehd to the repository. GitHub webhooks
 # can be configured to handle that automatically, but for some infrequent maintenance tasks
 # running this manually is fine
-
-subproject="$1"
-
-if [ -z $subproject ]; then
-  subproject_postfix=""
-else
-  subproject_postfix="-$subproject"
-fi
    
 for d in auth service-locator session-db file-broker scheduler session-worker type-service web-server toolbox backup job-history; do 
 	echo $d
-	oc rollout cancel dc/$d$subproject_postfix
+	oc rollout cancel dc/$d
 done
 
 for d in auth service-locator session-db file-broker scheduler session-worker type-service web-server toolbox backup job-history; do 
 	echo $d
-	oc rollout latest $d$subproject_postfix
+	oc rollout latest $d
 done
 
 # is there a better way?

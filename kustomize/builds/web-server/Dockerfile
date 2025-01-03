@@ -1,6 +1,6 @@
-FROM chipster-web-server
+FROM chipster-web-server-build
 
-COPY chipster-web /opt/chipster
+COPY chipster-web-build /opt/chipster
 # copy html separately so that the BuildConfig can be patched to take it from another image
 COPY html /opt/chipster/chipster-web/assets
 COPY manual /opt/chipster/chipster-web/assets

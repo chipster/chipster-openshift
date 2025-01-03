@@ -1,6 +1,6 @@
 FROM base-node
 
-COPY . /tmp/build/chipster-web-server/
+COPY chipster-web-server /tmp/build/
 
 # build typescript server components
 # config.ts assumes it's running in the js/type-service folder when it's finding the configs

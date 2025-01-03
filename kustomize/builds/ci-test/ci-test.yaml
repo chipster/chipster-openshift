@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: web-server
-  name: web-server
+    build: ci-test
+  name: ci-test
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: web-server:latest
+      name: ci-test:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,29 +19,30 @@ spec:
       - as: null
         from:
           kind: ImageStreamTag
-          name: chipster-web-build:latest
+          name: chipster-web-server:latest
         paths:
-          - destinationDir: chipster-web
-            sourcePath: /home/user/chipster-web
-      - as: null
-        from:
-          kind: ImageStreamTag
-          name: chipster-web-build:latest
-        paths:
-          - destinationDir: html
-            sourcePath: /home/user/chipster-web/assets/html
+          - destinationDir: chipster-web-server
+            sourcePath: /home/user/chipster-web-server
       - as: null
         from:
           kind: ImageStreamTag
           name: chipster-tools:latest
         paths:
-          - destinationDir: manual
-            sourcePath: /home/user/chipster-tools/manual
+          - destinationDir: chipster-tools
+            sourcePath: /home/user/chipster-tools
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-web:latest
+        paths:
+          # add "-app" to the name to separate it from chipster-web-server (to overcome bad parsing in buildconfig-to-docker.bash)
+          - destinationDir: chipster-web-app
+            sourcePath: /home/user/chipster-web
   strategy:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: chipster-web-server-build:latest
+        name: base-ci-test:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
@@ -51,10 +52,8 @@ spec:
     - imageChange:
         from:
           kind: ImageStreamTag
-          name: chipster-web-build:latest
-      type: ImageChange
+          name: chipster-web-server:latest
     - imageChange:
         from:
           kind: ImageStreamTag
           name: chipster-tools:latest
-      type: ImageChange

@@ -15,27 +15,27 @@ spec:
   source:
     dockerfile: ""
     images:
-    - as: null
-      from:
-        kind: ImageStreamTag
-        name: chipster-tools:latest
-      paths:
-      - destinationDir: tools
-        sourcePath: /home/user/chipster-tools/tools
+      - as: null
+        from:
+          kind: ImageStreamTag
+          name: chipster-tools:latest
+        paths:
+          - destinationDir: tools
+            sourcePath: /home/user/chipster-tools/tools
     type: Dockerfile
   strategy:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: chipster-web-server:latest
+        name: chipster-web-server-build:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
-  - imageChange:
-      from:
-        kind: ImageStreamTag
-        name: chipster-tools:latest
-    type: ImageChange
-  - type: ConfigChange
-  - imageChange:
-    type: ImageChange
+    - imageChange:
+        from:
+          kind: ImageStreamTag
+          name: chipster-tools:latest
+      type: ImageChange
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange

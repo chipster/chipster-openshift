@@ -1,6 +1,6 @@
 FROM base-java-comp
 
-COPY chipster-web-server /opt/
+COPY chipster-web-server-build /opt/
 
 RUN mkdir -p /opt/chipster \
   && chmod -R ugo+rwx /opt/chipster \
