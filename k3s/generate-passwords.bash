@@ -105,7 +105,7 @@ for key in $(yq e $default_values_yaml_path -o=json | jq '.users | keys[]' -r); 
         echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
     else
         echo "generate password for $name"
-        password=$(diceware -w en)
+        password=$(diceware)
         values_json=$(echo $values_json | jq ".users.\"$key\".password = \"$password\"")
     fi
 done
