@@ -132,7 +132,7 @@ watch kubectl get pod
 When all pods are running again, follow this page from the start to update the databases. Then go back to latest deployment scripts:
 
 ```bash
-git checkout master
+git checkout k3s
 ```
 
 After that you can finally update Chipster safely.
