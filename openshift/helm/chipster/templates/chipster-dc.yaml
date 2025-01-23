@@ -159,14 +159,5 @@ spec:
   test: false
   triggers:
     - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-          - {{ $deployment.name }}
-        from:
-          kind: ImageStreamTag
-          name: "{{ $deployment.image }}:{{$.Values.image.tag}}"
-          namespace: {{$.Values.image.namespace}}
-      type: ImageChange
 {{- end }}
 {{- end }}
