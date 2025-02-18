@@ -189,15 +189,17 @@ bash generate-passwords.bash
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other.
 
-Run the following command to see what image versions are available. For example, the output could look something like this:
+Chipster images are available in two different places. These instructions show how to use the most recent image versions which are available in an image registry. There is separate page for [older image versions](image-archive.md), which are stored in object storage.
+
+Run the following command to see what image versions are available in the image registry. For example, the output could look something like this:
 
 ```bash
-$ curl -s https://image-registry.apps.2.rahti.csc.fi/v2/chipster-images/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort
+$ curl -s https://image-registry.apps.2.rahti.csc.fi/v2/chipster-images/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort --version-sort
 latest
+v4.6.0
 v4.7.0-rc1
 v4.7.0-rc2
 v4.7.0
-v4.6.0
 ```
 
 Select the newest version, which doesn't have letters "-rc" (short for "release candidate"). Configure it in your `~/values.yaml`. Keep it there until it's time to update to the next Chipster version.
