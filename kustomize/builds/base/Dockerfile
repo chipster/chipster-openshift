@@ -5,13 +5,10 @@ WORKDIR /home/user
 ENV HOME=/home/user
 
 # set timezone, because dstat package depends on tzdata, which tries to ask it interactively
-# why dstat cannot be installed with everything else: https://bugs.launchpad.net/ubuntu/+source/pcp/+bug/2064784 ?
+# why dstat cannot be installed after upgrade: https://bugs.launchpad.net/ubuntu/+source/pcp/+bug/2064784 ?
 RUN apt-get update -y \
 	&& ln -snf /usr/share/zoneinfo/Etc/UTC /etc/localtime && echo "Etc/UTC" > /etc/timezone \
 	&& apt-get install -y dstat \
-	&& apt-get clean
-
-RUN apt-get update -y \
 	&& apt-get upgrade -y \
 	&& apt-get install -y nano pv curl liblz4-tool parallel jq wget rsync less \
 	&& apt-get clean \
