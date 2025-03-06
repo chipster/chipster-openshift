@@ -5,7 +5,7 @@ RUN apt-get update -y \
 	&& curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
 	&& unzip awscliv2.zip \
 	&& ./aws/install \
-	&& mkdir /etc/apt/keyrings \
+	&& mkdir -p /etc/apt/keyrings \
 	&& curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg \
 	&& echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list \
 	&& apt-get update -y \
