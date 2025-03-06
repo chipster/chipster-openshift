@@ -10,10 +10,8 @@ RUN apt-get update -y \
 	&& echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list \
 	&& apt-get update -y \
 	&& apt-get install -y kubectl \
-	&& apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64 \
-	&& add-apt-repository ppa:rmescandon/yq \
-	&& apt-get update -y \
-	&& apt-get install -y yq \
+	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& chmod +x /usr/bin/yq \
 	&& echo 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main' | tee /etc/apt/sources.list.d/pgdg.list \
 	&& wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
 	&& apt-get update \
