@@ -14,11 +14,11 @@ RUN apt-get update -y \
 
 # why dstat cannot be installed with everything else: https://bugs.launchpad.net/ubuntu/+source/pcp/+bug/2064784 ?
 RUN apt-get install -y dstat \
-	&& apt-get clean \
+	&& apt-get clean
 
-	# OpenShift gives a random uid for the user and some programs (e.g. dstat) try to find a username from the /etc/passwd.
-	# Let user to fix it, but obviously this shouldn't be run outside OpenShift
-	RUN chmod ug+rw /etc/passwd \
+# OpenShift gives a random uid for the user and some programs (e.g. dstat) try to find a username from the /etc/passwd.
+# Let user to fix it, but obviously this shouldn't be run outside OpenShift
+RUN chmod ug+rw /etc/passwd \
 	&& echo 'echo "chipster:x:$(id -u):$(id -g)::/tmp:/bin/bash" >> /etc/passwd' > fix-username.bash
 
 CMD sleep inf
