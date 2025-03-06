@@ -10,10 +10,12 @@ RUN apt-get update -y \
 	&& echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list \
 	&& apt-get update -y \
 	&& apt-get install -y kubectl \
-	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& wget --quiet https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
 	&& chmod +x /usr/bin/yq \
-	&& echo 'deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main' | tee /etc/apt/sources.list.d/pgdg.list \
-	&& wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+	&& apt-get install -y curl ca-certificates \
+	&& install -d /usr/share/postgresql-common/pgdg \
+	&& curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+	&& sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
 	&& apt-get update \
 	&& apt-get install -y postgresql-client-14 postgresql-contrib-14 \
 	&& apt-get clean
