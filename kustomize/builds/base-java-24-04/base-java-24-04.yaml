@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-20-04:latest
+        name: base-24-04:latest
     type: Docker
   triggers:
     - type: ConfigChange
