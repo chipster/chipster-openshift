@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: base
-  name: base
+    build: base-java-24-04
+  name: base-java-24-04
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: base:latest
+      name: base-java-24-04:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,10 +19,9 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-24-04:latest
+        name: base-20-04:latest
     type: Docker
   triggers:
     - type: ConfigChange
-  # this seems to start an extra build when we have just run it
-  # - imageChange:
-  #   type: ImageChange
+    - imageChange:
+      type: ImageChange
