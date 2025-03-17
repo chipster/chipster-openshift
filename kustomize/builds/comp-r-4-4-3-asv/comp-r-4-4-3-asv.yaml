@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-r-4-4-3:latest
+        name: comp-20-04-r-deps:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
