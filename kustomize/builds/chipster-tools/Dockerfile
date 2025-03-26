@@ -1,4 +1,4 @@
-FROM base
+FROM base-24-04
 
 COPY tools /home/user/chipster-tools/tools
 COPY manual /home/user/chipster-tools/manual

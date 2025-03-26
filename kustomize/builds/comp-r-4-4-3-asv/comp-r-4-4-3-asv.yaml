@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: base-java
-  name: base-java
+    build: comp-r-4-4-3-asv
+  name: comp-r-4-4-3-asv
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: base-java:latest
+      name: comp-r-4-4-3-asv:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,9 +19,10 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base:latest
+        name: comp-24-04-r-deps:latest
     type: Docker
+  successfulBuildsHistoryLimit: 5
   triggers:
-  - type: ConfigChange
-  - imageChange:
-    type: ImageChange
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange
