@@ -2,8 +2,8 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-r-4-4-3-enabrowsertools
-  name: comp-r-4-4-3-enabrowsertools
+    build: comp-r-4-3-2-enabrowsertools
+  name: comp-r-4-3-2-enabrowsertools
 spec:
   output:
     to:
@@ -19,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-r-4-4-3:latest
+        name: comp-r-4-3-2:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

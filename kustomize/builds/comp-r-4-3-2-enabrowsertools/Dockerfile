@@ -1,4 +1,6 @@
-FROM comp-r-4-4-3
+# use Python 3.8 in Ubuntu 20.04, because enaBrowserTools apparently isn't 
+# compatible with Python 3.12 in Ubuntu 24.04: SyntaxWarning: invalid escape sequence '\.'
+FROM comp-r-4-3-2
 
 RUN mkdir /tmp/enabrowsertools \
     && cd /tmp/enabrowsertools \
