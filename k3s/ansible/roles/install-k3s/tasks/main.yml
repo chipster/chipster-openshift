@@ -1,11 +1,5 @@
-- name: Remove Traefik to update it (if Traefik 1 in K3s 1.20 and earlier)
-  shell: "kubectl -n kube-system delete helmcharts.helm.cattle.io traefik"
-  ignore_errors: yes
-
 - name: Install K3s
   shell: "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=\"{{ k3s_version }}\" sh -"
-  args:
-    warn: no
 
 - name: Allow the current user to use kubectl command with K3s without sudo
   file:
