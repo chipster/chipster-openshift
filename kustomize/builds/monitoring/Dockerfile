@@ -1,4 +1,4 @@
-FROM base
+FROM base-24-04
 
 WORKDIR /home/user
 

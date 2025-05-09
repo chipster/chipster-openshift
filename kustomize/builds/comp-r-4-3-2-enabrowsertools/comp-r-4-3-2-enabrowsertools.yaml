@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: base-java-comp
-  name: base-java-comp
+    build: comp-r-4-3-2-enabrowsertools
+  name: comp-r-4-3-2-enabrowsertools
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: base-java-comp:latest
+      name: comp-r-4-4-3-enabrowsertools:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -19,10 +19,10 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-java-16-04:latest
+        name: comp-r-4-3-2:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
-  - type: ConfigChange
-  - imageChange:
-    type: ImageChange
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange

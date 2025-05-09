@@ -1,4 +1,4 @@
-FROM base
+FROM base-24-04
 
 # installation of node-gyb npm package expects the program "make" from the build-essential package
 # disable update-notifier. Otherwise node doesn't start a week after the image build, because the .npm is directory was created by root. As a side effect node refuses to start immediately, if the root-owned .npm directory exists, but you can simply delete it.

@@ -1,4 +1,4 @@
-FROM base-java-comp
+FROM base-java-comp-16-04
 
 # build arg for build version, because envs are not configurable directly
 ARG ARG_CHIPSTER_BUILD_VERSION=""
