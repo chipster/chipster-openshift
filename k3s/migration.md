@@ -81,19 +81,19 @@ And then continue with the [Chipster update instructions](README.md#Updates).
 
 ## Update to K3s v1.32.4
 
-The Ansible playbook in the update instructions will update the K3s from version `v1.26.4` to `v1.32.4` since 2025-05-??. The new K3s will have different API version for the IngressRoute object. After K3s has been updated, Helm and kubectl cannot manage the old IngressRoute objects anymore.
+Since Chipster version v4.14.3, the Ansible playbook in the update instructions will update the K3s from version `v1.26.4` to `v1.32.4`. The new K3s will have different API version for the IngressRoute object. After K3s has been updated, Helm and kubectl cannot manage the old IngressRoute objects anymore.
 
-Remove all IngressRoute objects before the K3s update to prevent problems later:
+Uninstall Chipster before the K3s update to prevent problems later:
 
 ```bash
 helm uninstall chipster
 ```
 
-This didn't delete data on our test servers, but take the necessary precautions condsidering backups.
+This didn't delete the data on our test servers, but take the necessary precautions condsidering backups.
 
 And then continue with the [Chipster update instructions](README.md#Updates).
 
-### Recovering from failed K3s v1.32.4 update
+### Recovering from Failed K3s v1.32.4 Update
 
 If you didn't uninstall Chipster before upgrading K3s, you will get a error like this:
 
@@ -125,17 +125,25 @@ After this we were able to to deploy Chipster again:
 bash deploy -f values.yaml
 ```
 
-## Update to v4.14.2 (Ubuntu 24.04)
+## Update to Ubuntu 24.04
 
-We have updated the [Chipster installation instructions](README.md). Those now start from Ubuntu 24.04 and install Chipster, where all internet-facing containers are updated to Ubuntu 24.04.
+The table of different Chipster versions and corresponding Ubuntu and K3s versions:
+
+| Chipster version  | Ubuntu on K3s host | Ubuntu in Chipster containers (excpept comp) | Ubuntu in comp containers | K3s version |
+| ----------------- | ------------------ | -------------------------------------------- | ------------------------- | ----------- |
+| <= v4.13.15       | 20.04              | 20.04                                        | 16.04 or 20.04            | v1.26.4     |
+| v4.14.0 - v4.14.2 | 20.04              | 24.04                                        | 16.04, 20.04 or 24.04     | v1.26.4     |
+| >= v4.14.3        | 24.04              | 24.04                                        | 16.04, 20.04 or 24.04     | v1.32.4     |
+
+Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.14.3. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see previous chapter) and Ubuntu on the K3s host. The next too sections show you two options for doing it.
 
 Analysis tools in `comp` containers run in Ubuntu 16.04, Ubuntu 20.04 or Ubuntu 24.04. That shouldn’t pose significant security risks, because comp is well protected behind other Chipster services.
 
-When a job is started, the comp gets an access token only for the session where it's run. The most important attack vector for the comp is the input files and parameters, but the user who can change parameters and input files, can already access all the data in the session anyway.
+When a job is started, the comp gets an access token only for the session where it's run. The most important attack vector for the comp are the input files and parameters, but the user who can change the parameters and input files, can already access all the data in the session anyway.
 
 ### Option 1: Install New Server (recommended)
 
-You should update existing Chipster servers. Our recommended option is to install a new server and make sure that all necessary data is moved before removing the old server. The tools-bin package wasn’t updated at this point, so you can reuse your possible local copies of the latest tools-bin package (tools-bin version chipster-4.9.0).
+Our recommended option is to install a new server and make sure that all necessary data is moved before removing the old server. The tools-bin package wasn’t updated at this point, so you can reuse your possible local copies of the latest tools-bin package (tools-bin version chipster-4.9.0).
 
 The sessions from the old server can be moved either by following the [backup instructions](backup.md) or users can do it themselves by downloading the sessions to zip files from the old server and upload those to the new server.
 

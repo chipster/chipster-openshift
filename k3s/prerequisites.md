@@ -1,7 +1,8 @@
 # Chipster in K3s prerequisites
+
 ## Operating system and remote connection
 
-Let's assume that we have a ssh access to an Ubuntu 20.04 server. It doesn't matter if it is a physical hardwware or a virtual server.
+Let's assume that we have a ssh access to an Ubuntu 24.04 server. It doesn't matter if it is a physical hardwware or a virtual server.
 
 The instructions assume that your account has passwordless sudo rights. TODO how to set it up?
 
@@ -21,60 +22,62 @@ Usually 20 GB is enough space for the root disk.
 
 We need a lot of additinal storage space to store all the reference genomes, indexes and users' files.
 
- * mount at least 1 TB volume to the server (or 2 TB if you want to update to new tools-bin versions before deleting the old one)
- * create a filesystem to the volume (assuming it's `/dev/vdb`)
+- mount at least 1 TB volume to the server (or 2 TB if you want to update to new tools-bin versions before deleting the old one)
+- create a filesystem to the volume (assuming it's `/dev/vdb`)
 
- ```bash
- sudo mkfs.xfs -L data /dev/vdb
- ```
+```bash
+sudo mkfs.xfs -L data /dev/vdb
+```
 
- * configure the volume mount
+- configure the volume mount
 
- ```bash
+```bash
 sudo bash -c "echo 'LABEL=data /mnt/data xfs defaults 0 0' >> /etc/fstab"
- ```
+```
 
- * mount it
+- mount it
 
- ```bash
+```bash
 sudo mkdir -p /mnt/data
 sudo mount -a
- ```
+```
 
- * make sure you can see it
+- make sure you can see it
 
- ```bash
- $ df -h | grep data
+```bash
+$ df -h | grep data
 /dev/vdb        1.0T   33M  1.0T   1% /mnt/data
- ```
+```
 
- * create a symlink to use the volume for K3s volume storage
+- create a symlink to use the volume for K3s volume storage
 
- ```bash
- sudo mkdir -p /mnt/data/k3s/storage /var/lib/rancher/k3s/
- sudo ln -s /mnt/data/k3s/storage /var/lib/rancher/k3s/storage
- ```
+```bash
+sudo mkdir -p /mnt/data/k3s/storage /var/lib/rancher/k3s/
+sudo ln -s /mnt/data/k3s/storage /var/lib/rancher/k3s/storage
+```
 
- * create a symlink to use the volume for container root and emptyDir volumes. We'll need a large emptyDir volume for temporary directory of the tools-bin download. K3s stores both root and emptyDir volumes in the same place.
+- create a symlink to use the volume for container root and emptyDir volumes. We'll need a large emptyDir volume for temporary directory of the tools-bin download. K3s stores both root and emptyDir volumes in the same place.
 
- ```bash
+```bash
 sudo mkdir -p /mnt/data/k3s/pods /var/lib/kubelet
 sudo ln -s /mnt/data/k3s/pods /var/lib/kubelet/pods
- ```
+```
 
 ## Firewall
 
-Make sure that you have firewall a (in the network / IaaS cloud or the Ubuntu's local iptables) that allows only 
-* inbound access from your laptop to ports 22 (ssh), 80 (http) and optionally 443 for https
-* outbound access to anything
+Make sure that you have firewall a (in the network / IaaS cloud or the Ubuntu's local iptables) that allows only
 
-* Optional [TLS (https) instructions](tls.md#firewall) will have a few additional requirements for the firewall
+- inbound access from your laptop to ports 22 (ssh), 80 (http) and optionally 443 for https
+- outbound access to anything
 
-Especially make sure to protect the port 8472 that K3s would use for cummunicating with other K3s nodes (although we are going to install only one node now). 
+- Optional [TLS (https) instructions](tls.md#firewall) will have a few additional requirements for the firewall
+
+Especially make sure to protect the port 8472 that K3s would use for cummunicating with other K3s nodes (although we are going to install only one node now).
 
 TODO What is port 6443, is it important to protect that too?
 
 If you don't want the server to have unrestricted outbound access, it's possible to [install Chipster behind a HTTP proxy](behind-proxy.md).
+
 ## Install Ansible
 
 We'll install Ansible. It will be used to install other required programs.
@@ -144,4 +147,4 @@ helm uninstall nginx-test
 rm -rf nginx-test
 ```
 
-After checking that the test project above worked, you are ready to continue to the [Chipster installation](README.md#installation). 
+After checking that the test project above worked, you are ready to continue to the [Chipster installation](README.md#installation).

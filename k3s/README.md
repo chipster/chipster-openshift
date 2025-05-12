@@ -155,10 +155,9 @@ See the next chapter.
 
 ### Updates
 
-#### Introduction to updates and remarks
+#### Introduction to updates
 
-Even if you have just installed a new Chipster server, it's recommended to follow this chapter. It includes instructions for specifying a container image version and pulling
-all images, which makes sure your Chipster installation doesn't break when new versions are released.
+Even if you have just installed a new Chipster server, it's recommended to follow this chapter. It includes instructions for specifying a container image version and pulling all images, which makes sure your Chipster installation doesn't break when new versions are released.
 
 If you are going to maintain a Chipster server, you should subscribe at least to the [chipster-tech](https://chipster.2.rahtiapp.fi/contact) email list to get notifications about critical vulnerabilities. Consider subscribing to the [chipster-announcements](https://chipster.2.rahtiapp.fi/contact) list too which focuses on the new analysis features for end-users.
 
@@ -168,11 +167,11 @@ If you plan to maintain a single node Chipster server for a longer period of tim
 
 TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
+#### Select Chipster version
+
 > 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
 
-> 2025-05-12 Note! The Chipster versions up to v4.14.2 used K3s version `v1.26.4` and K3s `v1.32.4` is used since Chipster version v4.14.3(?). Please [follow the separate instructions](migration.md#update-to-k3s-v1324) before updating from v4.14.2 (or older) to v4.14.3.
-
-#### Select Chipster version
+> 2025-05-12 Note! The Chipster versions up to v4.14.2 used K3s version `v1.26.4` and Ubuntu 20.04. Since Chipster version v4.14.3, K3s `v1.32.4` and Ubuntu 24.04 are used. Please update [K3s](migration.md#update-to-k3s-v1324) and [Ubuntu](migration.md#update-to-2404) when updating from Chipster v4.14.2 (or older) to v4.14.3.
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
@@ -188,17 +187,18 @@ v4.14.0
 v4.14.0-rc1
 v4.14.1
 v4.14.2
+v4.14.3
 ```
 
 Usually you should select the newest version, which doesn't have letters "-rc" (short for "release candidate").
 
 #### Update Chipster to selected version
 
-Pull the correct version of the deployment repository. Replace `v4.14.2` with a version you chose in the previous chapter.
+Pull the correct version of the deployment repository. Replace `v4.14.2` with a version you chose in the previous chapter. We won't update the version numbers in these instructions after every release, so make sure to check the latest versions like shown above.
 
 ```bash
 cd ~/git/chipster-openshift/k3s
-git checkout v4.14.2
+git checkout v4.14.3
 git pull
 ```
 
@@ -206,7 +206,7 @@ Configure the chosen version also in your `~/values.yaml`. Keep it there until i
 
 ```yaml
 image:
-  tag: v4.14.2
+  tag: v4.14.3
 ```
 
 Install latest package repositories etc. This will also install the latest K3s (compatible with Chipster) and Helm.
@@ -268,7 +268,7 @@ Set the tools-bin version in your `~/values.yaml`.
 
 ```yaml
 toolsBin:
-  version: chipster-4.5.2
+  version: chipster-4.9.0
 ```
 
 And deploy Chipster again.
