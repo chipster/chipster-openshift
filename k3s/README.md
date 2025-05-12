@@ -187,18 +187,18 @@ v4.14.0
 v4.14.0-rc1
 v4.14.1
 v4.14.2
-v4.14.3
+v4.15.0
 ```
 
 Usually you should select the newest version, which doesn't have letters "-rc" (short for "release candidate").
 
 #### Update Chipster to selected version
 
-Pull the correct version of the deployment repository. Replace `v4.14.3` with a version you chose in the previous chapter. We won't update the version numbers in these instructions after every release, so make sure to check the latest versions like shown above.
+Pull the correct version of the deployment repository. Replace `v4.15.0` with a version you chose in the previous chapter. We won't update the version numbers in these instructions after every release, so make sure to check the latest versions like shown above.
 
 ```bash
 cd ~/git/chipster-openshift/k3s
-git checkout v4.14.3
+git checkout v4.15.0
 git pull
 ```
 
@@ -206,7 +206,7 @@ Configure the chosen version also in your `~/values.yaml`. Keep it there until i
 
 ```yaml
 image:
-  tag: v4.14.3
+  tag: v4.15.0
 ```
 
 Install latest package repositories etc. This will also install the latest K3s (compatible with Chipster) and Helm.
