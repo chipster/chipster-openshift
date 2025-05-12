@@ -171,7 +171,7 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
 
-> 2025-05-12 Note! The Chipster versions up to v4.14.2 used K3s version `v1.26.4` and Ubuntu 20.04. Since Chipster version v4.14.3, K3s `v1.32.4` and Ubuntu 24.04 are used. Please follow [K3s instructions](migration.md#update-to-k3s-v1324) **before** updating to v4.14.3. You can update [Ubuntu](migration.md#update-to-ubuntu-2404) before or after updating Chipster.
+> 2025-05-12 Note! The Chipster versions up to v4.14.2 used K3s version `v1.26.4` and Ubuntu 20.04. Since Chipster version v4.15.0, K3s `v1.32.4` and Ubuntu 24.04 are used. Please follow [K3s instructions](migration.md#update-to-k3s-v1324) **before** updating to v4.15.0. You can update [Ubuntu](migration.md#update-to-ubuntu-2404) before or after updating Chipster.
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 

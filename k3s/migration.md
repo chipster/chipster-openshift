@@ -81,7 +81,7 @@ And then continue with the [Chipster update instructions](README.md#Updates).
 
 ## Update to K3s v1.32.4
 
-Since Chipster version v4.14.3, the Ansible playbook in the update instructions will update the K3s from version `v1.26.4` to `v1.32.4`. The new K3s will have different API version for the IngressRoute object. After K3s has been updated, Helm and kubectl cannot manage the old IngressRoute objects anymore.
+Since Chipster version v4.15.0, the Ansible playbook in the update instructions will update the K3s from version `v1.26.4` to `v1.32.4`. The new K3s will have different API version for the IngressRoute object. After K3s has been updated, Helm and kubectl cannot manage the old IngressRoute objects anymore.
 
 Uninstall Chipster before the K3s update to prevent problems later:
 
@@ -133,9 +133,9 @@ The table of different Chipster versions and corresponding Ubuntu and K3s versio
 | ----------------- | ------------------ | ------------------------------------------- | ------------------------- | ----------- |
 | <= v4.13.15       | 20.04              | 20.04                                       | 16.04 or 20.04            | v1.26.4     |
 | v4.14.0 - v4.14.2 | 20.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.26.4     |
-| >= v4.14.3        | 24.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.32.4     |
+| >= v4.15.0        | 24.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.32.4     |
 
-Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.14.3. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see previous chapter) and Ubuntu on the K3s host. The next two sections show you two options for doing it.
+Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.15.0. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see previous chapter) and Ubuntu on the K3s host. The next two sections show you two options for doing it.
 
 Analysis tools in `comp` containers run in Ubuntu 16.04, Ubuntu 20.04 or Ubuntu 24.04. That shouldn’t pose significant security risks, because comp is well protected behind other Chipster services.
 
