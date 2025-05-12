@@ -194,7 +194,7 @@ Usually you should select the newest version, which doesn't have letters "-rc" (
 
 #### Update Chipster to selected version
 
-Pull the correct version of the deployment repository. Replace `v4.14.2` with a version you chose in the previous chapter. We won't update the version numbers in these instructions after every release, so make sure to check the latest versions like shown above.
+Pull the correct version of the deployment repository. Replace `v4.14.3` with a version you chose in the previous chapter. We won't update the version numbers in these instructions after every release, so make sure to check the latest versions like shown above.
 
 ```bash
 cd ~/git/chipster-openshift/k3s
