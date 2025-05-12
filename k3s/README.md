@@ -155,6 +155,8 @@ See the next chapter.
 
 ### Updates
 
+#### Introduction to updates and remarks
+
 Even if you have just installed a new Chipster server, it's recommended to follow this chapter. It includes instructions for specifying a container image version and pulling
 all images, which makes sure your Chipster installation doesn't break when new versions are released.
 
@@ -168,11 +170,43 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
 
-Pull latest changes from the deployment repository.
+> 2025-05-12 Note! The Chipster versions up to v4.14.2 used K3s version `v1.26.4` and K3s `v1.32.4` is used since Chipster version v4.14.3(?). Please [follow the separate instructions](migration.md#update-to-k3s-v1324) before updating from v4.14.2 (or older) to v4.14.3.
+
+#### Select Chipster version
+
+In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
+
+Chipster images are available in two different places. These instructions show how to use the most recent image versions which are available in an image registry. There is separate page for [older image versions](image-archive.md), which are stored in object storage.
+
+Run the following command to see what image versions are available in the image registry. For example, the output could look something like this:
+
+```bash
+$ curl -s https://image-registry.apps.2.rahti.csc.fi/v2/chipster-images/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort --version-sort
+latest
+v4.13.15
+v4.14.0
+v4.14.0-rc1
+v4.14.1
+v4.14.2
+```
+
+Usually you should select the newest version, which doesn't have letters "-rc" (short for "release candidate").
+
+#### Update Chipster to selected version
+
+Pull the correct version of the deployment repository. Replace `v4.14.2` with a version you chose in the previous chapter.
 
 ```bash
 cd ~/git/chipster-openshift/k3s
+git checkout v4.14.2
 git pull
+```
+
+Configure the chosen version also in your `~/values.yaml`. Keep it there until it's time to update to the next Chipster version.
+
+```yaml
+image:
+  tag: v4.14.2
 ```
 
 Install latest package repositories etc. This will also install the latest K3s (compatible with Chipster) and Helm.
@@ -187,29 +221,7 @@ Check if new passwords need to be generated:
 bash generate-passwords.bash
 ```
 
-In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure all your images are compatible with each other.
-
-Chipster images are available in two different places. These instructions show how to use the most recent image versions which are available in an image registry. There is separate page for [older image versions](image-archive.md), which are stored in object storage.
-
-Run the following command to see what image versions are available in the image registry. For example, the output could look something like this:
-
-```bash
-$ curl -s https://image-registry.apps.2.rahti.csc.fi/v2/chipster-images/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort --version-sort
-latest
-v4.6.0
-v4.7.0-rc1
-v4.7.0-rc2
-v4.7.0
-```
-
-Select the newest version, which doesn't have letters "-rc" (short for "release candidate"). Configure it in your `~/values.yaml`. Keep it there until it's time to update to the next Chipster version.
-
-```yaml
-image:
-  tag: v4.7.0
-```
-
-Pull the configured images to make sure your installation keeps working even if our image repository isn't available:
+Pull the configured version of the images to make sure your installation keeps working even if our image repository isn't available:
 
 ```bash
 bash pull-images.bash
@@ -221,7 +233,7 @@ Configure Chipster to use that image version. This will be taken in use soon aft
 bash deploy.bash -f ~/values.yaml
 ```
 
-Update operating system packages on the host (including Ansible). These commands give you the latest updates of the Ubuntu 20.04. Our plan is to migrate next to Ubuntu 24.04 after it's released. We recommend staying in the Ubuntu version 20.04 until we have tested the migration.
+Update operating system packages on the host (including Ansible). These commands give you the latest updates of the Ubuntu 24.04. Our plan is to migrate next to Ubuntu 28.04 after it's released. We recommend staying in the Ubuntu version 24.04 until we have tested the migration.
 
 TODO Prevent Ubuntu from advertising `do-release-upgrade` at login?
 
@@ -233,7 +245,7 @@ sudo apt upgrade -y
 Restart the server to make sure all new packages and container images are taken in use.
 
 ```bash
-sudo shutdown -r 0
+sudo shutdown -r now
 ```
 
 See also the next chapter for instructions how to update the tools-bin package.
