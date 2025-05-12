@@ -166,4 +166,4 @@ Update to Ubuntu 24.04:
 sudo do-release-upgrade
 ```
 
-And then continue with the [Chipster update instructions](README.md#Updates).
+And then continue with the [Chipster update instructions](README.md#Updates), if you didn't do that already.
