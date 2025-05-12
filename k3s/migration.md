@@ -129,17 +129,17 @@ bash deploy -f values.yaml
 
 The table of different Chipster versions and corresponding Ubuntu and K3s versions:
 
-| Chipster version  | Ubuntu on K3s host | Ubuntu in Chipster containers (excpept comp) | Ubuntu in comp containers | K3s version |
-| ----------------- | ------------------ | -------------------------------------------- | ------------------------- | ----------- |
-| <= v4.13.15       | 20.04              | 20.04                                        | 16.04 or 20.04            | v1.26.4     |
-| v4.14.0 - v4.14.2 | 20.04              | 24.04                                        | 16.04, 20.04 or 24.04     | v1.26.4     |
-| >= v4.14.3        | 24.04              | 24.04                                        | 16.04, 20.04 or 24.04     | v1.32.4     |
+| Chipster version  | Ubuntu on K3s host | Ubuntu in Chipster containers (except comp) | Ubuntu in comp containers | K3s version |
+| ----------------- | ------------------ | ------------------------------------------- | ------------------------- | ----------- |
+| <= v4.13.15       | 20.04              | 20.04                                       | 16.04 or 20.04            | v1.26.4     |
+| v4.14.0 - v4.14.2 | 20.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.26.4     |
+| >= v4.14.3        | 24.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.32.4     |
 
-Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.14.3. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see previous chapter) and Ubuntu on the K3s host. The next too sections show you two options for doing it.
+Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.14.3. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see previous chapter) and Ubuntu on the K3s host. The next two sections show you two options for doing it.
 
 Analysis tools in `comp` containers run in Ubuntu 16.04, Ubuntu 20.04 or Ubuntu 24.04. That shouldn’t pose significant security risks, because comp is well protected behind other Chipster services.
 
-When a job is started, the comp gets an access token only for the session where it's run. The most important attack vector for the comp are the input files and parameters, but the user who can change the parameters and input files, can already access all the data in the session anyway.
+When a job is started, the comp gets an access token only for the session where it's run. The most important attack vectors for the comp are the input files and parameters, but the user who can change the parameters and input files, can already access all the data in the session anyway.
 
 ### Option 1: Install New Server (recommended)
 
