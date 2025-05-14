@@ -1,0 +1,14 @@
+# Default values for Chipster Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into the templates.
+
+# image is a section for defining how to get the images
+image:
+  pullPolicy: IfNotPresent
+  name: docker.io/library/nginx
+  tag: latest
+  
+
+# host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network. For OIDC and TLS (Let's Encrypt) this must be a DNS name.
+host: ""
+

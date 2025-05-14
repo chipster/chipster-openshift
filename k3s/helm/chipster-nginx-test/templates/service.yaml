@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chipster-nginx-test
+  labels:
+    app: chipster-nginx-test
+spec:
+  ports:
+      # the service can be accessed with the default port
+    - port: 80
+      # use the named port of the deployment
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: chipster-nginx-test
+    deployment: chipster-nginx-test
