@@ -78,7 +78,7 @@ Please see [Getting started with K3s](getting-started-with-k3s.md) for K3s basic
 Deployment settings are defined in the `helm/chipster/values.yaml` file. You can override any of these values by passing `--set KEY=VALUE` arguments to the `deploy.bash` script (in addition to all the previous arguments), just like you have already done with the host name.
 
 For example, to create a new user account `john` with a password `verysecretpassword`, you would check the file `helm/chipster/values.yaml` to see which object needs to modified.
-You would run the `deploy.bash` scripte then again with an additional argument:
+You would run the `deploy.bash` script then again with an additional argument:
 
 ```bash
 --set users.john.password=verysecretpassword
@@ -155,7 +155,7 @@ See the next chapter.
 
 ### Updates
 
-#### Introduction to updates
+#### Introduction to Chipster updates
 
 Even if you have just installed a new Chipster server, it's recommended to follow this chapter. It includes instructions for specifying a container image version and pulling all images, which makes sure your Chipster installation doesn't break when new versions are released.
 
