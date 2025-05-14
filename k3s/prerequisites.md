@@ -33,6 +33,7 @@ sudo mkfs.xfs -L data /dev/vdb
 
 ```bash
 sudo bash -c "echo 'LABEL=data /mnt/data xfs defaults 0 0' >> /etc/fstab"
+sudo systemctl daemon-reload
 ```
 
 - mount it
@@ -86,7 +87,7 @@ We'll install Ansible. It will be used to install other required programs.
 sudo apt update
 sudo apt install software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
-sudo apt install -y ansible
+sudo apt install -y ansible-core
 ```
 
 ### Clone deployment scripts
@@ -119,23 +120,16 @@ Check that you can now run `kubectl get node` without `sudo`.
 
 ## Test K3s and Helm
 
-Generate an example project to a folder `nginx-test`.
+Deploy an example project `chipster-nginx-test`. Replace `HOST_ADDRESS` with your server's DNS name.
 
 ```bash
-helm create nginx-test
+helm install chipster-nginx-test helm/chipster-nginx-test --set host="HOST_ADDRESS"
 ```
 
-Deploy it. Replace `HOST_ADDRESS` with your server's DNS name.
+If you don't have a DNS name for your host, you can skip the `HOST_ADDRESS` parameter. In this case the example won't be able to print the correct address for you to open in the next step, but just use the host's IP address there.
 
 ```bash
-helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0].path="/" --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific" --set ingress.hosts[0].host="HOST_ADDRESS"
-```
-
-If you don't have a DNS name for your host, you can set the `HOST_ADDRESS` parameter to an empty string `""`. In this case the example won't be able to print the correct address for you to open
-in the next step, but just use the host's IP address there.
-
-```bash
-helm install nginx-test nginx-test --set ingress.enabled=true --set ingress.hosts[0].paths[0]="/"  --set ingress.hosts[0].paths[0].pathType="ImplementationSpecific" --set ingress.hosts[0].host=""
+helm install chipster-nginx-test helm/chipster-nginx-test
 ```
 
 Open the HOST_ADDRESS in a browser on your laptop and check that you can see a page `Welcome to nginx!`. If there is any problem with this example deployment, it's a lot easier to investigate and fix it in this simple example setup, before starting to deploy Chipster.
@@ -143,8 +137,7 @@ Open the HOST_ADDRESS in a browser on your laptop and check that you can see a p
 When you are done, uninstall the test project from K3s and delete the folder.
 
 ```bash
-helm uninstall nginx-test
-rm -rf nginx-test
+helm uninstall chipster-nginx-test
 ```
 
 After checking that the test project above worked, you are ready to continue to the [Chipster installation](README.md#installation).
