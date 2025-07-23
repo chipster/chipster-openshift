@@ -2,14 +2,9 @@
   apt:
     name: jq
 
-- name: Install pip
-  apt:
-    name: python3-pip
-
 - name: Install diceware for generating human friendly passwords
-  pip:
+  apt:
     name: diceware
-    executable: pip3
 
 - name: Install yq for parsing yaml files
   # no snap module in this ancient Ansible 2.0

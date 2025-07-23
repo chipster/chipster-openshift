@@ -30,15 +30,14 @@ cat <<EOF | kubectl apply -f -
 apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
-  annotations:
-    volume.beta.kubernetes.io/storage-class: nfs-1
   name: ${pvc_name}    
 spec:
   accessModes:
-    - "ReadWriteOnce"
+    - "ReadWriteMany"
   resources:
     requests:
       storage: ${tools_bin_size}
+  storageClassName: nfs-1
 EOF
 	
 temp_pvc="${pvc_name}-temp"
@@ -51,8 +50,6 @@ cat <<EOF | kubectl apply -f -
 apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
-  annotations:
-    volume.beta.kubernetes.io/storage-class: local-path
   name: ${temp_pvc}    
 spec:
   accessModes:
@@ -60,6 +57,7 @@ spec:
   resources:
     requests:
       storage: 400Gi
+  storageClassName: local-path
 EOF
 
 name=download-tools-bin-bash-job

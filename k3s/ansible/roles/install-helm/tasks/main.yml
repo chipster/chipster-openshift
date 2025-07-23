@@ -1,7 +1,5 @@
 - name: Install Helm
   shell: "curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash"
-  args:
-    warn: no
 
 - name: Add the repo "stable"
   shell: helm repo add stable https://charts.helm.sh/stable

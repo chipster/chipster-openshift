@@ -109,15 +109,7 @@ spec:
   test: false
   triggers:
   - type: ConfigChange
-  - imageChangeParams:
-      automatic: true
-      containerNames:
-      - replay
-      from:
-        kind: ImageStreamTag
-        name: "cli-client:{{$.Values.image.tag}}"
-        namespace: {{$.Values.image.namespace}}
-    type: ImageChange
+
 ---
 apiVersion: route.openshift.io/v1
 kind: Route

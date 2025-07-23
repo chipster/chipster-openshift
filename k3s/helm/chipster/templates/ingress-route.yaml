@@ -2,7 +2,7 @@
 ---
 # http/websocket reverse proxy for making Chipster APIs accessible
 # from the internet
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: chipster
@@ -65,7 +65,7 @@ spec:
 
 {{- if $.Values.tls.env }}
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: TLSOption
 metadata:
   # Configuration for a special name tlsoption/default which affects also when
@@ -89,7 +89,7 @@ spec:
 {{- end }}
 
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: chipster-stripprefix
@@ -110,7 +110,7 @@ spec:
 
 {{- if $.Values.tls.env }}
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: chipster-http-redirect
@@ -128,7 +128,7 @@ spec:
 {{- end }}
 
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: chipster-https-redirect

@@ -1,0 +1,28 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: base-20-04
+  name: base-20-04
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: base:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: ubuntu:20.04
+    type: Docker
+  triggers:
+    - type: ConfigChange
+  # this seems to start an extra build when we have just run it
+  # - imageChange:
+  #   type: ImageChange

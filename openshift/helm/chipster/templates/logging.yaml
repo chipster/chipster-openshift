@@ -23,8 +23,8 @@ spec:
         name: logstash
     spec:
       containers:
-        - image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/logstash"
-          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        - image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/logstash:{{$.Values.image.tag}}"
+          imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
           name: logstash
           ports:
             - containerPort: 5044
@@ -66,15 +66,6 @@ spec:
   test: false
   triggers:
     - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-          - logstash
-        from:
-          kind: ImageStreamTag
-          name: logstash:latest
-          namespace: {{$.Values.image.namespace}}
-      type: ImageChange
 
 ---
 apiVersion: v1

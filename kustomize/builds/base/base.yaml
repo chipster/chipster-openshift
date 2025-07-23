@@ -19,10 +19,10 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: ubuntu:20.04
+        name: base-24-04:latest
     type: Docker
   triggers:
-  - type: ConfigChange
+    - type: ConfigChange
   # this seems to start an extra build when we have just run it
   # - imageChange:
   #   type: ImageChange

@@ -33,7 +33,7 @@ spec:
         - name: {{ $deployment.name }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}            
-          # Java class to start for the chipster-web-server image
+          # Java class to start for the chipster-web-server-build image
           env:
             - name: JAVA_CLASS
               value: {{ $deployment.class }}

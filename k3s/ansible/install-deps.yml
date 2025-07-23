@@ -2,7 +2,9 @@
 - name: Install Chipster K3s prerequisites
   hosts: all
   vars:
-    k3s_version: v1.26.4+k3s1
+    k3s_version: v1.32.4+k3s1
+    # hide a wwarning about interpreter discovery
+    ansible_python_interpreter: python3
   become: yes
 
   roles:
