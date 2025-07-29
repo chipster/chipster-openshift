@@ -286,7 +286,7 @@ Export the private key. Encode with base64 to make it easier to store in passwor
 gpg --export-secret-keys KEY_ID | base64
 ```
 
-Store these keys safely. Well configure the public key to Chipster soon. The private key is needed only in the restore operation. See a [later chapter](#How-to-manage-gpg-keys) includes instructions for removing the keys from your local gpg.
+Store these keys safely. We will configure the public key to Chipster soon. The private key is needed only in the restore operation. See a [later chapter](#How-to-manage-gpg-keys) includes instructions for removing the keys from your local gpg.
 
 > Note! If you change the key, make sure the file-storage creates a full backup next time (e.g. by deleting the old backups from the object storage). Otherwise even your new file-storage backups will include the old files encrypted with the old key!
 
