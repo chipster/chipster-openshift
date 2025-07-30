@@ -82,7 +82,7 @@ deployments:
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
-    image: chipster-web-server-java
+    image: scheduler
     apiPort: 8006
     adminPort: 8106
     eventsPort: ""
@@ -110,7 +110,8 @@ deployments:
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
-    image: chipster-web-server-java
+    # file-storage can use gpg in backups
+    image: backup
     apiPort: 8016
     adminPort: 8116
     eventsPort: ""
@@ -180,7 +181,7 @@ deployments:
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
-    image: chipster-web-server-java
+    image: backup
     apiPort: ""
     adminPort: 8115
     eventsPort: ""
