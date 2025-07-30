@@ -16,7 +16,8 @@ objects:
       spec:
         containers:
         - name: copy-pvc
-          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/base
+          # image with rsync
+          image: docker-registry.default.svc:5000/${IMAGE_PROJECT}/comp-24-04-r-deps
           command: ["bash", "-c", "set -x; set -e; cd /mnt; du -sh *; rm -rf /mnt/destination/lost+found; shopt -s dotglob; if [ -z \"$(ls -A destination)\" ]; then cp -ar source/* destination/; else rsync -a source/* destination/; fi; du -sh *"]
           volumeMounts:        
           - mountPath: /mnt/source
