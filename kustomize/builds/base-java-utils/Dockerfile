@@ -19,13 +19,6 @@ RUN apt-get update -y \
 # && unzip awscliv2.zip \
 # && ./aws/install \
 
-# no need for psql here, because we can use it in the database containers (K3s) or on laptop (Openshift)
-# && install -d /usr/share/postgresql-common/pgdg \
-# && curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-# && sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
-# && apt-get update \
-# && apt-get install -y postgresql-client-14 postgresql-contrib-14 \
-
 CMD sleep inf
 
 
