@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: chipster-web-server-java
-  name: chipster-web-server-java
+    build: backup
+  name: backup
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: chipster-web-server-java:latest
+      name: backup:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -27,7 +27,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-java-24-04:latest
+        name: base-backup:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

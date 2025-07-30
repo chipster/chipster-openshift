@@ -1,4 +1,6 @@
-FROM base-java-utils
+# use base-scheduler to have yq for BashJobScheduler scripts
+
+FROM base-scheduler
 
 # CI tests need both Java and NodeJS
 # TODO how to copy node from base-node ta avoid installing it twice?

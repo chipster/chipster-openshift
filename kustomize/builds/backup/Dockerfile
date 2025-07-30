@@ -1,6 +1,6 @@
-# runtime image for java components
+# runtime image for with backup dependencies (gpg)
 
-FROM base-java-24-04
+FROM base-backup
 
 # build arg for build version, because envs are not configurable directly
 ARG ARG_CHIPSTER_BUILD_VERSION=""

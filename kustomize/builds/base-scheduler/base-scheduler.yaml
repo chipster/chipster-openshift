@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: base-java-utils
-  name: base-java-utils
+    build: base-scheduler
+  name: base-scheduler
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: base-java-utils:latest
+      name: base-scheduler:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
