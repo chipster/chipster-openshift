@@ -1,7 +1,7 @@
 # Chipster logging configuration
 ## Introduction
 
-Chipster loggin levels can be configured in file `log4j2.xml`. The [default configuration](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/log4j2.xml) is included in the jar packages. However, if a file `conf/log4j2.xml` exists, it will be used instead. 
+Chipster logging levels can be configured in file `log4j2.xml`. The [default configuration](https://github.com/chipster/chipster-web-server/blob/master/src/main/resources/log4j2.xml) is included in the jar packages. However, if a file `conf/log4j2.xml` exists, it will be used instead. 
 
 This example shows how to change a logging level of individual library. By default the logging level of LdapExtLoginModule (used in [LDAP instructions](ldap.md) is `debug`. In this example we'll change it to `trace`. 
 
