@@ -1,9 +1,6 @@
-FROM base-java-utils
+# checkout chipster-web-server repository
 
-# build arg for build version, because envs are not configurable directly
-ARG ARG_CHIPSTER_BUILD_VERSION=""
-# Chipster config can get values from envs
-ENV chipster_build_version=${ARG_CHIPSTER_BUILD_VERSION}
+FROM base-java-build
 
 COPY . /home/user/chipster-web-server
 

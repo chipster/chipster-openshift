@@ -2,13 +2,13 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: toolbox
-  name: toolbox
+    build: chipster-web-server-java
+  name: chipster-web-server-java
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: toolbox:latest
+      name: chipster-web-server-java:latest
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -18,23 +18,23 @@ spec:
       - as: null
         from:
           kind: ImageStreamTag
-          name: chipster-tools:latest
+          name: chipster-web-server-build:latest
         paths:
-          - destinationDir: tools
-            sourcePath: /home/user/chipster-tools/tools
+          - destinationDir: chipster-web-server-build
+            sourcePath: /opt/chipster
     type: Dockerfile
   strategy:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: chipster-web-server-java:latest
+        name: base-java-utils:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
     - imageChange:
         from:
           kind: ImageStreamTag
-          name: chipster-tools:latest
+          name: chipster-web-server-build:latest
       type: ImageChange
     - type: ConfigChange
     - imageChange:

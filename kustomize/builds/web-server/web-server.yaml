@@ -41,7 +41,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: chipster-web-server-build:latest
+        name: chipster-web-server-java:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

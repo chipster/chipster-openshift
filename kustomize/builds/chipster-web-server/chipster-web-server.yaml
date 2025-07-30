@@ -28,7 +28,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: base-java-utils:latest
+        name: base-java-build:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:

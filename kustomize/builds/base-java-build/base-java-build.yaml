@@ -1,0 +1,27 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: base-java-build
+  name: base-java-build
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: base-java-build:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: base-java-24-04:latest
+    type: Docker
+  triggers:
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange

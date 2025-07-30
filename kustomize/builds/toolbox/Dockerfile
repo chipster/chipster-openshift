@@ -1,4 +1,4 @@
-FROM chipster-web-server-build
+FROM chipster-web-server-java
 
 COPY tools /opt/chipster/toolbox/
 

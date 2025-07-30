@@ -36,7 +36,7 @@ deployments:
   auth:
     name: auth
     class: fi.csc.chipster.auth.AuthenticationService
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8002
     adminPort: 8102
     eventsPort: ""
@@ -52,7 +52,7 @@ deployments:
   serviceLocator:
     name: service-locator
     class: fi.csc.chipster.servicelocator.ServiceLocator
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8003
     adminPort: 8103
     eventsPort: ""
@@ -66,7 +66,7 @@ deployments:
   sessionDb:
     name: session-db
     class: fi.csc.chipster.sessiondb.SessionDb
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8004
     adminPort: 8104
     eventsPort: 8005
@@ -82,7 +82,7 @@ deployments:
   scheduler:
     name: scheduler
     class: fi.csc.chipster.scheduler.Scheduler
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8006
     adminPort: 8106
     eventsPort: ""
@@ -96,7 +96,7 @@ deployments:
   fileBroker:
     name: file-broker
     class: fi.csc.chipster.filebroker.FileBroker
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8007
     adminPort: 8107
     eventsPort: ""
@@ -110,7 +110,7 @@ deployments:
   fileStorage:
     name: file-storage
     class: fi.csc.chipster.filestorage.FileStorage
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8016
     adminPort: 8116
     eventsPort: ""
@@ -144,7 +144,7 @@ deployments:
   sessionWorker:
     name: session-worker
     class: fi.csc.chipster.sessionworker.SessionWorker
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: 8009
     adminPort: 8109
     eventsPort: ""
@@ -180,7 +180,7 @@ deployments:
   backup:
     name: backup
     class: fi.csc.chipster.backup.Backup
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: ""
     adminPort: 8115
     eventsPort: ""
@@ -194,7 +194,7 @@ deployments:
   jobHistory:
     name: job-history
     class: fi.csc.chipster.jobhistory.JobHistoryService
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: ""
     adminPort: 8114
     eventsPort: ""
@@ -210,7 +210,7 @@ deployments:
   s3Storage:
     name: s3-storage
     class: fi.csc.chipster.s3storage.S3Storage
-    image: chipster-web-server-build
+    image: chipster-web-server-java
     apiPort: ""
     adminPort: 8117
     eventsPort: ""

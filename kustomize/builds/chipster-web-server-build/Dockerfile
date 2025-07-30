@@ -1,6 +1,8 @@
+# image for building java components
+
 FROM chipster-web-server
 
-# build the new chipster project
+# build the chipster project
 
 # options for setting java version
 # 1) parameter for ./gradlew -Dorg.gradle.java.home=/JDK_PATH
@@ -19,4 +21,4 @@ RUN cd /home/user/chipster-web-server \
 
 WORKDIR /opt/chipster
 
-CMD java -cp lib/*:  ${JAVA_CLASS:-fi.csc.chipster.rest.ServerLauncher}
+CMD ["echo", "ERROR: this is a build image and shouldn't be run, use chipster-web-server-java instead"]
