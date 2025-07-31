@@ -5,7 +5,7 @@ ARG ARG_CHIPSTER_BUILD_VERSION=""
 # Chipster config can get values from envs
 ENV chipster_build_version=${ARG_CHIPSTER_BUILD_VERSION}
 
-COPY chipster-web-server-build /opt/
+COPY chipster-web-server-build /
 
 RUN mkdir -p /opt/chipster \
   && chmod -R ugo+rwx /opt/chipster \

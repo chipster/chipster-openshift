@@ -20,8 +20,9 @@ spec:
           kind: ImageStreamTag
           name: chipster-web-server-build:latest
         paths:
+          # copy the whole /opt to preserve write permissions of /opt/chipster
           - destinationDir: chipster-web-server-build
-            sourcePath: /opt/chipster
+            sourcePath: /opt
     type: Dockerfile
   strategy:
     dockerStrategy:
