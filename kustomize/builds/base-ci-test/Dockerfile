@@ -2,9 +2,10 @@
 
 FROM base-scheduler
 
-# CI tests need both Java and NodeJS
-# TODO how to copy node from base-node ta avoid installing it twice?
-# also psql is needed to create the databases for the tests
+# CI tests need many dependencies, but all other images have only dependencies that are needed in production
+# - get java, kubectl and yq from the base image
+# - install node (installed also in image base-node)
+# - install psql (installed also in image base-backup)
 RUN apt-get update -y \
 	&& apt-get install -y build-essential \
 	&& curl -sL https://deb.nodesource.com/setup_20.x | bash - \
