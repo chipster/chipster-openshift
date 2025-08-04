@@ -3,6 +3,7 @@ FROM comp-24-04-r-deps
 RUN apt update -y \ 
     && apt install -y \
     cmake \
+    file \
     && apt-get clean
 
 RUN rm /opt/chipster/tools \
