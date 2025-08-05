@@ -6,7 +6,6 @@ RUN rm /opt/chipster/tools \
     && apt update -y \ 
     && apt install -y \
     unzip \
-    file \
     && apt-get clean \
     && cd /opt/chipster/tools \
     && wget -nv https://github.com/mothur/mothur/releases/download/v1.48.2/Mothur.Ubuntu_22.zip \
