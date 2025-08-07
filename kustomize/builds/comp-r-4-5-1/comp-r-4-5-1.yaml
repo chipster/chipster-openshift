@@ -2,21 +2,15 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    build: comp-r-4-2-3-cellbender
-  name: comp-r-4-2-3-cellbender
+    build: comp-r-4-5-1
+  name: comp-r-4-5-1
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: comp-r-4-2-3-cellbender:latest
+      name: comp-r-4-5-1:latest
   postCommit: {}
-  resources:
-    limits:
-      cpu: 1
-      memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 500Mi
+  resources: {}
   runPolicy: Serial
   source:
     dockerfile: ""
@@ -25,7 +19,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: comp-20-04-r-deps:latest
+        name: comp-24-04-r-deps:latest
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
