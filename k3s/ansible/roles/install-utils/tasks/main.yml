@@ -6,6 +6,15 @@
   apt:
     name: diceware
 
+- name: Install community.general collection to use snap module
+  shell: ansible-galaxy collection install community.general
+
 - name: Install yq for parsing yaml files
-  # no snap module in this ancient Ansible 2.0
-  shell: "snap install yq"
+  community.general.snap:
+    name:
+      - yq
+
+- name: Install aws-cli for checking tools-bin versions
+  community.general.snap:
+    name:
+      - aws-cli

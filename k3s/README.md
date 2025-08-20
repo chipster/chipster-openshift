@@ -261,7 +261,11 @@ There are two ways to download the tools-bin. This chapter shows the more automa
 To let the deployment scripts do the download, simply configure the tools-bin version and run the deployment again. Use to following command to check the available tools-bin versions. Don't worry if the latest tools-bin version there is older than the latest Chipster version. It means only that the tools-bin package hasn't changed since that version.
 
 ```bash
-curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | cut -d "/" -f 1 | sort | uniq
+$ aws s3 --endpoint-url https://a3s.fi --no-sign-request ls s3://chipster-tools-bin
+...
+                           PRE chipster-4.6.5/
+                           PRE chipster-4.6.6/
+                           PRE chipster-4.9.0/
 ```
 
 Set the tools-bin version in your `~/values.yaml`.
