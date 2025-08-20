@@ -7,9 +7,6 @@ cd /mnt/tools
 export temp="/mnt/temp"
 export url="https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts"
 
-# Kill other tasks after first error: "--halt 2" in this old 2014 version 
-# of parallel, equals "--halt now,fail=1" in newer versions.
-#
 # Downlaod packages to local temp file before extraction. We can't pipe directly
 # from the curl to lz4 and tar, because when the files
 # are small, it would take too much time to create all files in pipe's 64k buffer
@@ -117,4 +114,6 @@ rm -f $temp/*
 echo "files in $url/files.txt":
 curl -s $url/files.txt | wc -l
           
-curl -s $url/files.txt | grep lz4$ | parallel --ungroup -j 1 --halt 2 "download_file {}" 2>&1 | tee /mnt/tools/download.log
+for file in $(curl -s $url/files.txt | grep lz4$); do 
+	download_file $file 2>&1 | tee --append /mnt/tools/download.log
+done
