@@ -6,7 +6,7 @@ ENV HOME=/home/user
 
 RUN apt-get update -y \
 	&& apt-get upgrade -y \
-	&& apt-get install -y nano pv curl liblz4-tool parallel jq wget less \
+	&& apt-get install -y nano pv curl liblz4-tool jq wget less \
 	&& apt-get clean \
 	&& chmod ug+rwx $HOME
 
