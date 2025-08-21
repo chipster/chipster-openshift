@@ -65,9 +65,7 @@ cd temp
 
 # download packages
 for f in $(cat files.txt); do 
-  if ! wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f; then 
-    break
-  fi
+  wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f || break
 done
 cd ..
 
@@ -84,9 +82,7 @@ Or if you are tight on disk space, you can downlaod and extract the files one by
 
 for f in $(cat temp/files.txt); do
   # download
-  if ! wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f -O temp/$f ; then
-    break
-  fi
+  wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f -O temp/$f || break
 
   # extract
   lz4 -d temp/$f -c - | tar -x -C tools-bin/$TOOLS_BIN_VERSION
@@ -107,7 +103,7 @@ watch kubectl get pod
 If you already downloaded the tools-bin to a PVC, you could also locate the correct volume:
 
 ```bash
-sudo du -sh /mnt/data/k3s/storage/*
+sudo bash -c 'du -sh /mnt/data/k3s/storage/*'
 ```
 
 And copy, symlink or move the files from there.
