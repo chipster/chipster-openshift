@@ -17,4 +17,9 @@ RUN mkdir -p /opt/chipster/tools/cutadapt/venv \
   && . /opt/chipster/tools/cutadapt/venv/bin/activate \
   && pip3 install cutadapt
 
+RUN mkdir -p /opt/chipster/tools/cutadapt/venv \
+  && python3 -m venv /opt/chipster/tools/cutadapt/venv \
+  && . /opt/chipster/tools/cutadapt/venv/bin/activate \
+  && pip3 install cutadapt
+
 CMD ["sleep", "inf"]
