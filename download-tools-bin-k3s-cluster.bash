@@ -62,7 +62,7 @@ EOF
 
 name=download-tools-bin-bash-job
 
-cat <<EOF | yq | jq .spec.template.spec.containers[0].command[2]="$(cat openshift/jobs/download-tools-bin.bash | jq -s -R .)" | kubectl apply -f -
+cat <<EOF | yq | jq .spec.template.spec.containers[0].command[2]="$(cat templates/jobs/download-tools-bin.bash | jq -s -R .)" | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
