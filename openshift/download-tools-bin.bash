@@ -38,7 +38,7 @@ oc process -f jobs/pvc.yaml --local \
 	| oc create -f - --validate
 	
 # bash run-job-with-tools-bin.bash "templates/jobs/download-tools-bin.bash" "$tools_bin_version" "$temp_pvc"
-bash jobs/run-job-with-tools-bin.bash "jobs/download-tools-bin.bash" "$tools_bin_version"
+bash jobs/run-job-with-tools-bin.bash "../templates/jobs/download-tools-bin.bash" "$tools_bin_version"
 
 #TODO how to run this after the job has finished?
 #oc delete pvc $temp_pvc
