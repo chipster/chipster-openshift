@@ -7,7 +7,7 @@ cd /mnt/tools
 export temp="/mnt/temp"
 export url="https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts"
 
-# Downlaod packages to local temp file before extraction. We can't pipe directly
+# Download packages to local temp file before extraction. We can't pipe directly
 # from the curl to lz4 and tar, because when the files
 # are small, it would take too much time to create all files in pipe's 64k buffer
 # causing the server to timeout the idle connection. 

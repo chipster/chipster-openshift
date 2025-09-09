@@ -51,7 +51,7 @@ sudo chown $(whoami) temp
 sudo apt install -y liblz4-tool
 ```
 
-Downlaod the list of packages. Variable $TOOLS_BIN_VERSION must be set beforehand.
+Download the list of packages. Variable $TOOLS_BIN_VERSION must be set beforehand.
 
 ```bash
 curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/files.txt | grep .tar.lz4$ > temp/files.txt
@@ -64,7 +64,7 @@ If you have lot of free disk space, you can first download all files and then ex
 cd temp
 
 # download packages
-for f in $(cat files.txt); do 
+for f in $(cat files.txt); do
   wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f || break
 done
 cd ..
@@ -76,7 +76,7 @@ for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -v -x -C tools-bin/$TOOLS_BIN_V
 rm -rf temp
 ```
 
-Or if you are tight on disk space, you can downlaod and extract the files one by one. Variable $TOOLS_BIN_VERSION must be set beforehand.
+Or if you are tight on disk space, you can download and extract the files one by one. Variable $TOOLS_BIN_VERSION must be set beforehand.
 
 ```bash
 
