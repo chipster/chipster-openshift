@@ -1,0 +1,161 @@
+{{- range $dbKey, $db := .Values.databases }}
+{{- if $db.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: chipster-{{ $db.name }}-postgresql
+spec:
+  ports:
+  - name: tcp-postgresql
+    port: 5432
+    protocol: TCP
+    targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/name: {{ $db.name }}-postgresql
+  # headless service: https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
+  clusterIP: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: chipster
+  name: chipster-{{ $db.name }}-postgresql
+stringData:
+  postgres-password: {{ $db.password }}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: chipster
+  name: chipster-{{ $db.name }}-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $db.name }}-postgresql
+  serviceName: chipster-{{ $db.name }}-postgresql
+  template:
+    metadata:
+      labels:
+        app: chipster
+        app.kubernetes.io/name: {{ $db.name }}-postgresql
+      name: chipster-{{ $db.name }}-postgresql
+    spec:
+      containers:
+      - env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data_14
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgres-password
+              name: chipster-{{ $db.name }}-postgresql
+        - name: POSTGRES_DATABASE
+          value: {{ $db.dbName }}
+        image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
+        imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+        # command: ["sleep", "inf"]
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U "postgres" -d "dbname={{ $db.dbName }}" -h 127.0.0.1 -p 5432
+        name: postgresql
+        ports:
+        - containerPort: 5432
+          name: tcp-postgresql
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U "postgres" -d "dbname={{ $db.dbName }}" -h 127.0.0.1 -p 5432
+        resources: {}
+        securityContext:
+          runAsGroup: 1001
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /tmp
+          name: empty-dir
+          subPath: tmp-dir
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /var/lib/postgresql
+        # - mountPath: /bitnami/postgresql
+          name: data
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+      initContainers:
+        - name: configure-postgresql
+          # image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
+          image: docker.io/library/postgres:14
+          command: 
+            - bash
+            - -c
+            - |
+              postgresql_conf="/var/lib/postgresql/data_14/postgresql.conf"
+              hba_conf=/var/lib/postgresql/data_14/pg_hba.conf
+              if [ -f $postgresql_conf ]; then
+                echo "configuration file $postgresql_conf exists already"
+              else
+                # copy a static configuration file to the PVC, if this PVC was created by a Bitnami image
+                echo "configuration file $postgresql_conf not found"
+                echo "copy from /usr/share/postgresql/postgresql.conf.sample"
+                cp /usr/share/postgresql/postgresql.conf.sample $postgresql_conf
+              fi
+
+              if [ -f $hba_conf ]; then
+                echo "configuration file $hba_conf exists already"
+              else
+                echo "creating configuration file $hba_conf"
+                # rules from Bitname image
+                echo "host     all             all             0.0.0.0/0               md5" >> $hba_conf
+                echo "host     all             all             ::/0                    md5" >> $hba_conf
+                echo "local    all             all                                     md5" >> $hba_conf
+                echo "host     all             all        127.0.0.1/32                 md5" >> $hba_conf
+                echo "host     all             all        ::1/128                      md5" >> $hba_conf
+              fi
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql
+      volumes:
+      - emptyDir: {}
+        name: empty-dir
+      - emptyDir:
+          medium: Memory
+        name: dshm
+      {{- if $db.hostPath }}
+      - name: data
+        hostPath:
+          path: {{ $db.hostPath }}
+          type: Directory
+      {{- end}}
+  {{- if not $db.hostPath }}
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      volumeMode: Filesystem
+{{- end}}
+{{- end }}
+{{- end }}

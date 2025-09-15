@@ -34,7 +34,7 @@ sudo chown ubuntu:ubuntu auth-postgresql session-db-postgresql job-history-postg
 popd
 ```
 
-Configure Chipster to store data in these directories. Add the following configuration to your `~/values.yaml`. Unfortunately there are to separate configuration sections for each database: one for Chipster to create a hostPath volume (e.g. `databases.auth.hostPath`), and another for the database itself to use that volume (e.g. 'auth-postgresql.persistence.existingClaim`):
+Configure Chipster to store data in these directories. Add the following configuration to your `~/values.yaml`:
 
 ```yaml
 deployments:
@@ -48,21 +48,6 @@ databases:
     hostPath: "/mnt/data/session-db-postgresql"
   jobHistory:
     hostPath: "/mnt/data/job-history-postgresql"
-
-auth-postgresql:
-  primary:
-    persistence:
-      existingClaim: "auth-pvc-volume-postgres"
-
-session-db-postgresql:
-  primary:
-    persistence:
-      existingClaim: "session-db-pvc-volume-postgres"
-
-job-history-postgresql:
-  primary:
-    persistence:
-      existingClaim: "job-history-pvc-volume-postgres"
 ```
 
 ## Migrate data
@@ -75,11 +60,12 @@ pushd /mnt/data
 
 sudo ls -lah k3s/storage/
 
-# replace the VOLUME_IDs and remember to include the asterisk '*' in the end!
-sudo mv k3s/storage/pvc-VOLUME_ID_default_storage-file-storage-0/* file-storage
-sudo mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-job-history-postgresql-0/* job-history-postgresql
-sudo mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-session-db-postgresql-0/* session-db-postgresql
-sudo mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-auth-postgresql-0/* auth-postgresql
+# replace the VOLUME_IDs and remember to include the asterisk '*' in the end
+# make sure the asterisk is interpreted by the root shell with sudo bash -c '*', because only root can list files under k3s/storage
+sudo bash -c 'mv k3s/storage/pvc-VOLUME_ID_default_storage-file-storage-0/* file-storage'
+sudo bash -c 'mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-job-history-postgresql-0/* job-history-postgresql'
+sudo bash -c 'mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-session-db-postgresql-0/* session-db-postgresql'
+sudo bash -c 'mv k3s/storage/pvc-VOLUME_ID_default_data-chipster-auth-postgresql-0/* auth-postgresql'
 popd
 ```
 

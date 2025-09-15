@@ -73,19 +73,19 @@ for key in "monitoring"; do
 done
 
 for key in $(yq e $default_values_yaml_path -o=json | jq '.databases | keys[]' -r); do
-    name="$key"
-    passwordKey=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.passwordKey -r)
+    name=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.name -r)
+    passwordKey="databases.$key.password"
     old_password=$(echo "$values_json" | jq .$passwordKey -r)
 
-    # postgres template v8 stored passwords in different path than v12
+    # migrate passwords from Bitanami Helm chart
     if [[ $old_password == "null" ]]; then
-        oldPasswordKey=$(yq e $default_values_yaml_path -o=json | jq .databases.$key.passwordKey -r | sed 's/.auth.postgresPassword/.postgresqlPassword/')
+        oldPasswordKey="\"$name-postgresql\".auth.postgresPassword"
         old_password=$(echo "$values_json" | jq .$oldPasswordKey -r)
 
         if [[ $old_password != "null" ]]; then
             echo "migrating database password from an old key $oldPasswordKey to new key $passwordKey"
             values_json=$(echo $values_json | jq ".$passwordKey = \"$old_password\"")
-            # keep the password also in old path in case the old version is needed in the migration
+            values_json=$(echo $values_json |  jq "del( .\"$name-postgresql\")")
         fi
     fi
     
