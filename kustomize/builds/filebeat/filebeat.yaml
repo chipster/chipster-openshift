@@ -22,7 +22,7 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: filebeat:7.16.2
+        name: docker.elastic.co/beats/filebeat:7.16.2
     type: Docker
   successfulBuildsHistoryLimit: 5
   triggers:
