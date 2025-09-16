@@ -57,8 +57,11 @@ spec:
             secretKeyRef:
               key: postgres-password
               name: chipster-{{ $db.name }}-postgresql
-        - name: POSTGRES_DATABASE
+        - name: POSTGRES_DB
           value: {{ $db.dbName }}
+        # Require password for all connections, because Bitnami used to require too (although wiht md5). This image has "trust" for local connections by default. 
+        - name: POSTGRES_INITDB_ARGS
+          value: --auth=scram-sha-256
         image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
         imagePullPolicy: {{ $.Values.image.localPullPolicy }}
         # command: ["sleep", "inf"]
@@ -96,38 +99,52 @@ spec:
         fsGroup: 1001
         fsGroupChangePolicy: Always
       initContainers:
-        - name: configure-postgresql
-          # image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
-          image: docker.io/library/postgres:14
+        - name: configure
+          image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
+          # image: docker.io/library/postgres:14
           command: 
             - bash
             - -c
             - |
-              postgresql_conf="/var/lib/postgresql/data_14/postgresql.conf"
-              hba_conf=/var/lib/postgresql/data_14/pg_hba.conf
-              if [ -f $postgresql_conf ]; then
-                echo "configuration file $postgresql_conf exists already"
-              else
-                # copy a static configuration file to the PVC, if this PVC was created by a Bitnami image
-                echo "configuration file $postgresql_conf not found"
-                echo "copy from /usr/share/postgresql/postgresql.conf.sample"
-                cp /usr/share/postgresql/postgresql.conf.sample $postgresql_conf
-              fi
 
-              if [ -f $hba_conf ]; then
-                echo "configuration file $hba_conf exists already"
+              # Create necessary configuration files, because old data directories from Bitnami 
+              # images didn't store them. This init container can be removed in a later version, 
+              # when all installations have had a change to convert the directories.
+
+              data_dir="/var/lib/postgresql/data_14"
+
+              if [ -d $data_dir ]; then
+                echo "check if existing database needs to be configured"
+                if [ -f $data_dir/postgresql.conf ]; then                
+                  echo "configuration file $data_dir/postgresql.conf exists already"
+                else
+
+                  echo "** create temporary database to generate configuration files"
+                  
+                  PGDATA=/tmp/tmp-db
+                  POSTGRES_PASSWORD="tmp-db-password"
+                  POSTGRES_INITDB_ARGS="--auth=scram-sha-256"
+
+                  source docker-entrypoint.sh
+                  docker_setup_env
+                  echo "** init database dir (this will take a moment)"
+                  docker_init_database_dir
+                  echo "** setup hba conf"
+                  pg_setup_hba_conf
+
+                  echo "** copy posgresql.conf and pg_hba.conf"
+                  cp /tmp/tmp-db/postgresql.conf $data_dir/postgresql.conf
+                  cp /tmp/tmp-db/pg_hba.conf $data_dir/pg_hba.conf
+
+                  rm -rf /tmp/tmp-db
+                fi
               else
-                echo "creating configuration file $hba_conf"
-                # rules from Bitname image
-                echo "host     all             all             0.0.0.0/0               md5" >> $hba_conf
-                echo "host     all             all             ::/0                    md5" >> $hba_conf
-                echo "local    all             all                                     md5" >> $hba_conf
-                echo "host     all             all        127.0.0.1/32                 md5" >> $hba_conf
-                echo "host     all             all        ::1/128                      md5" >> $hba_conf
+                echo "new databases will be created, nothing to configure"
               fi
+                
           securityContext:
-            runAsUser: 0
-            runAsGroup: 0
+            runAsUser: 1001
+            runAsGroup: 1001
           volumeMounts:
           - name: data
             mountPath: /var/lib/postgresql
