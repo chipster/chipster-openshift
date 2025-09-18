@@ -229,7 +229,7 @@ Until now Chipster used Bitnami Helm chart and container image to deploy the dat
 
 * The Helm chart was replaced with a StatefulSet among other Chipster templates: https://github.com/chipster/chipster-openshift/blob/k3s/k3s/helm/chipster/templates/postgresql-sts.yaml
 * The image is replaced with the "Docker Official Image" PostgreSQL: https://hub.docker.com/_/postgres . This upstream image is copied to Chipster image repository and tagged like all other Chipster images.
-* The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The template above creates a `initContainer`, which creates these files if necessary.
+* The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The template above creates an `initContainer`, which creates these files if necessary.
 
 Until now the database configuration was messy, because there was seprate configuration items for the Bitnami chart and Chipster. The benefit from this change is, that now the configuration is more simple, when we can use the our configuration items directly in the template.
 
