@@ -173,6 +173,8 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > 2025-05-12 Note! The Chipster versions up to `v4.14.2` used K3s version `v1.26.4` and Ubuntu `20.04`. Since Chipster version `v4.15.0`, K3s `v1.32.4` and Ubuntu `24.04` are used. Please follow [K3s instructions](migration.md#update-to-k3s-v1324) **before** updating to v4.15.0. You can update [Ubuntu](migration.md#update-to-ubuntu-2404) before or after updating Chipster.
 
+> 2025-09-18 Note! The Chipster versions up to `v4.17.5` used Bitnami container image for the databases. This was changed in `v4.18.0`. Please follow the few [extra update steps](migration#replace-bitnami-image).
+
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
 Chipster images are available in two different places. These instructions show how to use the most recent image versions which are available in an image registry. There is separate page for [older image versions](image-archive.md), which are stored in object storage.
