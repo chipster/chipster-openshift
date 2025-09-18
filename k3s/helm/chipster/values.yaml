@@ -280,6 +280,7 @@ tokens:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Configure depenency subcharts
 
 <<<<<<< HEAD
@@ -289,6 +290,10 @@ tokens:
 # Configure depenency subcharts
 
 <<<<<<< HEAD
+=======
+# Configure depenency subcharts
+
+>>>>>>> 9509a9d (Use legacy bitnami images)
 =======
 # Configure depenency subcharts
 
@@ -325,6 +330,7 @@ job-history-postgresql:
     repository: bitnamilegacy/postgresql
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 9509a9d (Use legacy bitnami images)
 =======
 >>>>>>> 2da5ca6 (Remove Bitnami DB config)
@@ -336,6 +342,8 @@ job-history-postgresql:
 >>>>>>> 2da5ca6 (Remove Bitnami DB config)
 =======
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+>>>>>>> 9509a9d (Use legacy bitnami images)
 # image is a section for defining how to get the images
 image:
   # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
