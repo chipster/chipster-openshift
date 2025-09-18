@@ -278,6 +278,7 @@ tokens:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Configure depenency subcharts
 
 =======
@@ -286,6 +287,10 @@ tokens:
 # Configure depenency subcharts
 
 <<<<<<< HEAD
+=======
+# Configure depenency subcharts
+
+>>>>>>> 9509a9d (Use legacy bitnami images)
 # the key is the dependency alias in Chart.yaml
 # aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
 auth-postgresql:
@@ -317,11 +322,14 @@ job-history-postgresql:
     tag: 14.13.0
     repository: bitnamilegacy/postgresql
 
+<<<<<<< HEAD
 >>>>>>> 9509a9d (Use legacy bitnami images)
 =======
 >>>>>>> 2da5ca6 (Remove Bitnami DB config)
 =======
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+>>>>>>> 9509a9d (Use legacy bitnami images)
 # image is a section for defining how to get the images
 image:
   # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
