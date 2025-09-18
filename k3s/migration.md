@@ -213,7 +213,7 @@ job-history-postgresql:
       existingClaim: "job-history-pvc-volume-postgres"
 ```
 
-5. After this follow the usual instructions in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#updates . When running “bash generate-passwords.bash”, you will see little bit of extra text telling that the three database passwords are migrated to their new names. 
+5. After this follow the usual instructions in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#updates to update to version v4.18.0. When running “bash generate-passwords.bash”, you will see little bit of extra text telling that the three database passwords are migrated to their new names. 
 
 ### Troubleshooting
 
