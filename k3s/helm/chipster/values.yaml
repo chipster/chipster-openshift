@@ -285,6 +285,7 @@ auth-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.13.0
+    repository: bitnamilegacy/postgresql
 
 session-db-postgresql:
   auth:
@@ -293,6 +294,7 @@ session-db-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.13.0
+    repository: bitnamilegacy/postgresql
 
 job-history-postgresql:
   auth:
@@ -301,6 +303,7 @@ job-history-postgresql:
   postgresqlDataDir: /bitnami/postgresql/data_14
   image:
     tag: 14.13.0
+    repository: bitnamilegacy/postgresql
 
 # image is a section for defining how to get the images
 image:
