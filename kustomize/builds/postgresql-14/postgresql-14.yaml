@@ -1,0 +1,27 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: postgresql-14
+  name: postgresql-14
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: postgresql-14:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: postgres:14
+    type: Docker
+  triggers:
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange
