@@ -234,22 +234,25 @@ deploymentDefault:
     timeoutSeconds: 1
 
 # databases is a section for Chipster scripts to know which databases exist
-# passwordKey is the YAML path where generate-passwords.bash will store the password
-# we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
-# names with dashes have to be quoted to work in jq
 databases:
   auth:
-    passwordKey: '"auth-postgresql".auth.postgresPassword'
+    name: auth
+    dbName: auth_db
     enabled: true
     hostPath: ""
+    password: ""
   sessionDb:
-    passwordKey: '"session-db-postgresql".auth.postgresPassword'
+    name: session-db
+    dbName: session_db_db
     enabled: true
     hostPath: ""
+    password: ""
   jobHistory:
-    passwordKey: '"job-history-postgresql".auth.postgresPassword'
+    name: job-history
+    dbName: job_history_db
     enabled: true
     hostPath: ""
+    password: ""
 
 # generate-passwords.bash will generate all serviceAccounts.*.password fields
 serviceAccounts:
@@ -271,39 +274,6 @@ users:
 tokens:
   auth:
     privateKey:
-
-# Configure depenency subcharts
-
-# the key is the dependency alias in Chart.yaml
-# aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
-auth-postgresql:
-  auth:
-    # postgresqlDatabase is the name of the database
-    database: auth_db
-    # postgresqlPassword is the database password, see the comment of "databases" section
-    postgresPassword: ""
-  postgresqlDataDir: /bitnami/postgresql/data_14
-  image:
-    tag: 14.13.0
-    repository: bitnamilegacy/postgresql
-
-session-db-postgresql:
-  auth:
-    database: session_db_db
-    postgresPassword: ""
-  postgresqlDataDir: /bitnami/postgresql/data_14
-  image:
-    tag: 14.13.0
-    repository: bitnamilegacy/postgresql
-
-job-history-postgresql:
-  auth:
-    database: job_history_db
-    postgresPassword: ""
-  postgresqlDataDir: /bitnami/postgresql/data_14
-  image:
-    tag: 14.13.0
-    repository: bitnamilegacy/postgresql
 
 # image is a section for defining how to get the images
 image:

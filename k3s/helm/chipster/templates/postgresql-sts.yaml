@@ -1,0 +1,178 @@
+{{- range $dbKey, $db := .Values.databases }}
+{{- if $db.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chipster
+  name: chipster-{{ $db.name }}-postgresql
+spec:
+  ports:
+  - name: tcp-postgresql
+    port: 5432
+    protocol: TCP
+    targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/name: {{ $db.name }}-postgresql
+  # headless service: https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
+  clusterIP: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: chipster
+  name: chipster-{{ $db.name }}-postgresql
+stringData:
+  postgres-password: {{ $db.password }}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: chipster
+  name: chipster-{{ $db.name }}-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $db.name }}-postgresql
+  serviceName: chipster-{{ $db.name }}-postgresql
+  template:
+    metadata:
+      labels:
+        app: chipster
+        app.kubernetes.io/name: {{ $db.name }}-postgresql
+      name: chipster-{{ $db.name }}-postgresql
+    spec:
+      containers:
+      - env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data_14
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgres-password
+              name: chipster-{{ $db.name }}-postgresql
+        - name: POSTGRES_DB
+          value: {{ $db.dbName }}
+        # Require password for all connections, because Bitnami used to require too (although wiht md5). This image has "trust" for local connections by default. 
+        - name: POSTGRES_INITDB_ARGS
+          value: --auth=scram-sha-256
+        image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
+        imagePullPolicy: {{ $.Values.image.localPullPolicy }}
+        # command: ["sleep", "inf"]
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U "postgres" -d "dbname={{ $db.dbName }}" -h 127.0.0.1 -p 5432
+        name: postgresql
+        ports:
+        - containerPort: 5432
+          name: tcp-postgresql
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U "postgres" -d "dbname={{ $db.dbName }}" -h 127.0.0.1 -p 5432
+        resources: {}
+        securityContext:
+          runAsGroup: 1001
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /tmp
+          name: empty-dir
+          subPath: tmp-dir
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /var/lib/postgresql
+        # - mountPath: /bitnami/postgresql
+          name: data
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+      initContainers:
+        - name: configure
+          image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
+          # image: docker.io/library/postgres:14
+          command: 
+            - bash
+            - -c
+            - |
+
+              # Create necessary configuration files, because old data directories from Bitnami 
+              # images didn't store them. This init container can be removed in a later version, 
+              # when all installations have had a change to convert the directories.
+
+              data_dir="/var/lib/postgresql/data_14"
+
+              if [ -d $data_dir ]; then
+                echo "check if existing database needs to be configured"
+                if [ -f $data_dir/postgresql.conf ]; then                
+                  echo "configuration file $data_dir/postgresql.conf exists already"
+                else
+
+                  echo "** create temporary database to generate configuration files"
+                  
+                  PGDATA=/tmp/tmp-db
+                  POSTGRES_PASSWORD="tmp-db-password"
+                  POSTGRES_INITDB_ARGS="--auth=scram-sha-256"
+
+                  source docker-entrypoint.sh
+                  docker_setup_env
+                  echo "** init database dir (this will take a moment)"
+                  docker_init_database_dir
+                  echo "** setup hba conf"
+                  pg_setup_hba_conf
+
+                  echo "** copy posgresql.conf and pg_hba.conf"
+                  cp /tmp/tmp-db/postgresql.conf $data_dir/postgresql.conf
+                  cp /tmp/tmp-db/pg_hba.conf $data_dir/pg_hba.conf
+
+                  rm -rf /tmp/tmp-db
+                fi
+              else
+                echo "new databases will be created, nothing to configure"
+              fi
+                
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+          volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql
+      volumes:
+      - emptyDir: {}
+        name: empty-dir
+      - emptyDir:
+          medium: Memory
+        name: dshm
+      {{- if $db.hostPath }}
+      - name: data
+        hostPath:
+          path: {{ $db.hostPath }}
+          type: Directory
+      {{- end}}
+  {{- if not $db.hostPath }}
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      volumeMode: Filesystem
+{{- end}}
+{{- end }}
+{{- end }}
