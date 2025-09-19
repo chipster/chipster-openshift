@@ -277,37 +277,6 @@ tokens:
 
 # Configure depenency subcharts
 
-# the key is the dependency alias in Chart.yaml
-# aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
-auth-postgresql:
-  auth:
-    # postgresqlDatabase is the name of the database
-    database: auth_db
-    # postgresqlPassword is the database password, see the comment of "databases" section
-    postgresPassword: ""
-  postgresqlDataDir: /bitnami/postgresql/data_14
-  image:
-    tag: 14.13.0
-    repository: bitnamilegacy/postgresql
-
-session-db-postgresql:
-  auth:
-    database: session_db_db
-    postgresPassword: ""
-  postgresqlDataDir: /bitnami/postgresql/data_14
-  image:
-    tag: 14.13.0
-    repository: bitnamilegacy/postgresql
-
-job-history-postgresql:
-  auth:
-    database: job_history_db
-    postgresPassword: ""
-  postgresqlDataDir: /bitnami/postgresql/data_14
-  image:
-    tag: 14.13.0
-    repository: bitnamilegacy/postgresql
-
 # image is a section for defining how to get the images
 image:
   # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
