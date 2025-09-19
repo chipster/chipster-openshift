@@ -179,6 +179,9 @@ This is fixed in Chipster version v4.18.0. Do the following steps to update. Thi
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a296af3 (Take backup copy of passwords)
 =======
 >>>>>>> a296af3 (Take backup copy of passwords)
 1. Take a backup copy of the passwords Secret
@@ -189,6 +192,7 @@ kubectl get secret passwords -o json > ~/passwords-backup.json
 
 2. Delete old Bitnami chart (otherwise Helm will deploy it with default name `chipster-postgresql`):
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 1. Delete old Bitnami chart (otherwise Helm will deploy it with default name `chipster-postgresql`):
 >>>>>>> e24fd92 (Replace Bitnami chart)
@@ -197,6 +201,8 @@ kubectl get secret passwords -o json > ~/passwords-backup.json
 =======
 1. Delete old Bitnami chart (otherwise Helm will deploy it with default name `chipster-postgresql`):
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+>>>>>>> a296af3 (Take backup copy of passwords)
 
 ```bash
 rm helm/chipster/charts/postgresql-16.0.1.tgz
@@ -205,6 +211,7 @@ rm helm/chipster/charts/postgresql-16.0.1.tgz
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 3. Delete Services of old databases:
 =======
 2. Delete Services of old databases:
@@ -215,6 +222,9 @@ rm helm/chipster/charts/postgresql-16.0.1.tgz
 =======
 2. Delete Services of old databases:
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+3. Delete Services of old databases:
+>>>>>>> a296af3 (Take backup copy of passwords)
 
 ```bash
 kubectl delete service/chipster-auth-postgresql service/chipster-job-history-postgresql service/chipster-session-db-postgresql
@@ -223,6 +233,7 @@ kubectl delete service/chipster-auth-postgresql service/chipster-job-history-pos
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 4. Delete StatefulSets of old databases:
 =======
 3. Delete StatefulSets of old databases:
@@ -233,6 +244,9 @@ kubectl delete service/chipster-auth-postgresql service/chipster-job-history-pos
 =======
 3. Delete StatefulSets of old databases:
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+4. Delete StatefulSets of old databases:
+>>>>>>> a296af3 (Take backup copy of passwords)
 
 ```bash
 kubectl delete sts/chipster-auth-postgresql sts/chipster-job-history-postgresql sts/chipster-session-db-postgresql
@@ -241,6 +255,7 @@ kubectl delete sts/chipster-auth-postgresql sts/chipster-job-history-postgresql 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 5. (Optional) If you have used hostPath volumes for your databases like shown in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/change-k3s-version.md#configure-hostpath-volumes , the new configuration is much simpler. If you have the following in your ~/values.yaml, it can be removed:
 =======
 4. (Optional) If you have used hostPath volumes for your databases like shown in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/change-k3s-version.md#configure-hostpath-volumes , the new configuration is much simpler. If you have the following in your ~/values.yaml, it can be removed:
@@ -251,6 +266,9 @@ kubectl delete sts/chipster-auth-postgresql sts/chipster-job-history-postgresql 
 =======
 4. (Optional) If you have used hostPath volumes for your databases like shown in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/change-k3s-version.md#configure-hostpath-volumes , the new configuration is much simpler. If you have the following in your ~/values.yaml, it can be removed:
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+5. (Optional) If you have used hostPath volumes for your databases like shown in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/change-k3s-version.md#configure-hostpath-volumes , the new configuration is much simpler. If you have the following in your ~/values.yaml, it can be removed:
+>>>>>>> a296af3 (Take backup copy of passwords)
 
 ```yaml
 auth-postgresql:
@@ -272,6 +290,9 @@ job-history-postgresql:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a296af3 (Take backup copy of passwords)
 =======
 >>>>>>> a296af3 (Take backup copy of passwords)
 6. After this, follow the usual instructions in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#updates to update to version v4.18.0. When running “bash generate-passwords.bash”, you will see little bit of extra text telling that the three database passwords are migrated to their new names. 
@@ -281,6 +302,7 @@ job-history-postgresql:
 ```bash
 rm ~/passwords-backup.json
 ```
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ### Troubleshooting
@@ -304,6 +326,12 @@ If you see an error like this, see steps 3 and 4.
 >>>>>>> a296af3 (Take backup copy of passwords)
 =======
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+
+### Troubleshooting
+
+If you see an error like this, see steps 3 and 4.
+>>>>>>> a296af3 (Take backup copy of passwords)
 
 ```
 Error: UPGRADE FAILED: cannot patch "chipster-auth-postgresql" with kind Service: Service "chipster-auth-postgresql"
@@ -313,6 +341,7 @@ Error: UPGRADE FAILED: cannot patch "chipster-auth-postgresql" with kind Service
 
 Until now Chipster used Bitnami Helm chart and container image to deploy the databases. 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -336,4 +365,9 @@ Until now the database configuration was messy, because there were separate conf
 >>>>>>> a296af3 (Take backup copy of passwords)
 =======
 >>>>>>> e24fd92 (Replace Bitnami chart)
+=======
+* The Bitnami Helm chart was replaced with a StatefulSet. This is placed among other Chipster templates: https://github.com/chipster/chipster-openshift/blob/k3s/k3s/helm/chipster/templates/postgresql-sts.yaml . Until now the database configuration was a bit messy, because there were separate configuration items for the Bitnami chart and Chipster. Now the configuration is simpler, because we can use the our configuration items directly in the StatefulSet.
+* The Bitnami image is replaced with the "Docker Official Image" PostgreSQL: https://hub.docker.com/_/postgres . This upstream image is copied to Chipster image repository and tagged like all other Chipster images. This ensures that the image stays available, even if the upstream renames it.
+* The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The StatefulSet above creates an `initContainer`, which creates these files if necessary.
+>>>>>>> a296af3 (Take backup copy of passwords)
 
