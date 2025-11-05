@@ -3,8 +3,8 @@
 set -e
 
 # these must match with the image versions copied to the server
-IMAGE_REPO="image-registry.apps.2.rahti.csc.fi/chipster-images-dev/"
-IMAGE_TAG="v4.18.1-rc2"
+IMAGE_REPO="image-registry.apps.2.rahti.csc.fi/chipster-images/"
+IMAGE_TAG="v4.18.1-rc3"
 TOOLS_BIN_VERSION="chipster-4.17.4"
 
 # installation directory for chipster
