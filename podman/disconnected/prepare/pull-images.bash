@@ -11,7 +11,7 @@ if [ -z $1 ]; then
 fi
 
 version="$1"
-image_repo="image-registry.apps.2.rahti.csc.fi/chipster-images-dev"
+image_repo="image-registry.apps.2.rahti.csc.fi/chipster-images"
 
 mkdir -p $version
 
