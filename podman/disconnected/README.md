@@ -76,7 +76,7 @@ Find the Data Gateway icon in the SD Desktop to mount the files in SD Connect to
 Extract `chipster-openshift.tar` from the SD Connecct.
 
 ```bash
-tar -xf ~/Project/SD-Connect/project_PROJECT_NUMBER/chipster/chipster-openshift.tar
+tar -xf ~/Project/SD-Connect/project_PROJECT_NUMBER/chipster-repo/chipster-openshift.tar
 ```
 
 ### Container images
