@@ -4,6 +4,22 @@ set -e
 
 source $(dirname "$0")/env.bash
 
+if ! podman images | tr -s ' ' | cut -d " " -f 2 | grep $IMAGE_TAG > /dev/null; then
+    echo "Error: container image version not found. "
+    echo "Version configured: $IMAGE_TAG (in $BASH_SOURCE)"
+    echo "Version available: (in 'podman images'):"
+    podman images | tr -s ' ' | cut -d " " -f 2 | sort | uniq
+    exit 1
+fi
+
+if ! [ -d $HOST_DIR/tools-bin/$TOOLS_BIN_VERSION ]; then
+    echo "Error: tools-bin directory not found."
+    echo "Version configured: $TOOLS_BIN_VERSION (in $BASH_SOURCE)"
+    echo "Versions available (in $HOST_DIR/tools-bin):"
+    ls $HOST_DIR/tools-bin
+    exit 1
+fi
+
 stop_and_remove_all
 
 mkdir -p db-data storage conf security podman-graphroot tools-bin/$TOOLS_BIN_VERSION

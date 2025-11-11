@@ -13,10 +13,14 @@ Here are a few steps to package a Chipster in a format that is easy to transfer 
 
 Create three folders in SD Connect. In these examples we'll call them `chipster-repo`, `chipster-images` and `chipster-tools-bin`. However, each folder name in SD Connect has to be unique, so you have to modify these names somehow to find an unused name. For example, you can add some part of your project name or number to create unique folder names.
 
+Only selected Chipster versions are tested in SD Connect. Check the latest tested image and tools-bin versions from variables in file https://github.com/chipster/chipster-openshift/blob/master/podman/disconnected/env.bash , and download those versions in the following sections.
+
 ### This repository
 
+Check out a repository version that matches with your selected image version.
+
 ```bash
-git clone https://github.com/chipster/chipster-openshift.git
+git clone --branch v4.18.2 https://github.com/chipster/chipster-openshift.git
 tar -cf chipster-openshift.tar chipster-openshift
 ```
 
@@ -24,17 +28,41 @@ Upload `chipster-openshfit.tar` to your `chipster-repo` folder in SD Connect.
 
 ### Container images
 
-Latest image versions are published in a container image registry. See the script https://github.com/chipster/chipster-openshift/blob/master/podman/disconnected/prepare/pull-images.bash for an example how to pull and package those. It uses the repository `chipster-openshift` to find all image names. Change the path in the script if you checked out the repository somewhere else in the previous step.
-
-The script created a directory like `v4.18.1`. Upload files in that directory to your SD Connect folder `chipster-images`. Upload seems to be significantly faster in Chrome (80 MiB/s) than in Safari (10 MiB/s).
-
-### Tools-bin
-
-Check available tools-bin versions:
+Download a container image package of your selected version:
 
 ```bash
-aws s3 --endpoint-url https://a3s.fi --no-sign-request ls s3://chipster-tools-bin
+mkdir images
+pushd images
+curl https://a3s.fi/chipster-images/chipster-images-v4.18.2.tar.lz4 -O
 ```
+
+Extract the package:
+
+```bash
+cat chipster-images-v4.18.2.tar.lz4 | lz4 -d | tar -x
+```
+
+Compress each file separately:
+
+```bash
+for f in *.tar; do
+    cat $f | zstd > $f.zst
+    rm $f
+done
+```
+
+Delete the original package:
+
+```bash
+rm chipster-images-v4.18.2.tar.lz4
+popd
+```
+
+Upload all files in the directory `images` to your SD Connect folder `chipster-images`. Upload seems to be significantly faster in Chrome (80 MiB/s) than in Safari (10 MiB/s).
+
+If you want to use images from newer (but untested in SD Desktop) Chipster versions, see alternative instructions in https://github.com/chipster/chipster-openshift/blob/master/podman/disconnected/prepare/pull-images.md .
+
+### Tools-bin
 
 Download selected parts of tools-bin. This example downloads only one subdirectory (`R-3.2.3`). Remove `| grep R-3.2.3` from the command if you have enough storage space in SD Desktop for the whole tools-bin version.
 
