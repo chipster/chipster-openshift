@@ -5,7 +5,7 @@ These instructions show how to run Chipster in https://sd-desktop.csc.fi/. Secur
 - Air gap: Data can be transferred only through https://sd-connect.csc.fi/ .
 - No root privileges: but there is Podman to run container images.
 
-Although these instructions are written for SD Desktop, these can probably help a lot also in setting up Chipster other similar disconnected environments.
+Although these instructions are written for SD Desktop, these can probably help a lot also in setting up Chipster to other similar disconnected environments.
 
 ## Preparations on an internet connected machine
 
