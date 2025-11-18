@@ -29,6 +29,11 @@ if [ -z $postgres_password ]; then
     postgres_password=$(openssl rand -base64 24)
 fi
 
+# calculate how many jobs slots can run at the same time
+ram="$(free -g | grep Mem: | awk '{print $2}')"
+slots="$(( (ram - 7) / 8))"
+slots="$((slots == 0 ? 1 : slots))"
+
 # generate chipster configuration
 
 cat > $HOST_DIR/conf/chipster.yaml << EOF
@@ -56,6 +61,9 @@ toolbox-runtime-tools-bin-name: $TOOLS_BIN_VERSION
 scheduler-bash-image-repository: $IMAGE_REPOSITORY
 scheduler-bash-image-tag: $IMAGE_TAG
 scheduler-bash-tools-bin-host-mount-path: $HOST_DIR/tools-bin
+
+scheduler-bash-max-slots: "$slots"
+scheduler-max-scheduled-and-running-slots-per-user: "$slots"
 
 # generate key for signing authentication tokens
 # without this a new key is generated on every restart resulting ugly error messages in browser
