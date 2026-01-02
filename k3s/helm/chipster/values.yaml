@@ -275,8 +275,6 @@ tokens:
   auth:
     privateKey:
 
-# Configure depenency subcharts
-
 # image is a section for defining how to get the images
 image:
   # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess

@@ -168,11 +168,11 @@ sudo do-release-upgrade
 
 And then continue with the [Chipster update instructions](README.md#Updates), if you didn't do that already.
 
+## Replace Bitnami image
 
-## Replace Bitnami image 
 ### Update to v4.18.0
 
-Chipster has used Bitnami image to run its PostgreSQL databases until version v4.17.5. Unfortunately Bitnami has decided to stop providing this image after September 29th: https://hub.docker.com/r/bitnami/postgresql . 
+Chipster has used Bitnami image to run its PostgreSQL databases until version v4.17.5. Unfortunately Bitnami has decided to stop providing this image after September 29th: https://hub.docker.com/r/bitnami/postgresql .
 
 This is fixed in Chipster version v4.18.0. Do the following steps to update. This shouldn’t delete your sessions, but normal backup precautions are of course recommended when making changes to databases.
 
@@ -219,7 +219,7 @@ job-history-postgresql:
       existingClaim: "job-history-pvc-volume-postgres"
 ```
 
-6. After this, follow the usual instructions in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#updates to update to version v4.18.0. When running “bash generate-passwords.bash”, you will see little bit of extra text telling that the three database passwords are migrated to their new names. 
+6. After this, follow the usual instructions in https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#updates to update to version v4.18.0. When running “bash generate-passwords.bash”, you will see little bit of extra text telling that the three database passwords are migrated to their new names.
 
 7. When you have completed the update and you can still open your old sessions in Chipster, you can delete the backup copy of the passwords Secret:
 
@@ -237,9 +237,8 @@ Error: UPGRADE FAILED: cannot patch "chipster-auth-postgresql" with kind Service
 
 ### What was changed
 
-Until now Chipster used Bitnami Helm chart and container image to deploy the databases. 
+Until now Chipster used Bitnami Helm chart and container image to deploy the databases.
 
-* The Bitnami Helm chart was replaced with a StatefulSet. This is placed among other Chipster templates: https://github.com/chipster/chipster-openshift/blob/k3s/k3s/helm/chipster/templates/postgresql-sts.yaml . Until now the database configuration was a bit messy, because there were separate configuration items for the Bitnami chart and Chipster. Now the configuration is simpler, because we can use the our configuration items directly in the StatefulSet.
-* The Bitnami image is replaced with the "Docker Official Image" PostgreSQL: https://hub.docker.com/_/postgres . This upstream image is copied to Chipster image repository and tagged like all other Chipster images. This ensures that the image stays available, even if the upstream renames it.
-* The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The StatefulSet above creates an `initContainer`, which creates these files if necessary.
-
+- The Bitnami Helm chart was replaced with a StatefulSet. This is placed among other Chipster templates: https://github.com/chipster/chipster-openshift/blob/k3s/k3s/helm/chipster/templates/postgresql-sts.yaml . Until now the database configuration was a bit messy, because there were separate configuration items for the Bitnami chart and Chipster. Now the configuration is simpler, because we can use the our configuration items directly in the StatefulSet.
+- The Bitnami image is replaced with the "Docker Official Image" PostgreSQL: https://hub.docker.com/_/postgres . This upstream image is copied to Chipster image repository and tagged like all other Chipster images. This ensures that the image stays available, even if the upstream renames it.
+- The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The StatefulSet above creates an `initContainer`, which creates these files if necessary.
