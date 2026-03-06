@@ -14,11 +14,11 @@ RUN npm install -g typescript \
 	&& npm cache clean --force \
 	&& rm -rf /home/user/.npm
 
-#RUN which nodejs \
-#	&& ng -v \
-#	&& which npm \
-#	&& which tsc \
-#	&& which ng \
-#	&& npm config get prefix	
+RUN which nodejs \
+	&& ng -v \
+	&& which npm \
+	&& which tsc \
+	&& which ng \
+	&& npm config get prefix
 
 CMD sleep inf
