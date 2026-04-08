@@ -6,7 +6,7 @@ RUN cd /home/user/chipster-web-server/js/cli-client \
     && chmod -R ug+rwx .
 
 RUN cd /home/user/chipster-web-server/js/cli-client \
-    && npm install; tsc
+    && npm ci; npx tsc
 
 WORKDIR /home/user/chipster-web-server/js/cli-client
 

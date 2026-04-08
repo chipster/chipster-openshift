@@ -6,7 +6,7 @@ COPY chipster-web-server /tmp/build/
 # config.ts assumes it's running in the js/type-service folder when it's finding the configs
 # remove .npm directory to avoid file permission problems (see also ../base-node/Dockerfile)
 RUN cd /tmp/build/chipster-web-server/js/type-service \
-	&& npm install \
+	&& npm ci \
 	&& npm run build \
 	&& rm -rf /home/user/.npm
 
