@@ -5,8 +5,9 @@ COPY chipster-web-server /tmp/build/
 # build typescript server components
 # config.ts assumes it's running in the js/type-service folder when it's finding the configs
 # remove .npm directory to avoid file permission problems (see also ../base-node/Dockerfile)
+# npm ci --omit=dev does not install dev dependencies. gitlab-ci-audit.yml assumes this also
 RUN cd /tmp/build/chipster-web-server/js/type-service \
-	&& npm ci \
+	&& npm ci --omit=dev \
 	&& npm run build \
 	&& rm -rf /home/user/.npm
 
