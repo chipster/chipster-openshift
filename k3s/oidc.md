@@ -14,7 +14,7 @@ Register you Chipster installation in [Google API Console](https://console.devel
 
 - Select `APIs & Services` and then `Credentials` from the menu bar on the left
 - Click `Create project`, enter a project name and click `Create`
-- Click `Configure consent screen`, click `Get started` and fill in requested informatino, including application name and contact email.
+- Click `Configure consent screen`, click `Get started` and fill in requested information, including application name and contact email.
 - Click `Clients` from the left side menu and click `Create client` from the top.
 - Set `Application type` to `Web application`
 - Set some name for your Chipster installation
