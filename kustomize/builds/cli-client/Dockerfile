@@ -5,9 +5,12 @@ COPY chipster-web-server /home/user/
 RUN cd /home/user/chipster-web-server/js/cli-client \
     && chmod -R ug+rwx .
 
-# npm ci --omit=dev does not install dev dependencies. gitlab-ci-audit.yml assumes this also
+# Run first "npm ci" to install with dev dependecies, because tsc requires typescript.
+# Then use --omit=dev to remove dev dependencies. gitlab-ci-audit.yml assumes that those are removed.
 RUN cd /home/user/chipster-web-server/js/cli-client \
-    && npm ci --omit=dev; npx tsc
+    && npm ci \
+    && npx tsc \
+    && npm ci --omit=dev
 
 WORKDIR /home/user/chipster-web-server/js/cli-client
 
