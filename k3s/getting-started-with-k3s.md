@@ -1,37 +1,38 @@
 # Getting started with K3s
+
 ## Some Chipster and Kubernetes terms
 
-* Chipster service
-  
+- Chipster service
+
   (Mostly) a Java process executing one Chipster component, like auth, toolbox or comp.
 
-* Host
+- Host
 
   The Ubuntu server where we K3s is running. Right now we have just one of them, but a Kubernetes or K3s cluster can be scaled to run on several hosts.
 
-* Container
-  
-  Each Chipster service will run in its own container. For the process it looks like it would be the only process running on that machine. 
+- Container
 
-* Pod
+  Each Chipster service will run in its own container. For the process it looks like it would be the only process running on that machine.
+
+- Pod
 
   A pod contains one or more containers. At this point we will have exactly one container in each pod, so we have one pod for each Chipster service. Usually the other containers in the same pod
   could be used as `sidecar` containers for small background tasks, like collecting logs from the main service. You can scale the number of pods to run several replicas of the same Chipster service.
 
-* Namespace
+- Namespace
 
   Kubernetes project. All containers in the same namespace share the same private network. We'll setup our Chipster to run inside one `namespace`.
 
-* Service
+- Service
 
-  Generally we wouldn't know, on which host the Kubernetes decides to run our containers. So we need 
+  Generally we wouldn't know, on which host the Kubernetes decides to run our containers. So we need
   to define a `service` to access it. Service makes the container accessible from other containers in the same namespace. There is an internal DNS service, which resolves service names to the container IP addresses. If you have a web server running in a container and a `service` called `web-server`, you can simply run command `curl http://web-server` on any container (in the same namespace) to query the front page of that web server. When you have multiple instances of the same pod running, the `service` acts as a load-balancer that distributes your (TCP) connections to different pod instances.
 
-* Ingress
+- Ingress
 
-  To access a `service` from outside, like from your browser, you have to define an Ingress object. For example, you could setup an Ingress to publish the aforementioned web server in address `http://HOST_ADDRESS/web-server`. The Ingress is implemented as a reverse proxy and can usually pass only HTTP and WebSocket traffic. It can be also configured to terminate HTTPS connections. 
+  To access a `service` from outside, like from your browser, you have to define an Ingress object. For example, you could setup an Ingress to publish the aforementioned web server in address `http://HOST_ADDRESS/web-server`. The Ingress is implemented as a reverse proxy and can usually pass only HTTP and WebSocket traffic. It can be also configured to terminate HTTPS connections.
 
-* Deployment
+- Deployment
 
   We don't create pods ourselves, but we define a `deployment`. It takes care of creating and terminating pods when the desired number of pods is changed or new versions are created.
 
@@ -155,7 +156,7 @@ I have no name!@auth-75f564b8dd-xc5t9:/opt/chipster$
 If there is nothing alarming in the logs, make sure you can make a query to the server process from the same container. Use `kubectl describe deployment/auth` to see which port (e.g. 8002 for auth) the server is using. `HTTP 404` is a good sign here, it means that the server process responeded.
 
 ```bash
-$ curl localhost:8002       
+$ curl localhost:8002
 HTTP 404 Not Found
 ```
 
@@ -250,7 +251,7 @@ Spec:
 ...
 ```
 
-Finally you can check that you can connect to your IngressRoute from your laptop. If everything works, the Rest API should respond with `HTTP 404` again. 
+Finally you can check that you can connect to your IngressRoute from your laptop. If everything works, the Rest API should respond with `HTTP 404` again.
 
 ```bash
 $ curl http://HOST_ADDRESS/auth
@@ -259,7 +260,7 @@ HTTP 404
 
 ## View content of Chipster configuration file from a Kubernetes secret
 
-Use `kubectl get secret` to get the secret object. Then use `jq` to pick the correct configuration file. Careful quoting of dots is needed, because the file name unfortunately includes a dot character, which has other meaning in `jq` queries by default. Use `-r` to print the value without quotes. Finally, the values in secrets are base64 encoded and has to be decoded with `base64 -d`. 
+Use `kubectl get secret` to get the secret object. Then use `jq` to pick the correct configuration file. Careful quoting of dots is needed, because the file name unfortunately includes a dot character, which has other meaning in `jq` queries by default. Use `-r` to print the value without quotes. Finally, the values in secrets are base64 encoded and has to be decoded with `base64 -d`.
 
 For example, view the configuration of the service-locator:
 
@@ -275,56 +276,56 @@ bash get-secret.bash service-locator
 
 ## Build from local sources
 
- * Copy sources to the host. Run this on your laptop. We'll build the java code in chipster-web-server repository in this example, but the same works also for other Chipster repositories. Replace `USERNAME` and `HOST_ADDRESS` with the values of your host machine.
+- Copy sources to the host. Run this on your laptop. We'll build the java code in chipster-web-server repository in this example, but the same works also for other Chipster repositories. Replace `USERNAME` and `HOST_ADDRESS` with the values of your host machine.
 
-    ```bash
-    remote="USERNAME@HOST_ADDRESS"
-    cd ~/git
-    rsync -r chipster-web-server/ $remote:git/chipster-web-server --delete
-    ```
+  ```bash
+  remote="USERNAME@HOST_ADDRESS"
+  cd ~/git
+  rsync -r chipster-web-server/ $remote:git/chipster-web-server --delete
+  ```
 
- * Check the build command on the host
+- Check the build command on the host
 
-    ```bash
-    $ cd ~/git/chipster-openshift/k3s
-   $ bash scripts/buildconfig-to-docker.bash ../templates/builds/chipster-web-server
-   cat ../templates/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f - https://github.com/chipster/chipster-web-server.git
-    ```
+  ```bash
+  $ cd ~/git/chipster-openshift/k3s
+  $ bash scripts/buildconfig-to-buildah.bash ../templates/builds/chipster-web-server
+  cat ../templates/builds/chipster-web-server/Dockerfile | buildah build -t chipster-web-server -f - https://github.com/chipster/chipster-web-server.git
+  ```
 
- * Run the build, but replace the build context (GitHub URL) with the source dir
+- Run the build, but replace the build context (GitHub URL) with the source dir
 
-    ```bash
-    cat templates/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f - ../../chipster-web-server
-    ```
+  ```bash
+  cat templates/builds/chipster-web-server/Dockerfile | buildah build -t chipster-web-server -f - ../../chipster-web-server
+  ```
 
- * Restart pods
+- Restart pods
 
-   ```bash
-   bash restart.bash
-   ```
+  ```bash
+  bash restart.bash
+  ```
 
 ## Get a shell to a container that doesn't start
 
- * Let's edit the deployment a bit.
+- Let's edit the deployment a bit.
 
-   ```bash
-   kubectl edit deployment/comp
-   ```
+  ```bash
+  kubectl edit deployment/comp
+  ```
 
- * Hit `i` to go to the edit mode. Override the container command (usually defined in the Dockerfile) with infinite sleep to make sure it starts.
+- Hit `i` to go to the edit mode. Override the container command (usually defined in the Dockerfile) with infinite sleep to make sure it starts.
 
-  ```yaml
-  containers
-  - command:
-    - sleep
-    args:
-    - inf
+```yaml
+containers
+- command:
+  - sleep
+  args:
+  - inf
 ```
 
- * Hit Esc to go back to the command mode, and `:wq` to save and quit
+- Hit Esc to go back to the command mode, and `:wq` to save and quit
 
- * Get a shell
+- Get a shell
 
-   ```bash
-   kubectl exec -it deployment/comp bash
-   ```
+  ```bash
+  kubectl exec -it deployment/comp bash
+  ```
