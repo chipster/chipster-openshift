@@ -7,7 +7,7 @@
 set -e
 
 if [ -z $1 ]; then
-  echo "Usage bash build-image.bash IMAGE_NAME"
+  echo "Usage bash build-image-buildah.bash IMAGE_NAME"
   exit 1
 fi
 
@@ -44,4 +44,5 @@ cmd="$(bash scripts/buildconfig-to-buildah.bash ../kustomize/builds/$build $imag
 bash -c "$cmd"
 
 echo "copy image from podman to k3s"
-podman save $image_repo$build:$image_tag | pv | sudo k3s ctr -n k8s.io images import -
+# podman save $image_repo$build:$image_tag | pv | sudo k3s ctr -n k8s.io images import -
+podman save $image_repo$build:$image_tag | sudo k3s ctr -n k8s.io images import -

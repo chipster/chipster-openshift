@@ -30,7 +30,7 @@ dest_tag="$4"
 git_repo="$5"
 
 if [[ -z $dir ]]; then
-    echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_SOURCE_TAG [ IMAGE_DEST_TAG [ IMAGE_REPOSITORY [ GIT_REPOSITORY ]]]]"
+    echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY [ IMAGE_SOURCE_TAG [ IMAGE_DEST_TAG [ GIT_REPOSITORY ]]]]"
   exit 1
 fi
 
