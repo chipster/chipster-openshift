@@ -91,7 +91,7 @@ spec:
             # tools-bin for toolbox
             {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (eq $deployment.name "toolbox") }}
             - name: tools-bin
-              mountPath: /mnt/tools
+              mountPath: /opt/chipster/tools
               readOnly: {{ $.Values.toolsBin.readOnly }}
             {{- end }}
             {{- if and $.Values.tools.hostPath (eq $deployment.name "toolbox") }}

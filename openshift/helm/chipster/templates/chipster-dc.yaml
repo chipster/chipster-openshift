@@ -80,7 +80,7 @@ spec:
             - mountPath: /opt/chipster/conf
               name: conf
             {{- if eq $deployment.name "toolbox" }}
-            - mountPath: "/mnt/tools"
+            - mountPath: "/opt/chipster/tools"
               name: tools-bin
             {{- end }}
         - env:

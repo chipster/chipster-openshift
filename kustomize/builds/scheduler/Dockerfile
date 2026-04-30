@@ -11,4 +11,4 @@ COPY chipster-web-server-build /
 
 WORKDIR /opt/chipster
 
-CMD java -cp lib/*:  ${JAVA_CLASS:-fi.csc.chipster.rest.ServerLauncher}
+CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.scheduler.Scheduler"]

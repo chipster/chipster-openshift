@@ -24,23 +24,23 @@ set -e
 #set -x
 
 dir="$1"
-git_repo="$2"
-image_repository="$3"
-source_tag="$4"
+image_repository="$2"
+source_tag="$3"
+dest_tag="$4"
+git_repo="$5"
 
 if [[ -z $dir ]]; then
-  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ GIT_REPOSITORY [ IMAGE_REPOSITORY [ IMAGE_SOURCE_TAG ]]]"
+    echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_SOURCE_TAG [ IMAGE_DEST_TAG [ IMAGE_REPOSITORY [ GIT_REPOSITORY ]]]]"
   exit 1
 fi
 
-if [[ -z $image_repository ]]; then
-  image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
-fi
-
-dest_tag=$(cat ~/values.yaml | yq '.image.tag')
 
 if [[ -z $source_tag ]]; then
-  source_tag="$dest_tag"
+  source_tag="latest"
+fi
+
+if [[ -z $dest_tag ]]; then
+  dest_tag="latest"
 fi
 
 if [[ -z $git_repo ]]; then
@@ -50,7 +50,9 @@ if [[ -z $git_repo ]]; then
     git_repo=$git_uri#$branch
 fi
 
-dest_tag=$(cat ~/values.yaml | yq '.image.tag')
+if [[ -z $image_repository ]]; then
+  image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
+fi
 
 build="$(basename $dir)"
 

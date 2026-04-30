@@ -6,7 +6,4 @@ COPY chipster-web-app /home/user/
 
 WORKDIR /home/user/chipster-web-server
 
-# install JFrog CLI
-RUN curl -fL https://install-cli.jfrog.io | sh
-
 CMD ["java", "-cp", "lib/*:", "fi.csc.chipster.rest.ServerLauncher"]

@@ -347,6 +347,14 @@ gpg2 --delete-secret-keys chipster@localhost
 gpg2 --delete-keys chipster@localhost
 ```
 
+gpp refused to delete the secret key in RHEL9 directly (Permission denied), but deletion from gpg-connect-agent worked:
+
+```
+gpg --list-secret-keys --with-keygrip
+# replace $KEYGRIP with the value from the previous command:
+gpg-connect-agent "delete_key --force $KEYGRIP" /bye
+```
+
 Make sure the keystore is empty
 
 ```

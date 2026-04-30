@@ -11,6 +11,7 @@ FROM chipster-web-server
 
 RUN cd /home/user/chipster-web-server \
 	&& export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 \
+	&& ./gradlew -v \
 	&& ./gradlew distTar \
 	&& tar -zxf build/distributions/chipster-web-server.tar.gz \
 	&& mkdir -p /opt/chipster/lib \
