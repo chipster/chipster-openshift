@@ -6,21 +6,12 @@ Integration of new tool in Chipster often involves installation of new operating
 
 This page shows you how to build an image to install dependencies for a tool. There are a few other examples at the end of the page in case you want to change some other images, for example the server code.
 
-## Install Docker
+## Install Podman
 
-We'll use Docker to build the images. Let's install it first.
+We'll use Podman and Buildah to build the images. Let's install those first.
 
 ```bash
-
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt install podman
 ```
 
 ## Building your own images
@@ -36,24 +27,26 @@ Build it:
 
 ```
 cd ~/git/chipster-openshift/k3s
-bash scripts/build-image.bash comp-r-4-2-3-enabrowsertools
+bash scripts/build-image.bash comp-r-4-3-2-enabrowsertools
 ```
 
-## Copy image from Docker registry to K3s registry
+## Copy image from Podman registry to K3s registry
 
 The command to export the image (as a tar file) from Docker and import it to K3s looks like this:
 
 ```bash
-sudo docker save IMAGE | sudo k3s ctr -n k8s.io images import -
+podman save IMAGE | sudo k3s ctr -n k8s.io images import -
 ```
 
-For example, to copy the comp-r-4-2-3-enabrowsertools image from Docker to K3s registry:
+For example, to copy the comp-r-4-3-2-enabrowsertools:v4.19.0 image from Docker to K3s registry:
 
 ```bash
-sudo docker save image-registry.apps.2.rahti.csc.fi/chipster-images/comp-r-4-2-3-enabrowsertools | sudo k3s ctr -n k8s.io images import -
+podman save image-registry.apps.2.rahti.csc.fi/chipster-images/comp-r-4-2-3-enabrowsertools:v4.19.0 | sudo k3s ctr -n k8s.io images import -
 ```
 
-The K3s image registry requires us to use the long image names like `image-registry.apps.2.rahti.csc.fi/chipster-images/comp-r-4-2-3-enabrowsertools`. It assumes that short names like `comp-r-4-2-3-enabrowsertools` would refer to its default registry `docker.io/library/`.
+The K3s image registry requires us to use the long image names like `image-registry.apps.2.rahti.csc.fi/chipster-images/comp-r-4-2-3-enabrowsertools:v4.19.0`. It assumes that short names like `comp-r-4-2-3-enabrowsertools` would refer to its default registry `docker.io/library/`.
+
+At the moment, Chipster can use only one version tag for all images. Specifying a version tag like `v4.19.0` is nice with ready-made images, where you know exactly which version you are running. However, for Chipster to use your new image, the same tag has to be used for it too. The script `build-image.bash` checked your image tag from you `~/values.yaml` and tagged your new image with the same tag. 
 
 ## Use the new image in a tool
 
@@ -64,13 +57,13 @@ For example in the tool [enafetch.R](https://github.com/chipster/chipster-tools/
 First of all, define the name of the image. This will override the image definition in the runtime configuration:
 
 ```
-# IMAGE comp-r-4-2-3-enabrowsertools
+# IMAGE comp-r-4-3-2-enabrowsertools
 ```
 
-Set a [runtime](tool-script-dev.md#runtimes). The tool is written in R language, so Chipster needs to know how to find an R interpreter. In this case the source image [comp-r-4-2-4](https://github.com/chipster/chipster-openshift/tree/k3s/kustomize/builds/comp-r-4-2-3) already contains an R. We can also use an existing runtime `R-4.2.3` to tell Chipster that it can find the R in `/opt/chipster/tools/R-4.2.3/bin/R`.
+Set a [runtime](tool-script-dev.md#runtimes). The tool is written in R language, so Chipster needs to know how to find an R interpreter. In this case, we can use an existing runtime `R-4.3.2` to tell Chipster that it can find the R in `/opt/chipster/tools/R-4.3.2/bin/R`.
 
 ```
-# RUNTIME R-4.2.3
+# RUNTIME R-4.3.2
 ```
 
 If we have managed to provide all the tool's dependendencies in the image, it shouldn't need the tools-bin directory anymore. Set it to an empty string `""` to tell Chipster that this tool doesn't need tools-bin at all.
@@ -85,7 +78,7 @@ Remember to [reload toolbox](tool-script-dev.md#reload-toolbox-after-tool-script
 
 ## Appendix 1: Two local image registries
 
-There are two local image registries involved in this process, one for K3s and one for Docker. The K3s image registry is used for running the containers and the Docker image registry is used for building the images. To use the new image, we have to copy it from the Docker registry to K3s registry. In the above example we ran the builds on the same Chipster host, but you could run the builds on different host if you don't want to install Docker on your production server.
+There are two local image registries involved in this process, one for K3s and one for Podamn. The K3s image registry is used for running the containers and the Podman image registry is used for building the images. To use the new image, we have to copy it from the Podman registry to K3s registry. In the above example we ran the builds on the same Chipster host, but you could run the builds on different host if you don't want to install Podman on your production server.
 
 Let's check the images in K3s image registry:
 
@@ -108,17 +101,17 @@ docker.io/rancher/mirrored-metrics-server                             v0.5.2    
 docker.io/rancher/mirrored-pause                                      3.6                    6270bb605e12e       301kB
 ```
 
-The docker registry is still empty, if you haven't build any images yet:
+The podman registry is still empty, if you haven't build any images yet. Note that you get different results if you run the podman commands as different user. If you build a image as user "ubuntu", you see it only with command "podman images", but not with "sudo podman images" as root.
 
 ```bash
-$ sudo docker images
+$ podman images
 REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
 ```
 
 When copying image between these, you can also save the image to a file in between. This allows you to use the same image on different Chipster server.
 
 ```bash
-sudo docker save IMAGE -o image.tar
+podman save IMAGE -o image.tar
 # after copied to another server
 sudo k3s ctr -n k8s.io images import image.tar
 ```
@@ -172,22 +165,36 @@ After you have done your changes to this directory, you can build the image. Che
 
 ```bash
 cd ~/git/chipster-openshift/k3s
-bash scripts/buildconfig-to-docker.bash ../kustomize/builds/chipster-web-server
+bash scripts/buildconfig-to-buildah.bash ../kustomize/builds/chipster-web-server
 ```
 
 It will print the docker build command:
 
 ```bash
-cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f - https://github.com/chipster/chipster-web-server.git
+cat ../kustomize/builds/chipster-web-server/Dockerfile | buildah build -t chipster-web-server -f - https://github.com/chipster/chipster-web-server.git
 ```
 
-Run the command, but replace the repository URL in the end with a path to your local directory:
+Run the command, but replace the repository URL in the end with a path to your local directory. This command only copies your repository to an image:
 
 ```bash
-cat ../kustomize/builds/chipster-web-server/Dockerfile | sudo docker build -t chipster-web-server -f -  ~/git/chipster-web-server
+cat ../kustomize/builds/chipster-web-server/Dockerfile | buildah build -t chipster-web-server -f -  ~/git/chipster-web-server
 ```
 
-The latest image in K3s image repository is now the locally build image. Simply restart a pod to take it in use. For example, to restart the API server `session-db`:
+By looking at the Helm templates and BuildConfigs, you can find out that you have to build two more images, until you have someting to run. First build the Java code:
+
+```bash
+bash scripts/build-image.bash chipster-web-server-build*
+```
+
+And finally, build a final image, without any development tools:
+
+```bash
+bash scripts/build-image.bash chipster-web-server-java
+```
+
+Copy the image from the Podman image registry to K3s image registry, like shown above.
+
+The latest image in K3s image repository is now the locally built image. Simply restart a pod to take it in use. For example, to restart the API component `session-db`:
 
 ```bash
 kubectl rollout restart session-db

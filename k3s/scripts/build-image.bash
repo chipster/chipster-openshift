@@ -30,7 +30,7 @@ fi
 # this assumes that source images are built before images that depend on them in alphabetical order (provided by ls)
 while read -r build; do
     echo "** build $build"
-    cmd="$(bash scripts/buildconfig-to-docker.bash ../kustomize/builds/$build)"
+    cmd="$(bash scripts/buildconfig-to-buildah.bash ../kustomize/builds/$build)"
     #echo "build command: $cmd"
     bash -c "$cmd"
 done <<< "$images"
