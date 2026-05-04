@@ -4,20 +4,20 @@
 # (supported in OpenShfit, another variant of Kubernetes), which don't work 
 # in k3s. We have to dig out the GitHub urls and some paths from these objects 
 # in bash. This is a small utility scripts that converts the BuildConfig and 
-# Dockerfile to a `docker build` command. For example running
+# Dockerfile to a `buildah build` command. For example running
 # 
 #   $ bash k3s/buildconfig-to-docker.bash templates/builds/base
 # 
 # prints
 #
-#   cat ../templates/builds/base/Dockerfile | tee /dev/tty | sudo docker build -t base -
+#   cat ../templates/builds/base/Dockerfile | tee /dev/tty | buildah build -t base -
 #
 # This one was simple, but it gets a bit tortuous when the images copy 
 # directories from other images:
 #
 #   $ bash k3s/buildconfig-to-docker.bash templates/builds/web-server
 #
-#   cat templates/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#" | tee /dev/tty | sudo docker build -t web-server -
+#   cat templates/builds/web-server/Dockerfile | sed "s#COPY chipster-web /opt/chipster#COPY --from=chipster-web:latest /home/user/chipster-web /opt/chipster/chipster-web#" | sed "s#COPY manual /opt/chipster/chipster-web/assets#COPY --from=chipster-tools:latest /home/user/chipster-tools/manual /opt/chipster/chipster-web/assets/manual#" | tee /dev/tty | buildah build -t web-server -
 # 
 
 set -e
@@ -30,13 +30,10 @@ dest_tag="$4"
 git_repo="$5"
 
 if [[ -z $dir ]]; then
-  echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_SOURCE_TAG [ IMAGE_DEST_TAG [ IMAGE_REPOSITORY [ GIT_REPOSITORY ]]]]"
+    echo "Usage: $(basename $0) DOCKERFILE_AND_BUILDCONFIG_DIR [ IMAGE_REPOSITORY [ IMAGE_SOURCE_TAG [ IMAGE_DEST_TAG [ GIT_REPOSITORY ]]]]"
   exit 1
 fi
 
-if [[ -z $image_repository ]]; then
-  image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
-fi
 
 if [[ -z $source_tag ]]; then
   source_tag="latest"
@@ -51,6 +48,10 @@ if [[ -z $git_repo ]]; then
     branch=$(cat $dir/*.yaml | yq e .spec.source.git.ref -)
 
     git_repo=$git_uri#$branch
+fi
+
+if [[ -z $image_repository ]]; then
+  image_repository="image-registry.apps.2.rahti.csc.fi/chipster-images/"
 fi
 
 build="$(basename $dir)"
@@ -96,9 +97,9 @@ fi
 # cmd="$cmd | tee /dev/tty"
 
 if [ $git_repo = "null#null" ]; then
-    cmd="$cmd | buildah build -t $image_repository$build:$dest_tag -"
+    cmd="$cmd | buildah build --pull=missing -t $image_repository$build:$dest_tag -"
 else
-    cmd="$cmd | buildah build -t $image_repository$build:$dest_tag -f - $git_repo"
+    cmd="$cmd | buildah build --pull=missing -t $image_repository$build:$dest_tag -f - $git_repo"
 fi
 
 echo $cmd

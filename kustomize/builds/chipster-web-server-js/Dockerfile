@@ -2,12 +2,17 @@ FROM base-node
 
 COPY chipster-web-server /tmp/build/
 
-# build typescript server components
-# config.ts assumes it's running in the js/type-service folder when it's finding the configs
-# remove .npm directory to avoid file permission problems (see also ../base-node/Dockerfile)
+# Build typescript server components
+# 
+# config.ts assumes it's running in the js/type-service folder when it's finding the configs.
+# Remove .npm directory to avoid file permission problems (see also ../base-node/Dockerfile).
+# Run first "npm ci" to install with dev dependencies, because the build requires typescript.
+# Then use with --omit=dev to remove dev dependencies. gitlab-ci-audit.yml assumes that those are removed.
+# Use --ignore-scripts for safety (and we don't need them).
 RUN cd /tmp/build/chipster-web-server/js/type-service \
-	&& npm install \
+	&& npm ci --ignore-scripts \
 	&& npm run build \
+	&& npm ci --omit=dev --ignore-scripts \
 	&& rm -rf /home/user/.npm
 
 RUN cd /tmp/build/chipster-web-server/js/type-service \
