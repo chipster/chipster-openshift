@@ -19,8 +19,8 @@ Register you Chipster installation in [Google API Console](https://console.devel
 - Set `Application type` to `Web application`
 - Set some name for your Chipster installation
 - Set `Authorised JavaScript origins` to the address of your host: `http://HOST_ADDRESS`
-- Set `Authorised redirect URIs` to `http://HOST_ADDRESS/oidc/callback`
-- The service will show you two long strings called `Client ID` and `Client Secret`. You will need these soon in the Chipster configuration.
+- Set `Authorised redirect URIs` to `http://HOST_ADDRESS/auth/oidc/callback`
+- The service will show you two long strings called `Client ID` and `Client secret`. You will need these soon in the Chipster configuration.
 
 ## Configure OpenID Connect in Chipster
 
