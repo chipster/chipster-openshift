@@ -54,7 +54,7 @@ sudo apt install -y liblz4-tool
 Download the list of packages. Variable $TOOLS_BIN_VERSION must be set beforehand.
 
 ```bash
-curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/files.txt | grep .tar.lz4$ > temp/files.txt
+curl -s https://a3s.fi/swift/v1/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/files.txt | grep .tar.lz4$ > temp/files.txt
 
 ```
 
@@ -65,7 +65,7 @@ cd temp
 
 # download packages
 for f in $(cat files.txt); do
-  wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f || break
+  wget https://a3s.fi/swift/v1/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f || break
 done
 cd ..
 
@@ -82,7 +82,7 @@ Or if you are tight on disk space, you can download and extract the files one by
 
 for f in $(cat temp/files.txt); do
   # download
-  wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f -O temp/$f || break
+  wget https://a3s.fi/swift/v1/chipster-tools-bin/$TOOLS_BIN_VERSION/parts/$f -O temp/$f || break
 
   # extract
   lz4 -d temp/$f -c - | tar -x -C tools-bin/$TOOLS_BIN_VERSION

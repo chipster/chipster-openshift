@@ -7,8 +7,7 @@
 Use the following command to list available image version in the object storage. The output could look something like this:
 
 ```bash
-$ curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-images/ | sort --version-sor
-t
+$ curl -s https://a3s.fi/swift/v1/chipster-images/ | sort --version-sort
 chipster-images-v4.9.12.tar.lz4
 chipster-images-v4.10.3.tar.lz4
 chipster-images-v4.13.4.tar.lz4

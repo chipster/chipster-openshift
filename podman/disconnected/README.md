@@ -70,8 +70,8 @@ Download selected parts of tools-bin. This example downloads only one subdirecto
 version="chipster-4.17.4"
 mkdir tools-bin
 pushd tools-bin
-for f in $(curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$version$/parts/files.txt | grep R-3.2.3); do
-    curl https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$version$/parts/$f > $f
+for f in $(curl -s https://a3s.fi/swift/v1/chipster-tools-bin/$version$/parts/files.txt | grep R-3.2.3); do
+    curl https://a3s.fi/swift/v1/chipster-tools-bin/$version$/parts/$f > $f
 done
 ```
 
