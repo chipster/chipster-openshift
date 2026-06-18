@@ -11,7 +11,7 @@ tools_bin_size="$2"
 
 if [ -z $tools_bin_version ]; then
   echo "Usage:   bash download-tools-bin.bash TOOLS_BIN_VERSION TOOLS_BIN_SIZE"
-  echo "Example: bash download-tools-bin.bash chipster-3.15.6 550Gi"
+  echo "Example: bash download-tools-bin.bash chipster-3.15.6 500Gi"
   echo ""
   echo "Create an OpenShift job for downloading the specified tools-bin version from the object storage and follow its output."
   echo ""
@@ -37,7 +37,7 @@ spec:
   resources:
     requests:
       storage: ${tools_bin_size}
-  storageClassName: nfs-1
+  storageClassName: nfs-client
 EOF
 	
 temp_pvc="${pvc_name}-temp"
@@ -62,7 +62,7 @@ EOF
 
 name=download-tools-bin-bash-job
 
-cat <<EOF | yq | jq .spec.template.spec.containers[0].command[2]="$(cat templates/jobs/download-tools-bin.bash | jq -s -R .)" | kubectl apply -f -
+cat <<EOF | yq -o json | jq .spec.template.spec.containers[0].command[2]="$(cat templates/jobs/download-tools-bin.bash | jq -s -R .)" | kubectl apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:

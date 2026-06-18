@@ -5,7 +5,7 @@ echo "download tools-bin $TOOLS_BIN_VERSION"
 cd /mnt/tools
 
 export temp="/mnt/temp"
-export url="https://object.pouta.csc.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts"
+export url="https://a3s.fi/swift/v1/chipster-tools-bin/${TOOLS_BIN_VERSION}/parts"
 
 # Download packages to local temp file before extraction. We can't pipe directly
 # from the curl to lz4 and tar, because when the files
@@ -114,6 +114,6 @@ rm -f $temp/*
 echo "files in $url/files.txt":
 curl -s $url/files.txt | wc -l
           
-for file in $(curl -s $url/files.txt | grep lz4$); do 
+for file in $(curl -s $url/files.txt | grep lz4$); do
 	download_file $file 2>&1 | tee --append /mnt/tools/download.log
 done
