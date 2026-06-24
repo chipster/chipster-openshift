@@ -23,8 +23,8 @@ RUN mkdir -p /opt/chipster/tools \
     && curl -s https://a3s.fi/bundle-builds/seurat_regev_lab_cell_cycle_genes_2023-09-21.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools/seurat
 
 RUN cd tools/R-4.5.1/bin; \
-    ./R -e 'BiocManager::install("UCell")'; \
-    ./R -e 'install.packages(c("HGNChelper","openxlsx","ggraph","igraph", "data.tree"), repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+    ./R -e 'BiocManager::install(c("scrapper", "UCell"))' \
+    ./R -e 'install.packages(c("HGNChelper", "openxlsx", "ggraph", "igraph", "tidyverse", "data.tree"), repos="http://cran.us.r-project.org")'
 
 # installed in R-4.5.1-seurat5_2025-08-07.tar.lz4
 
