@@ -51,7 +51,7 @@ spec:
       containers:
       - env:
         - name: PGDATA
-          value: /var/lib/postgresql/data_14
+          value: /var/lib/postgresql/data_17
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -62,7 +62,8 @@ spec:
         # Require password for all connections, because Bitnami used to require too (although wiht md5). This image has "trust" for local connections by default. 
         - name: POSTGRES_INITDB_ARGS
           value: --auth=scram-sha-256
-        image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
+        image: {{$.Values.image.chipsterImageRepo}}postgresql-17:{{$.Values.image.tag}}
+        # image: docker.io/library/postgres:17-alpine
         imagePullPolicy: {{ $.Values.image.localPullPolicy }}
         # command: ["sleep", "inf"]
         livenessProbe:
@@ -98,56 +99,6 @@ spec:
       securityContext:
         fsGroup: 1001
         fsGroupChangePolicy: Always
-      initContainers:
-        - name: configure
-          image: {{$.Values.image.chipsterImageRepo}}postgresql-14:{{$.Values.image.tag}}
-          # image: docker.io/library/postgres:14
-          command: 
-            - bash
-            - -c
-            - |
-
-              # Create necessary configuration files, because old data directories from Bitnami 
-              # images didn't store them. This init container can be removed in a later version, 
-              # when all installations have had a change to convert the directories.
-
-              data_dir="/var/lib/postgresql/data_14"
-
-              if [ -d $data_dir ]; then
-                echo "check if existing database needs to be configured"
-                if [ -f $data_dir/postgresql.conf ]; then                
-                  echo "configuration file $data_dir/postgresql.conf exists already"
-                else
-
-                  echo "** create temporary database to generate configuration files"
-                  
-                  PGDATA=/tmp/tmp-db
-                  POSTGRES_PASSWORD="tmp-db-password"
-                  POSTGRES_INITDB_ARGS="--auth=scram-sha-256"
-
-                  source docker-entrypoint.sh
-                  docker_setup_env
-                  echo "** init database dir (this will take a moment)"
-                  docker_init_database_dir
-                  echo "** setup hba conf"
-                  pg_setup_hba_conf
-
-                  echo "** copy posgresql.conf and pg_hba.conf"
-                  cp /tmp/tmp-db/postgresql.conf $data_dir/postgresql.conf
-                  cp /tmp/tmp-db/pg_hba.conf $data_dir/pg_hba.conf
-
-                  rm -rf /tmp/tmp-db
-                fi
-              else
-                echo "new databases will be created, nothing to configure"
-              fi
-                
-          securityContext:
-            runAsUser: 1001
-            runAsGroup: 1001
-          volumeMounts:
-          - name: data
-            mountPath: /var/lib/postgresql
       volumes:
       - emptyDir: {}
         name: empty-dir

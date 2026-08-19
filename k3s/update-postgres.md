@@ -1,15 +1,14 @@
-# Update PostgreSQL 11 to 14
+# Update PostgreSQL 14 to 17
 
 ## Introduction
 
 Chipster has three PostgreSQL databases `auth`, `job-history` and `session-db`. Major releases of PostgreSQL change its internal storage format. These instructions show how to dump and restore the contents of the databases to move data to a new major version.
 
-Let's start by checking the currrent version. All Chipster installations made before 2024-10-08 should be using PostgreSQL 11:
+Let's start by checking the currrent version. Chipster installations since v4.18.0 and until version v4.19.5 should be using PostgreSQL 14.
 
 ```bash
 $ kubectl exec -it chipster-session-db-postgresql-0 -- psql --version
-Defaulted container "chipster-session-db-postgresql" out of: chipster-session-db-postgresql, init-chmod-data (init)
-psql (PostgreSQL) 11.6
+psql (PostgreSQL) 14.23 (Debian 14.23-1.pgdg13+1)
 ```
 
 ## Dump databases
@@ -22,70 +21,38 @@ kubectl exec -i chipster-job-history-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGR
 kubectl exec -i chipster-session-db-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dump --clean -U postgres session_db_db' > ~/session-db.sql
 ```
 
-## Fix optional hostPath volume configuration
-
-If you have configured [hostPath volumes](change-k3s-version.md) to store your databases on host directoriess, the configuration must be updated a bit. The old configuration looked like this. If you don't have this in your `~/values.yaml`, you are not using hostPath volumes for databases and can skip directly to the next chapter.
-
-```yaml
-auth-postgresql:
-  persistence:
-    existingClaim: "auth-pvc-volume-postgres"
-
-session-db-postgresql:
-  persistence:
-    existingClaim: "session-db-pvc-volume-postgres"
-
-job-history-postgresql:
-  persistence:
-    existingClaim: "job-history-pvc-volume-postgres"
-```
-
-The following is the new configuration for this. All three configuration items have been moved under an object called `primary`:
-
-```yaml
-auth-postgresql:
-  primary:
-    persistence:
-      existingClaim: "auth-pvc-volume-postgres"
-
-session-db-postgresql:
-  primary:
-    persistence:
-      existingClaim: "session-db-pvc-volume-postgres"
-
-job-history-postgresql:
-  primary:
-    persistence:
-      existingClaim: "job-history-pvc-volume-postgres"
-```
-
 ## Install new PostgreSQL
 
-Download the new PostgreSQL Helm Chart and deploy it. The command `helm uninstall chipster` doesn't delete volumes, so the users' files on file-storage service are safe. Deploy Chipster with the new version and wait until all pods are running again.
+PostgreSQL's data directory and container image are baked into the StatefulSet spec, and Kubernetes won't let an existing StatefulSet's `volumeClaimTemplates` be changed in place by the `helm upgrade` that `deploy.bash` normally does. Delete the three PostgreSQL StatefulSets — this leaves their PersistentVolumes alone, so the old PostgreSQL 14 data stays intact on disk:
 
 ```bash
-git pull
-helm dependencies update helm/chipster
-helm uninstall chipster
-bash generate-passwords.bash
-bash deploy.bash -f ~/values.yaml
-watch kubectl get pod
+kubectl delete statefulset chipster-auth-postgresql
+kubectl delete statefulset chipster-job-history-postgresql
+kubectl delete statefulset chipster-session-db-postgresql
 ```
 
-Check that the PostgreSQL version is now 14:
+The PostgreSQL 17 databases will be temporarily empty until you restore the dumps below. **Once the update is done, come back to this page** to continue with restoring the database dumps.
+
+Now [update Chipster](README.md#update-chipster-to-selected-version) to `v4.20.0` or later, following the normal update instructions — its `deploy.bash` step will recreate just the three deleted StatefulSets, and upgrade everything else normally.
+
+After the update, check that the PostgreSQL version is now 17:
 
 ```bash
 $ kubectl exec -it chipster-session-db-postgresql-0 -- psql --version
-psql (PostgreSQL) 14.7
+psql (PostgreSQL) 17.11
 ```
 
 ## Restore the database dumps
 
-The new database is configured to store data in directory `/bitnami/postgresql/data_14` instead of the old `/bitnami/postgresql/data`. If you open Chipster now, it doesn't show any sessions.
+The new database is configured to store data in directory `/var/lib/postgresql/data_17` instead of the old `/var/lib/postgresql/data_14`. If you open Chipster now, it doesn't show any sessions.
 
 Let's restore the database dumps, assuming that you saved the .sql files in the home directory. This will drop the database tables in the new databases, but that shouldn't matter, because the new databases should still be empty after those were just created.
 
+On large/long transfers `kubectl` (v1.32.4) can drop connection by itself — WebSocket exec transport loses its ping keepalive under sustained stdin writes. If that happens mid-transfer, PostgreSQL rolls back all large-object content in the database, silently leaving every large object empty. Set `KUBECTL_REMOTE_COMMAND_WEBSOCKETS=false` first to make `kubectl` fall back to the older, unaffected SPDY transport for the restore:
+
 ```bash
+export KUBECTL_REMOTE_COMMAND_WEBSOCKETS=false
+
 cat ~/auth.sql | kubectl exec -i chipster-auth-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres auth_db'
 cat ~/job-history.sql | kubectl exec -i chipster-job-history-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres job_history_db'
 cat ~/session-db.sql | kubectl exec -i chipster-session-db-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres session_db_db'
@@ -93,7 +60,7 @@ cat ~/session-db.sql | kubectl exec -i chipster-session-db-postgresql-0 -- bash 
 
 ## Clean-up
 
-Make sure all databases are now using the new diretory `data_14` and not the old `data`. Do not continue if this is not the case!
+Make sure all databases are now using the new diretory `data_17` and not the old `data_14`. Do not continue if this is not the case!
 
 ```bash
 kubectl exec -it chipster-auth-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres auth_db -c "show data_directory"'
@@ -104,9 +71,9 @@ kubectl exec -it chipster-session-db-postgresql-0 -- bash -c 'PGPASSWORD=$POSTGR
 Check also that you can see again the sessions in Chipster, open them and see the contents of the files. If all is fine, you can remove the old database directories:
 
 ```bash
-kubectl exec -it chipster-auth-postgresql-0 -- rm -rf /bitnami/postgresql/data
-kubectl exec -it chipster-job-history-postgresql-0 -- rm -rf /bitnami/postgresql/data
-kubectl exec -it chipster-session-db-postgresql-0 -- rm -rf /bitnami/postgresql/data
+kubectl exec -it chipster-auth-postgresql-0 -- rm -rf /var/lib/postgresql/data_14
+kubectl exec -it chipster-job-history-postgresql-0 -- rm -rf /var/lib/postgresql/data_14
+kubectl exec -it chipster-session-db-postgresql-0 -- rm -rf /var/lib/postgresql/data_14
 ```
 
 You can also remove the database dumps:
@@ -116,23 +83,3 @@ rm ~/auth.sql
 rm ~/job-history.sql
 rm ~/session-db.sql
 ```
-
-## Recovering from accidental update
-
-If you tried to update Chipster from version v4.11.1 (or older) to v4.12.0 (or newer) without following instructions on this page first, your Chipster won't start. If you check the output of command `kubectl get pod`, you will notice that instead of three database pods `chipster-auth-postgresql-0`, `chipster-session-db-postgresql-0` and `chipster-job-history-postgresql-0`, you only have one, called `chipster-postgresql-0`. This is because your old PostgreSQL Helm template doesn't understand the new configuration option names. In this case, get old deployment scripts:
-
-```bash
-git checkout v4.11.1
-bash deploy.bash -f ~/values.yaml
-kubectl delete pod file-storage-0
-bash restart.bash
-watch kubectl get pod
-```
-
-When all pods are running again, follow this page from the start to update the databases. Then go back to latest deployment scripts:
-
-```bash
-git checkout k3s
-```
-
-After that you can finally update Chipster safely.

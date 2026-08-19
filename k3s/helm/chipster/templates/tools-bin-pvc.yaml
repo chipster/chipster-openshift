@@ -6,6 +6,9 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     app: chipster
+  annotations:
+    # keep the downloaded tools-bin package across "helm uninstall" 
+    helm.sh/resource-policy: keep
   name: tools-bin-{{ $.Values.toolsBin.version }}
 spec:
   accessModes:

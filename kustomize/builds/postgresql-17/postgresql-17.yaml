@@ -1,0 +1,27 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: postgresql-17
+  name: postgresql-17
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: postgresql-17:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: ""
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: postgres:17-alpine
+    type: Docker
+  triggers:
+    - type: ConfigChange
+    - imageChange:
+      type: ImageChange

@@ -169,11 +169,13 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 #### Select Chipster version
 
-> 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
+> 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](https://github.com/chipster/chipster-openshift/blob/v4.19.5/k3s/update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
 
 > 2025-05-12 Note! The Chipster versions up to `v4.14.2` used K3s version `v1.26.4` and Ubuntu `20.04`. Since Chipster version `v4.15.0`, K3s `v1.32.4` and Ubuntu `24.04` are used. Please follow [K3s instructions](migration.md#update-to-k3s-v1324) **before** updating to v4.15.0. You can update [Ubuntu](migration.md#update-to-ubuntu-2404) before or after updating Chipster.
 
 > 2025-09-18 Note! The Chipster versions up to `v4.17.5` used Bitnami container image for the databases. This was changed in `v4.18.0`. Please follow the few [extra update steps](migration.md#replace-bitnami-image).
+
+> TODO date Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.0`. To update to `v4.20.0`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
@@ -456,7 +458,7 @@ public repositories. If you want to change anything in the images, you can [buil
 
 ### Uninstall Chipster
 
-Command `helm uninstall chipster` should delete all Kubernetes objects, except volumes. This is relatively safe to run when you want run the installation again, but want to keep the data volumes. Use `kubectl delete pvc --all`, if you want to delete the volumes too.
+Command `helm uninstall chipster` should delete all Kubernetes objects, except the volumes of StatefulSets (the databases and file-storage) — Kubernetes doesn't delete a StatefulSet's volumes just because the StatefulSet itself is deleted. This is relatively safe to run when you want run the installation again, but want to keep the data volumes. Other volumes, like tools-bin, are regular Helm-managed resources and do get deleted on uninstall unless separately protected with a `helm.sh/resource-policy: keep` annotation. Use `kubectl delete pvc --all`, if you want to delete the volumes too.
 
 The `helm uninstall chipster` command gives you almost a fresh start with one caveat. The databases store their password on their volumes. If you generate the passwords again, the databases won't accept the new passwords. In the early phases when you don't have anything valuable in the databases, it's easiest to simply delete the database volumes too.
 
