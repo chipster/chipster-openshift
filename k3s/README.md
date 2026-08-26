@@ -175,7 +175,7 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > 2025-09-18 Note! The Chipster versions up to `v4.17.5` used Bitnami container image for the databases. This was changed in `v4.18.0`. Please follow the few [extra update steps](migration.md#replace-bitnami-image).
 
-> TODO date Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.0`. To update to `v4.20.0`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
+> TODO 2025-08-26 Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.0`. To update to `v4.20.0`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
