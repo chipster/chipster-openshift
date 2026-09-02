@@ -33,7 +33,7 @@ kubectl delete statefulset chipster-session-db-postgresql
 
 The PostgreSQL 17 databases will be temporarily empty until you restore the dumps below. **Once the update is done, come back to this page** to continue with restoring the database dumps.
 
-Now [update Chipster](README.md#update-chipster-to-selected-version) to `v4.20.0` or later, following the normal update instructions — its `deploy.bash` step will recreate just the three deleted StatefulSets, and upgrade everything else normally.
+Now [update Chipster](README.md#update-chipster-to-selected-version) to `v4.20.1` or later, following the normal update instructions — its `deploy.bash` step will recreate just the three deleted StatefulSets, and upgrade everything else normally.
 
 After the update, check that the PostgreSQL version is now 17:
 

@@ -175,7 +175,7 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > 2025-09-18 Note! The Chipster versions up to `v4.17.5` used Bitnami container image for the databases. This was changed in `v4.18.0`. Please follow the few [extra update steps](migration.md#replace-bitnami-image).
 
-> TODO 2025-08-26 Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.0`. To update to `v4.20.0`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
+> TODO 2025-08-26 Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.1`. To update to `v4.20.1`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
@@ -186,12 +186,14 @@ Run the following command to see what image versions are available in the image 
 ```bash
 $ curl -s https://image-registry.apps.2.rahti.csc.fi/v2/chipster-images/base/tags/list -H "Authorization: Bearer anonymous" | jq .tags[] -r | sort --version-sort
 latest
-v4.13.15
-v4.14.0
-v4.14.0-rc1
-v4.14.1
-v4.14.2
-v4.15.0
+v4.19.0
+v4.19.1
+v4.19.2
+v4.19.3
+v4.19.4
+v4.19.5
+v4.20.1-rc1
+v4.20.1
 ```
 
 Usually you should select the newest version, which doesn't have letters "-rc" (short for "release candidate").
@@ -203,7 +205,6 @@ Pull the correct version of the deployment repository. Replace `v4.15.0` with a 
 ```bash
 cd ~/git/chipster-openshift/k3s
 git checkout v4.15.0
-git pull
 ```
 
 Configure the chosen version also in your `~/values.yaml`. Keep it there until it's time to update to the next Chipster version.
