@@ -57,7 +57,7 @@ RUN mkdir -p /opt/chipster/tools \
 
 # Next week, just build a new image, this script itself should be ready now. Copied to local Banksy.R file
 RUN cd tools/R-4.5.1/bin; \
-    ./R -e 'BiocManager::install(c("scrapper", "UCell"))' \
+    ./R -e 'BiocManager::install(c("scrapper"))' \
     ./R -e 'install.packages(c("remotes", "sf", "HGNChelper", "openxlsx", "ggraph", "igraph", "tidyverse", "data.tree"), repos="https://ftp.acc.umu.se/mirror/CRAN/")' \
     ./R -e 'remotes::install_github("prabhakarlab/Banksy@feat-sparse-matmul", force = T, upgrade = "never"); remotes::install_github("satijalab/seurat-wrappers", upgrade = "never"); remotes::install_github("dmcable/spacexr", build_vignettes = FALSE)' \
     ./R -e 'install.packages("ape", repos = "https://cloud.r-project.org/")' \
