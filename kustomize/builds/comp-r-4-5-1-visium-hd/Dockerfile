@@ -1,0 +1,152 @@
+FROM comp-24-04-r-deps
+
+RUN apt update -y \
+&& apt install -y \
+libhdf5-dev \
+libgeos-dev \
+libgdal-dev \
+libproj-dev \
+libudunits2-dev \
+pkg-config \
+libfftw3-dev \
+libgsl-dev \
+libfontconfig1-dev \
+libcairo2-dev \
+libxt-dev \
+libharfbuzz-dev \
+libfribidi-dev \
+libtiff-dev \
+libglpk-dev \
+libmagick++-dev \
+libssl-dev \
+libcurl4-openssl-dev \
+libxml2-dev \
+libfreetype6-dev \
+libpng-dev \
+libjpeg-dev \
+libgit2-dev \
+build-essential \
+gfortran \
+libblas-dev \
+liblapack-dev \
+libsqlite3-dev \
+cmake \
+libpango-1.0-0 \
+libpangocairo-1.0-0 \
+libxt6 \
+libx11-6 \
+libxext6 \
+libfontconfig1 \
+libfreetype6 \
+git \
+&& apt-get clean
+
+
+RUN mkdir -p /opt/chipster/tools \
+    && curl -s https://a3s.fi/bundle-builds/R-4.5.1-seurat5_2025-08-07.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools \
+    && mkdir -p /opt/chipster/tools/seurat \
+    && curl -s https://a3s.fi/bundle-builds/seurat_regev_lab_cell_cycle_genes_2023-09-21.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools/seurat
+
+# Install Matrix 1.8.0 straight from the devs (maybe needed for Banksy)
+# RUN git clone https://codeberg.org/jaganmn/Matrix.git \
+#     && cd Matrix \
+#     && ../tools/R-4.5.1/bin/R CMD build --no-build-vignettes . \
+#     && ../tools/R-4.5.1/bin/R CMD INSTALL Matrix_*.tar.gz \
+#     && cd .. \
+#     && rm -rf Matrix
+
+# Next week, just build a new image, this script itself should be ready now. Copied to local Banksy.R file
+RUN cd tools/R-4.5.1/bin; \
+    ./R -e 'BiocManager::install(c("scrapper", "UCell"))' \
+    ./R -e 'install.packages(c("remotes", "sf", "HGNChelper", "openxlsx", "ggraph", "igraph", "tidyverse", "data.tree"), repos="https://ftp.acc.umu.se/mirror/CRAN/")' \
+    ./R -e 'remotes::install_github("prabhakarlab/Banksy@feat-sparse-matmul", force = T, upgrade = "never"); remotes::install_github("satijalab/seurat-wrappers", upgrade = "never"); remotes::install_github("dmcable/spacexr", build_vignettes = FALSE)' \
+    ./R -e 'install.packages("ape", repos = "https://cloud.r-project.org/")' \
+    ./R -e 'install.packages("devtools", repos = "https://cloud.r-project.org/")' \
+    ./R -e 'devtools::install_github("immunogenomics/presto")' \
+    ./R -e 'install.packages("ragg", repos="https://ftp.acc.umu.se/mirror/CRAN/")'
+
+# installed in R-4.5.1-seurat5_2025-08-07.tar.lz4
+
+# # minimal R
+# RUN curl -s https://a3s.fi/bundle-builds/R-4.5.1_2025-08-07.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools
+
+# # these are needed to install some packages
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'install.packages("BiocManager", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("remotes", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+
+# # slow to install
+# # 21 min
+# # setRepositories: "Seurat does not require, but makes use of, packages developed by other labs that can substantially enhance speed and performance"
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'install.packages("Seurat", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'setRepositories(ind = 1:3, addURLs = c("https://satijalab.r-universe.dev", "https://bnprks.r-universe.dev/"))'
+
+# # 1 s
+# # BPCells requires "apt-get install -y libhdf5-dev"
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'install.packages(c("BPCells", "presto", "glmGamPoi"), repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+
+# # packages which required manually installed dependencies
+# # scater requires r-lib/systemfonts
+# # metap requires multtest
+# # 14 min
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'remotes::install_github("r-lib/systemfonts")'; \
+#     ./R -e 'BiocManager::install("scater")'; \
+#     ./R -e 'BiocManager::install("multtest")'; \
+#     ./R -e 'install.packages("metap", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+
+# # 12 min
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'install.packages("Rfast2", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+
+# # BiocManager
+# # limma is a more efficient implementation of the Wilcoxon Rank Sum Test for e.g. single-cell-seurat-diffexp-samples.R
+# # 14 min
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'BiocManager::install("DESeq2")'; \
+#     ./R -e 'BiocManager::install("glmGamPoi")'; \
+#     ./R -e 'BiocManager::install("GEOquery")'; \
+#     ./R -e 'BiocManager::install("celldex")'; \
+#     ./R -e 'BiocManager::install("MAST")'; \
+#     ./R -e 'BiocManager::install("SingleR")'; \
+#     ./R -e 'BiocManager::install("mvoutlier")'; \
+#     ./R -e 'BiocManager::install("limma")'
+
+# # remotes, 1 min
+# # install SCDC from pull request, because fix for NA values has not bee released yet
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'remotes::install_github("renozao/xbioc")'; \
+#     ./R -e 'remotes::install_github("meichendong/SCDC", ref = remotes::github_pull("31"))'
+
+# # relatively fast to install
+# # 10 min
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'install.packages("Matrix", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("umap", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("dplyr", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("pheatmap", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("gplots", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("cowplot", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("ggplot2", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("tidyr", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("hdf5r", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("devtools", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("ggrepel", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("tidyverse", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("patchwork", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'install.packages("arrow", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+
+# # schard requires apt install git
+# # 13 s
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'install.packages("devtools", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'; \
+#     ./R -e 'devtools::install_github("cellgeni/schard")'
+
+# # 2024-02-29: latest version 1.2.0 fails in spatial-transcriptomics-seurat-sctransform-v5.R with "Error: useNames = NA is defunct. Instead, specify either useNames = TRUE or useNames = FALSE."
+# # 5 s
+# RUN cd tools/R-4.5.1/bin; \
+#     ./R -e 'remotes::install_version("matrixStats", version="1.1.0", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'    
+
+CMD ["sleep", "inf"]
