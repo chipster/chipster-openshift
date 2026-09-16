@@ -8,11 +8,12 @@ RUN apt update -y \
     && apt-get clean
 
 RUN mkdir -p /opt/chipster/tools \
-    && curl -s https://a3s.fi/bundle-builds/R-4.4.3-phyloseq_2025-03-25.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools
+    && curl -s https://a3s.fi/bundle-builds/R-4.4.3-phyloseq_2026-09-16.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools
 
+# installed in R-4.4.3-phyloseq_2026-09-16.tar.lz4
 # deseq2-pca-heatmap.R
-RUN cd tools/R-4.4.3/bin; \
-    ./R -e 'install.packages("gplots", repos = "https://ftp.acc.umu.se/mirror/CRAN/")' \
-    ./R -e 'install.packages("RColorBrewer", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
+# RUN cd tools/R-4.4.3/bin; \
+#     ./R -e 'install.packages("gplots", repos = "https://ftp.acc.umu.se/mirror/CRAN/")' \
+#     ./R -e 'install.packages("RColorBrewer", repos = "https://ftp.acc.umu.se/mirror/CRAN/")'
 
 CMD ["sleep", "inf"]
