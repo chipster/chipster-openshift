@@ -12,6 +12,6 @@ subjects:
   # service account's namespace
   namespace: default
 roleRef:
-  kind: ClusterRole
-  name: edit
+  kind: Role
+  name: bash-job-scheduler
   apiGroup: rbac.authorization.k8s.io

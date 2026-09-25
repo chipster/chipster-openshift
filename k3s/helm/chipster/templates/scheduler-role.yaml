@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bash-job-scheduler
+  namespace: default
+# Minimal permissions the bash-job-scheduler needs to manage comp job pods.
+# It must NOT have the broad "edit" ClusterRole, which also grants read access
+# to all Secrets (service passwords, Postgres, JWT signing key, TLS keys) and
+# pods/exec into any pod.
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "create", "delete"]
