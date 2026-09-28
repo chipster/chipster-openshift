@@ -92,19 +92,22 @@ spec:
             {{- if and (or $.Values.toolsBin.version $.Values.toolsBin.hostPath) (eq $deployment.name "toolbox") }}
             - name: tools-bin
               mountPath: /opt/chipster/tools
-              readOnly: {{ $.Values.toolsBin.readOnly }}
+              readOnly: true
             {{- end }}
             {{- if and $.Values.tools.hostPath (eq $deployment.name "toolbox") }}
             - name: tool-scripts
               mountPath: /opt/chipster/toolbox/tools
+              readOnly: true
             {{- end }}
             {{- if and $.Values.tools.manualHostPath (eq $deployment.name "web-server") }}
             - name: tool-manuals
               mountPath: /opt/chipster/web-root/assets/manual
+              readOnly: true
             {{- end }}
             {{- if and $.Values.html.hostPath (eq $deployment.name "web-server") }}
             - name: html
               mountPath: /opt/chipster/web-root/assets/html
+              readOnly: true
             {{- end }}
             {{- if eq $deployment.name "backup" }}
             - name: db-backups
