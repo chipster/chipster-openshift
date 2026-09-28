@@ -242,3 +242,24 @@ Until now Chipster used Bitnami Helm chart and container image to deploy the dat
 - The Bitnami Helm chart was replaced with a StatefulSet. This is placed among other Chipster templates: https://github.com/chipster/chipster-openshift/blob/k3s/k3s/helm/chipster/templates/postgresql-sts.yaml . Until now the database configuration was a bit messy, because there were separate configuration items for the Bitnami chart and Chipster. Now the configuration is simpler, because we can use the our configuration items directly in the StatefulSet.
 - The Bitnami image is replaced with the "Docker Official Image" PostgreSQL: https://hub.docker.com/_/postgres . This upstream image is copied to Chipster image repository and tagged like all other Chipster images. This ensures that the image stays available, even if the upstream renames it.
 - The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The StatefulSet above creates an `initContainer`, which creates these files if necessary.
+
+## Update to v4.21.0
+
+The `bash-job-scheduler` ServiceAccount was bound to the built-in `edit` ClusterRole, which granted far more than the scheduler needs (read access to all Secrets, `pods/exec` into any pod, etc.). Since v4.21.0 it is bound to a minimal namespaced `Role` (`scheduler-role.yaml`) instead (GHSA-3j6x-m3jw-r5mg).
+
+A RoleBinding's `roleRef` is immutable, so an in-place `helm upgrade` cannot change the existing binding and fails with:
+
+```
+Error: UPGRADE FAILED: cannot patch "bash-job-scheduler-rb" with kind RoleBinding:
+RoleBinding.rbac.authorization.k8s.io "bash-job-scheduler-rb" is invalid:
+roleRef: ...: cannot change roleRef
+```
+
+`deploy.bash` removes the old binding automatically before upgrading. If you run `helm upgrade` by hand, delete it first:
+
+```bash
+kubectl delete rolebinding bash-job-scheduler-rb
+bash deploy.bash -f ~/values.yaml
+```
+
+This is a one-time step; fresh installs are unaffected.

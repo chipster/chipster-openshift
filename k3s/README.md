@@ -177,6 +177,8 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 > TODO 2025-08-26 Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.1`. To update to `v4.20.1`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
 
+> 2026-09-25 Note! Earlier versions bound the `bash-job-scheduler` ServiceAccount to the cluster `edit` role. Since Chipster version `v4.21.0` it uses a minimal namespaced Role instead (GHSA-3j6x-m3jw-r5mg). `deploy.bash` migrates existing installations automatically. If you run `helm upgrade` by hand, follow the [scheduler RBAC step](migration.md#update-to-v4210) first, otherwise the upgrade fails on the immutable `roleRef`.
+
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
 Chipster images are available in two different places. These instructions show how to use the most recent image versions which are available in an image registry. There is separate page for [older image versions](image-archive.md), which are stored in object storage.
