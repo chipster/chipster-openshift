@@ -1,1 +1,6 @@
 Chipster OpenShift deployment
+{{- if not $.Values.ipWhitelist.admin }}
+
+WARNING: ipWhitelist.admin is not set. The admin, grafana and replay Routes are
+reachable from any IP address. Set ipWhitelist.admin in the private values.yaml.
+{{- end }}
