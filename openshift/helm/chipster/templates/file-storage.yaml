@@ -80,8 +80,12 @@ spec:
               value: "8116"
             - name: role
               value: file-storage
+              # get password from secret to hide it from this statefulset
             - name: password
-              value: "{{ $.Values.serviceAccounts.monitoring.password }}"
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: monitoring
           image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring:{{$.Values.image.tag}}"
           imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
           name: status

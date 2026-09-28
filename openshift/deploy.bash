@@ -48,6 +48,8 @@ fi
 # Create a temp dir. Don't store the temporary Helm output in the repository folders to avoid
 # committing it by accident. It contains a few passwords.
 tmp_dir=$(mktemp -d -t deploy-chipster)
+# delete it also when the deployment fails
+trap 'rm -rf "$tmp_dir"' EXIT
 echo "Creating temp dir $tmp_dir"
 
 echo "Copy kustomize files"
@@ -93,4 +95,3 @@ else
             --post-renderer $script_dir/utils/kustomize-post-renderer.bash
 fi
 
-rm -rf $tmp_dir

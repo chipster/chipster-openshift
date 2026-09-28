@@ -10,6 +10,10 @@ spec:
   tags:
     - from:
         kind: DockerImage
+        name: 'ubuntu:24.04'
+      name: '24.04'
+    - from:
+        kind: DockerImage
         name: 'ubuntu:20.04'
       name: '20.04'
     - from:

@@ -46,16 +46,20 @@ if [ $(oc get dc influxdb -o json | jq .spec.replicas) == 1 ]; then
 fi
 
 if [ $(oc get dc grafana -o json | jq .spec.replicas) == 1 ]; then
-  if [ -z ../chipster-private/confs/chipster-all/grafana-admin-password ]; then
-	  grafana_password="$(cat ../chipster-private/confs/chipster-all/grafana-admin-password)"
+  grafana_password_file="../chipster-private/confs/chipster-all/grafana-admin-password"
+  if [ ! -s "$grafana_password_file" ]; then
+    echo "ERROR: $grafana_password_file is missing or empty, Grafana admin password not set" >&2
+    exit 1
+  else
+	  grafana_password="$(cat "$grafana_password_file")"
 	  oc rsh dc/grafana grafana-cli admin reset-admin-password --homepath "/usr/share/grafana" "$grafana_password"
 
-	  curl https://grafana-$PROJECT.$DOMAIN/api/datasources -u admin:$grafana_password -X POST --data-binary '{ "name": "InfluxDB", "type": "influxdb", "url": "http://influxdb:8086", "access": "proxy", "basicAuth": false, "database": "db" }' -H Content-Type:application/json
-	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-summary.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-websocket.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-load.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-rest.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-benchmark.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
-	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u admin:$grafana_password -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-replay-test.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/datasources -u "admin:$grafana_password" -X POST --data-binary '{ "name": "InfluxDB", "type": "influxdb", "url": "http://influxdb:8086", "access": "proxy", "basicAuth": false, "database": "db" }' -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u "admin:$grafana_password" -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-summary.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u "admin:$grafana_password" -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-websocket.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u "admin:$grafana_password" -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-load.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u "admin:$grafana_password" -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-rest.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u "admin:$grafana_password" -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-benchmark.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
+	  curl https://grafana-$PROJECT.$DOMAIN/api/dashboards/db -u "admin:$grafana_password" -X POST --data-binary "{ \"dashboard\": $(cat monitoring/dashboard-replay-test.json | sed 's/${DS_INFLUXDB}/InfluxDB/g') }" -H Content-Type:application/json
   fi
 fi 
