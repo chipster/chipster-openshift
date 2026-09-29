@@ -55,19 +55,6 @@ RUN mkdir -p /opt/chipster/tools \
 #     && cd .. \
 #     && rm -rf Matrix
 
-<<<<<<< HEAD
-# Next week, just build a new image, this script itself should be ready now. Copied to local Banksy.R file
-RUN cd tools/R-4.5.1/bin; \
-    ./R -e 'BiocManager::install(c("scrapper"))' \
-    ./R -e 'install.packages(c("remotes", "sf", "HGNChelper", "openxlsx", "ggraph", "igraph", "tidyverse", "data.tree"), repos="https://ftp.acc.umu.se/mirror/CRAN/")' \
-    ./R -e 'remotes::install_github("prabhakarlab/Banksy@feat-sparse-matmul", force = T, upgrade = "never"); remotes::install_github("satijalab/seurat-wrappers", upgrade = "never"); remotes::install_github("dmcable/spacexr", build_vignettes = FALSE)' \
-    ./R -e 'install.packages("devtools", repos = "https://cloud.r-project.org/")' \
-    ./R -e 'devtools::install_github("immunogenomics/presto")' \
-    ./R -e 'install.packages("ragg", repos="https://ftp.acc.umu.se/mirror/CRAN/")' \
-    ./R -e 'install.packages("plotly", repos="https://ftp.acc.umu.se/mirror/CRAN/")' \
-    ./R -e 'install.packages("ape", repos = "https://cloud.r-project.org/")'
-# installed in R-4.5.1-seurat5_2025-08-07.tar.lz4
-=======
 # installed in R-4.5.1-visium-hd_2026-09-16.tar.lz4
 # RUN cd tools/R-4.5.1/bin \
 #     && ./R -e 'BiocManager::install(c("scrapper"))' \
@@ -77,7 +64,6 @@ RUN cd tools/R-4.5.1/bin; \
 #     && ./R -e 'install.packages("devtools", repos = "https://cloud.r-project.org/")' \
 #     && ./R -e 'devtools::install_github("immunogenomics/presto")' \
 #     && ./R -e 'install.packages("ragg", repos="https://ftp.acc.umu.se/mirror/CRAN/")'
->>>>>>> ab2fc579756b24134bb8e706cfad24ee3e97dc5e
 
 # # minimal R
 # RUN curl -s https://a3s.fi/bundle-builds/R-4.5.1_2025-08-07.tar.lz4 | lz4 -d | tar x -C /opt/chipster/tools
