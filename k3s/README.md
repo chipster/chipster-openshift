@@ -377,6 +377,48 @@ bash restart.bash
 watch kubectl get pod
 ```
 
+#### Service passwords
+
+Each Chipster service authenticates to the `auth` service with its own service password. These are generated in `generate-passwords.bash` and stored in the `passwords` secret. You can rotate one service password, for example if it may have been exposed.
+
+First take a copy of the current secret `passwords`:
+
+```bash
+kubectl get secret passwords -o json > ~/passwords-backup.json
+```
+
+Remove the service's password from the secret so that a new one is generated. This example rotates `session-worker`; use the camelCase key of the service you want from `helm/chipster/values.yaml` (`deployments.<service>`):
+
+```bash
+kubectl get secret passwords -o json | jq '.data."values.yaml"="'"$(kubectl get secret passwords -o json | jq '.data."values.yaml"' -r | base64 -d | jq  'del(.deployments.sessionWorker.password)' | base64)"'"' | kubectl apply -f -
+```
+
+Generate the new password, generate new configuration secrets for each service, restart all services and wait until old pods have disappeared:
+
+```bash
+bash generate-passwords.bash
+bash deploy.bash -f ~/values.yaml
+bash restart.bash
+watch kubectl get pod
+```
+
+If all services started properly and you are able to log in to Chipster, you can remove the copy of the passwords secret:
+
+```bash
+rm ~/passwords-backup.json
+```
+
+If something goes wrong, you can restore the old passwords from the backup:
+
+```bash
+# Only for reverting to the old passwords!
+kubectl delete secret passwords
+kubectl apply -f ~/passwords-backup.json
+bash deploy.bash -f ~/values.yaml
+bash restart.bash
+watch kubectl get pod
+```
+
 #### OpenID Connect
 
 A separate document has instructions for [authenticating Chipster users with OpenID Connect](oidc.md) protocol.
