@@ -22,7 +22,7 @@ fi
 
 stop_and_remove_all
 
-mkdir -p db-data storage conf security podman-graphroot tools-bin/$TOOLS_BIN_VERSION
+mkdir -p $HOST_DIR/{db-data,storage,conf,security,podman-graphroot}
 
 if [ -z $postgres_password ]; then
     echo "generate new database password"
@@ -80,11 +80,55 @@ for component in auth session-db service-locator scheduler file-broker session-w
     echo "service-password-$component: $(openssl rand -base64 24)" >> $HOST_DIR/conf/chipster.yaml
 done
 
-# generate basic user accounts
-cat > $HOST_DIR/security/users << EOF
-chipster:chipster
-admin:admin
-EOF
+# user accounts
+# auth refuses to start when a password is blank, the same as the username or one of the other
+# well-known default passwords (these accounts used to have the username as the password), so
+# replace those with generated passwords and keep everything else in an existing file: other
+# passwords, accounts added by hand, expiration dates and comments
+users_file=$HOST_DIR/security/users
+touch $users_file
+
+# the same list as UsersFile.DEFAULT_PASSWORDS in chipster-web-server
+default_passwords="chipster admin example_session_owner support_session_owner clientPassword client2Password monitoring"
+
+new_users_file=$(mktemp)
+trap 'rm -f "$new_users_file"' EXIT
+awk -F : -v OFS=: -v defaults="$default_passwords" '
+    BEGIN { split(defaults, list, " "); for (i in list) is_default[list[i]] = 1 }
+    # auth reads the file with String.lines(), which accepts CRLF line endings
+    { sub(/\r$/, "") }
+    /^[[:space:]]*#/ || /^[[:space:]]*$/ { print; next }
+    {
+        # like UsersFile.parseLine() and isDefaultPassword() in chipster-web-server: the username is
+        # trimmed, the password is compared as it is, except that a whitespace-only password is blank
+        username = $1
+        sub(/^[[:space:]]+/, "", username)
+        sub(/[[:space:]]+$/, "", username)
+        stripped_password = $2
+        gsub(/[[:space:]]/, "", stripped_password)
+        if (stripped_password == "" || $2 == username || ($2 in is_default)) {
+            command = "openssl rand -base64 24"
+            if ((command | getline $2) <= 0 || close(command) != 0) {
+                print "failed to generate a password with openssl" > "/dev/stderr"
+                exit 1
+            }
+        }
+        print
+    }
+' $users_file > $new_users_file
+# keep the owner and permissions of the original file
+cat $new_users_file > $users_file
+
+# add the basic accounts, if they don't exist yet (the username may have whitespace around it, see above)
+for username in chipster admin; do
+    if ! grep -q "^[[:space:]]*$username[[:space:]]*:" $users_file; then
+        # a separate assignment, so that set -e notices if openssl fails
+        password=$(openssl rand -base64 24)
+        echo "$username:$password" >> $users_file
+    fi
+done
+
+echo "user accounts and their passwords are in $users_file"
 
 start_postgres
 
