@@ -8,7 +8,7 @@ FROM base-scheduler
 # - install psql (installed also in image base-backup)
 RUN apt-get update -y \
 	&& apt-get install -y build-essential \
-	&& curl -sL https://deb.nodesource.com/setup_20.x | bash - \
+	&& curl -sL https://deb.nodesource.com/setup_24.x | bash - \
 	&& apt-get install -y nodejs \
 	&& npm config set update-notifier false \
 	&& install -d /usr/share/postgresql-common/pgdg \
