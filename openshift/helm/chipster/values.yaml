@@ -196,6 +196,10 @@ image:
 toolsBin:
   version: "empty"
 
+# localJobs runs comp jobs in this project. Set it to false, if the scheduler is configured to run jobs
+# in another cluster. Then the scheduler gets no Kubernetes permissions in this project.
+localJobs: true
+
 project: ""
 domain: ""
 

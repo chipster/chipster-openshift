@@ -296,6 +296,15 @@ securityContext:
 # podSecurityContext allows you set fsGroup: 0, if the file permissions prevent containers to modify volumes
 podSecurityContext: {}
 
+# compJobNetworkPolicy allows comp jobs to connect only to DNS, the Chipster services they need and the internet
+compJobNetworkPolicy:
+  enabled: true
+  # NetworkPolicy egress rules to allow more, for example an http proxy in a private network (see behind-proxy.md)
+  extraEgress: []
+  # IPv4 addresses to block in addition to private networks and the metadata service. Public IPs of the nodes
+  # are allowed, unless you add them here, for example "- 203.0.113.5/32".
+  extraExcludedCidrs: []
+
 # host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network. For OIDC and TLS (Let's Encrypt) this must be a DNS name.
 host: ""
 

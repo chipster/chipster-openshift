@@ -1,0 +1,32 @@
+{{- if .Values.localJobs }}
+# Minimal permissions the bash-job-scheduler needs to manage comp job pods in this project.
+# Not the "edit" ClusterRole, which would also allow reading all Secrets.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bash-job-scheduler
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "create", "delete"]
+---
+# new name, because the roleRef of the old bash-job-scheduler-rb can't be changed
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bash-job-scheduler
+subjects:
+  - kind: ServiceAccount
+    name: bash-job-scheduler
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: bash-job-scheduler
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

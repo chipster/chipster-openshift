@@ -1,4 +1,0 @@
-
-- op: add
-  path: /spec/template/spec/serviceAccountName
-  value: "bash-job-scheduler"

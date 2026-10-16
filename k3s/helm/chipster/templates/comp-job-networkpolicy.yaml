@@ -1,0 +1,59 @@
+{{- if .Values.compJobNetworkPolicy.enabled }}
+# Comp jobs process untrusted input files and parameters. Allow them only DNS, the services they need and the internet.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: comp-job
+spec:
+  podSelector:
+    matchLabels:
+      comp-job: ""
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      # DNS, TCP for large responses
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Chipster services used by SingleShotComp
+    - to:
+        - podSelector:
+            matchExpressions:
+              - key: deployment
+                operator: In
+                values: [service-locator, session-db, file-broker, toolbox, scheduler]
+      ports:
+        - port: api
+    # internet, but not private networks or the metadata service
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              # private network: K3s pods (10.42.0.0/16) and services (10.43.0.0/16) by default
+              - 10.0.0.0/8
+              # private network, possibly used by other internal hosts
+              - 172.16.0.0/12
+              # private network: often used by the nodes (API server, kubelet) and other internal hosts
+              - 192.168.0.0/16
+              # shared address space (RFC 6598), not public, possibly used by internal hosts
+              - 100.64.0.0/10
+              # link-local: cloud metadata service (169.254.169.254)
+              - 169.254.0.0/16
+              {{- with .Values.compJobNetworkPolicy.extraExcludedCidrs }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+    {{- with .Values.compJobNetworkPolicy.extraEgress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}
