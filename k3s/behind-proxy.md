@@ -46,6 +46,18 @@ deployments:
       scheduler-bash-image-pull-policy: "IfNotPresent"
 ```
 
+If the proxy is in a private network (e.g. 10.0.0.0/8, 172.16.0.0/12 or 192.168.0.0/16), the NetworkPolicy of the jobs blocks it. Allow the jobs to connect to the proxy in your ~/values.yaml:
+
+```yaml
+compJobNetworkPolicy:
+  extraEgress:
+    - to:
+        - ipBlock:
+            cidr: 10.1.2.3/32
+      ports:
+        - port: 3128
+```
+
 ## Appendix 1: How to setup http proxy in OpenStack
 
 These instructions show how to setup a simple squid proxy to test Chipster installation. For any real use, you may want to setup more strict configuration and security group rules.

@@ -1,4 +1,6 @@
+{{- if .Values.localJobs }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: bash-job-scheduler
+{{- end }}
