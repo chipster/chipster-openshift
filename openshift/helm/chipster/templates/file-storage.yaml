@@ -86,6 +86,11 @@ spec:
                 secretKeyRef:
                   key: password
                   name: monitoring
+            - name: influxdb_password
+              valueFrom:
+                secretKeyRef:
+                  key: writer-password
+                  name: influxdb
           image: "{{$.Values.image.repository}}/{{$.Values.image.namespace}}/monitoring:{{$.Values.image.tag}}"
           imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
           name: status

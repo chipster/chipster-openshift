@@ -66,4 +66,4 @@ post_data="$(echo "$status" | jq -r ". | to_entries | map( \
 
 echo "** save $post_data"
 
-http_request POST "${influxdb}/write?db=db" "" "$post_data"
+http_request POST "${influxdb}/write?db=db" "writer:${influxdb_password-}" "$post_data"
