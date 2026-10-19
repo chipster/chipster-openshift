@@ -67,6 +67,19 @@ for key in "monitoring"; do
     fi
 done
 
+# hex, because the passwords are put in InfluxQL statements and JSON without escaping
+for key in adminPassword writerPassword readerPassword; do
+    name="influxdb $key"
+    old_password=$(echo "$values_json" | jq .influxdb.$key -r)
+    if [[ $old_password != "null" ]]; then
+        echo "use old password for $name:   $(echo "$old_password" | cut -c1-5)..."
+    else
+        echo "generate password for $name"
+        password=$(openssl rand -hex 30)
+        values_json=$(echo $values_json | jq ".influxdb.$key = \"$password\"")
+    fi
+done
+
 for key in $(yq e $default_values_yaml_path -o=json | jq '.db | keys[]' -r); do
     name="$key"
     old_password=$(echo "$values_json" | jq .db.$key.password -r)

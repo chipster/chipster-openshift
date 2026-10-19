@@ -24,7 +24,11 @@ spec:
     spec:
       containers:
       # influxdb2 is very different
-      - image: influxdb:1.8
+      - image: influxdb:1.12.4@sha256:f86abb84b7b78f82f5bef55dd9d034837e10701940e408d3cfb8da256ffd4bb5
+        env:
+        # users are created in setup.bash
+        - name: INFLUXDB_HTTP_AUTH_ENABLED
+          value: "true"
         imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
         name: influxdb
         ports:

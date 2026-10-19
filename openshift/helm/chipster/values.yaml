@@ -207,6 +207,12 @@ serviceAccounts:
   monitoring:
     password: ""
 
+# InfluxDB users. The admin is used only in setup.bash, writer by the status containers and replay, reader by Grafana.
+influxdb:
+  adminPassword: ""
+  writerPassword: ""
+  readerPassword: ""
+
 tokens:
   auth:
     privateKey: ""
