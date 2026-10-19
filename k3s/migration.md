@@ -264,8 +264,10 @@ bash deploy.bash -f ~/values.yaml
 
 This is a one-time step; fresh installs are unaffected.
 
-## Comp job NetworkPolicy
+## Update to v4.21.5
+
+### Comp job NetworkPolicy
 
 Comp jobs process untrusted input files and parameters, so a NetworkPolicy now limits their connections to DNS, the Chipster services they need and the internet. Private networks and the cloud metadata service are blocked.
 
-K3s enforces NetworkPolicies by default. If your jobs need a host in a private network, for example an [http proxy](behind-proxy.md), allow it with `compJobNetworkPolicy.extraEgress` in your `~/values.yaml`. See `compJobNetworkPolicy` in [values.yaml](helm/chipster/values.yaml) for all options.
+If your jobs use an http proxy in a private network, allow it as shown in [Chipster behind proxy](behind-proxy.md). Otherwise the jobs can't access the internet after the update. Other hosts in private networks can be allowed in the same way, see `compJobNetworkPolicy` in [values.yaml](helm/chipster/values.yaml).
