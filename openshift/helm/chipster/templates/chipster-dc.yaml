@@ -31,6 +31,16 @@ spec:
         app: chipster
         name: {{ $deployment.name }}
     spec:
+      {{- if eq $deployment.name "scheduler" }}
+      {{- if $.Values.localJobs }}
+      serviceAccountName: bash-job-scheduler
+      {{- else }}
+      # set both explicitly, because the deprecated serviceAccount may still refer to the old bash-job-scheduler
+      serviceAccountName: default
+      serviceAccount: default
+      automountServiceAccountToken: false
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ $deployment.name }}
           # Java class to start for the chipster-web-server image
