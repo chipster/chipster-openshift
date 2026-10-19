@@ -34,10 +34,12 @@ spec:
         - --password
         - {{ $.Values.users.replay_test.password }}
         - --influxdb
-        - http://influxdb:8086/write?db=db&u=writer&p=$(INFLUXDB_PASSWORD)
+        - http://influxdb:8086/write?db=db
         - --schedule
         - '*/10 * * * *:availability:1:500'          
         env:
+        - name: INFLUXDB_USERNAME
+          value: writer
         - name: INFLUXDB_PASSWORD
           valueFrom:
             secretKeyRef:

@@ -67,7 +67,7 @@ for key in "monitoring"; do
     fi
 done
 
-# hex, because the writer password is used also in an URL, where "+" would be decoded to a space
+# hex, because the passwords are put in InfluxQL statements and JSON without escaping
 for key in adminPassword writerPassword readerPassword; do
     name="influxdb $key"
     old_password=$(echo "$values_json" | jq .influxdb.$key -r)
