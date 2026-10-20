@@ -21,11 +21,22 @@ function get_domain {
   fi
 }
 
+# check if a DeploymentConfig exists, without printing the "NotFound" error
+function dc_exists {
+  oc get dc "$1" -o name > /dev/null 2>&1
+}
+
 function wait_dc {
   service="$1"
   is_printed="false"
-  while [ $(oc get dc $service -o json | jq .status.availableReplicas) != 1 ]; do
-    if [ $is_printed == "false" ]; then
+  # fail with a clear message instead of the confusing "[: !=: unary operator
+  # expected", which the empty jq output would cause below
+  if ! dc_exists "$service"; then
+    >&2 echo "ERROR: DeploymentConfig $service not found in project $(oc project -q)"
+    return 1
+  fi
+  while [ "$(oc get dc "$service" -o json | jq .status.availableReplicas)" != 1 ]; do
+    if [ "$is_printed" == "false" ]; then
       echo "waiting $service to start"
       is_printed="true"
     else
