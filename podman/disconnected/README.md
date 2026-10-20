@@ -137,10 +137,16 @@ bash chipster-openshift/podman/disconnected/setup.bash
 ## Start Chipster
 
 ```bash
-bash chipster-openshift/podman/disconnected/chipster-start.bash
+bash chipster-openshift/podman/disconnected/start.bash
 ```
 
-This will start the Chipster server components and finally opens the Chipster user interface in a Firefox browser. Log in with the default account where username is `chipster` and password is `chipster`. Only users of your SD Desktop virtual machine can access this Chipster installation, so a proper password is not needed.
+This will start the Chipster server components and finally opens the Chipster user interface in a Firefox browser. Log in with the username `chipster`. The `setup.bash` generated a random password for it and stored it in the file `security/users` under the Chipster directory (`HOST_DIR` in `env.bash`, `/media/volume/chipster` by default), where you can look it up:
+
+```bash
+cat /media/volume/chipster/security/users
+```
+
+Only users of your SD Desktop virtual machine can access this Chipster installation, but newer Chipster versions refuse to start with the old default password `chipster`, so `setup.bash` generates a random one. It keeps the passwords and accounts of an existing installation, except the old default passwords.
 
 ## How to keep your data safe
 
