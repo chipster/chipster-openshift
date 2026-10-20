@@ -60,9 +60,26 @@ echo $token > $token_file
 post_data=""
 
 # convert json to influxdb request
-post_data="$(echo "$status" | jq -r ". | to_entries | map( \
-  \"\(.key),role=${role},id=${HOSTNAME} value=\(.value) ${t0}\" \
-  ) | .[]")"
+#
+# The field value has to be formatted according to its type. Numbers and
+# booleans are written as such, everything else as a quoted string, because
+# InfluxDB would try to parse a bare word like "v4.21.5" as a boolean and
+# reject the whole batch. tojson also escapes quotes and newlines, which would
+# otherwise split one metric into several unparseable lines.
+#
+# Null values are skipped, because InfluxDB has no null.
+post_data="$(echo "$status" | jq -r \
+  --arg role "${role}" \
+  --arg id "${HOSTNAME}" \
+  --arg t0 "${t0}" '
+  to_entries
+  | map(select(.value != null))
+  | map("\(.key),role=\($role),id=\($id) value=" + (
+      if (.value | type) == "number" or (.value | type) == "boolean"
+      then (.value | tostring)
+      else (.value | tostring | tojson)
+      end) + " \($t0)")
+  | .[]')"
 
 echo "** save $post_data"
 
