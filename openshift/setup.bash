@@ -29,10 +29,17 @@ else
 
 fi
 
-psql auth-postgres        auth_db        'alter system set synchronous_commit to off'
-psql session-db-postgres  session_db_db  'alter system set synchronous_commit to off'
-oc rsh dc/auth-postgres       bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
-oc rsh dc/session-db-postgres bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
+# Tune the databases that run in this project. Projects with external
+# databases don't have these DeploymentConfigs, and synchronous_commit has to
+# be set on the database server instead.
+if dc_exists auth-postgres; then
+  psql auth-postgres auth_db 'alter system set synchronous_commit to off'
+  oc rsh dc/auth-postgres bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
+fi
+if dc_exists session-db-postgres; then
+  psql session-db-postgres session_db_db 'alter system set synchronous_commit to off'
+  oc rsh dc/session-db-postgres bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
+fi
 if dc_exists job-history-postgres && [ "$(oc get dc job-history-postgres -o json | jq .spec.replicas)" == 1 ]; then
   psql job-history-postgres job_history_db 'alter system set synchronous_commit to off'
   oc rsh dc/job-history-postgres bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
