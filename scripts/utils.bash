@@ -22,8 +22,14 @@ function get_domain {
 }
 
 # check if a DeploymentConfig exists, without printing the "NotFound" error
+# (other oc errors, e.g. an expired login, look like "not found" too)
 function dc_exists {
   oc get dc "$1" -o name > /dev/null 2>&1
+}
+
+# print the configured replicas of a DeploymentConfig, nothing if it doesn't exist
+function dc_replicas {
+  oc get dc "$1" -o jsonpath='{.spec.replicas}' 2> /dev/null
 }
 
 function wait_dc {
@@ -35,6 +41,7 @@ function wait_dc {
     >&2 echo "ERROR: DeploymentConfig $service not found in project $(oc project -q)"
     return 1
   fi
+  # waits forever if oc stops answering, e.g. when the login expires
   while [ "$(oc get dc "$service" -o json | jq .status.availableReplicas)" != 1 ]; do
     if [ "$is_printed" == "false" ]; then
       echo "waiting $service to start"
