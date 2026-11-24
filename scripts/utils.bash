@@ -21,34 +21,48 @@ function get_domain {
   fi
 }
 
-# check if a DeploymentConfig exists, without printing the "NotFound" error
-# (other oc errors, e.g. an expired login, look like "not found" too)
+# Check if a DeploymentConfig exists. --ignore-not-found makes a missing DC a
+# silent success with empty output, so other oc errors (e.g. an expired login)
+# are still errors. Those exit the script, because the callers use these in an
+# "if" or a "$(...)", where "set -e" doesn't apply and the status would be lost.
 function dc_exists {
-  oc get dc "$1" -o name > /dev/null 2>&1
+  local name
+  name="$(oc get dc "$1" --ignore-not-found -o name)" || exit 1
+  [ -n "$name" ]
 }
 
-# print the configured replicas of a DeploymentConfig, nothing if it doesn't exist
-function dc_replicas {
-  oc get dc "$1" -o jsonpath='{.spec.replicas}' 2> /dev/null
+# check if a DeploymentConfig exists and is scaled to 1 replica, i.e. an
+# optional component is enabled in this project. A predicate like dc_exists and
+# not a function that prints the replicas, because "exit" in a "$(...)" would
+# only end the subshell and the script would go on after an oc error.
+function dc_enabled {
+  local replicas
+  replicas="$(oc get dc "$1" --ignore-not-found -o jsonpath='{.spec.replicas}')" || exit 1
+  [ "$replicas" == 1 ]
 }
 
 function wait_dc {
+  local replicas
   service="$1"
   is_printed="false"
-  # fail with a clear message instead of the confusing "[: !=: unary operator
-  # expected", which the empty jq output would cause below
+  # fail with a message that names the project, instead of oc's own NotFound
+  # error from the loop below
   if ! dc_exists "$service"; then
     >&2 echo "ERROR: DeploymentConfig $service not found in project $(oc project -q)"
     return 1
   fi
-  # waits forever if oc stops answering, e.g. when the login expires
-  while [ "$(oc get dc "$service" -o json | jq .status.availableReplicas)" != 1 ]; do
+  # stop if oc fails while polling (e.g. the login expires) instead of looping
+  # forever: an unquoted test used to end the loop with a syntax error, a quoted
+  # one would compare the empty output and never end
+  while true; do
+    replicas="$(oc get dc "$service" -o jsonpath='{.status.availableReplicas}')" || return 1
+    [ "$replicas" == 1 ] && break
     if [ "$is_printed" == "false" ]; then
       echo "waiting $service to start"
       is_printed="true"
     else
       echo -n "."
-    fi 
+    fi
     sleep 2
   done
   echo ""

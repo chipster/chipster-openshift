@@ -40,7 +40,7 @@ if dc_exists session-db-postgres; then
   psql session-db-postgres session_db_db 'alter system set synchronous_commit to off'
   oc rsh dc/session-db-postgres bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
 fi
-if [ "$(dc_replicas job-history-postgres)" == 1 ]; then
+if dc_enabled job-history-postgres; then
   psql job-history-postgres job_history_db 'alter system set synchronous_commit to off'
   oc rsh dc/job-history-postgres bash -c 'pg_ctl reload -D /var/lib/pgsql/data/userdata'
 fi
@@ -51,7 +51,7 @@ influxdb_admin_password="$(echo "$influxdb_secret" | jq '.data."admin-password"'
 influxdb_writer_password="$(echo "$influxdb_secret" | jq '.data."writer-password"' -r | base64 -d)"
 influxdb_reader_password="$(echo "$influxdb_secret" | jq '.data."reader-password"' -r | base64 -d)"
 
-if [ "$(dc_replicas influxdb)" == 1 ]; then
+if dc_enabled influxdb; then
   echo "wait until InfluxDB responds"
   until oc rsh dc/influxdb curl -s -f localhost:8086/ping > /dev/null 2>&1; do sleep 2; done
 
@@ -75,7 +75,7 @@ if [ "$(dc_replicas influxdb)" == 1 ]; then
   influxql "GRANT READ ON db TO reader"
 fi
 
-if [ "$(dc_replicas grafana)" == 1 ]; then
+if dc_enabled grafana; then
   grafana_password_file="../chipster-private/confs/chipster-all/grafana-admin-password"
   if [ ! -s "$grafana_password_file" ]; then
     echo "ERROR: $grafana_password_file is missing or empty, Grafana admin password not set" >&2
