@@ -1,5 +1,9 @@
 # Chipster in K3s Migration
 
+Some Chipster versions need extra steps when you update an existing server. The chapters below are
+in version order. Before updating, read the chapters of all versions that are newer than your
+current version, up to the version you are updating to.
+
 ## Update to v4.3
 
 Before version v4.3 users' files were stored on file-broker and there could be only one of them making it difficult to add more storage space. In v4.3 a new service component called `file-storage` was introduced. There can be one or more file-storages. The file-broker is now only a stateless proxy passing requests to correct file-storages. There can be any number of file-brokers now too.
@@ -79,7 +83,18 @@ sudo apt remove python2
 
 And then continue with the [Chipster update instructions](README.md#Updates).
 
-## Update to K3s v1.32.4
+## Update to v4.12.0 (PostgreSQL 14)
+
+The Chipster versions up to v4.11.1 used PostgreSQL 11, and PostgreSQL 14 is used since v4.12.0.
+Before updating from v4.11.1 or older, [update the PostgreSQL and migrate the data](https://github.com/chipster/chipster-openshift/blob/v4.19.5/k3s/update-postgres.md).
+
+## Update to v4.15.0 (K3s v1.32.4 and Ubuntu 24.04)
+
+The Chipster versions up to v4.14.2 used K3s v1.26.4 and Ubuntu 20.04. Since v4.15.0, K3s v1.32.4
+and Ubuntu 24.04 are used. Follow the [K3s instructions](#k3s-v1324) **before** updating to
+v4.15.0. You can update [Ubuntu](#ubuntu-2404) before or after updating Chipster.
+
+### K3s v1.32.4
 
 Since Chipster version v4.15.0, the Ansible playbook in the update instructions will update the K3s from version `v1.26.4` to `v1.32.4`. The new K3s will have different API version for the IngressRoute object. After K3s has been updated, Helm and kubectl cannot manage the old IngressRoute objects anymore.
 
@@ -93,7 +108,7 @@ This didn't delete the data on our test servers, but take the necessary precauti
 
 And then continue with the [Chipster update instructions](README.md#Updates).
 
-### Recovering from Failed K3s v1.32.4 Update
+#### Recovering from Failed K3s v1.32.4 Update
 
 If you didn't uninstall Chipster before upgrading K3s, you will get a error like this:
 
@@ -125,7 +140,7 @@ After this we were able to to deploy Chipster again:
 bash deploy -f values.yaml
 ```
 
-## Update to Ubuntu 24.04
+### Ubuntu 24.04
 
 The table of different Chipster versions and corresponding Ubuntu and K3s versions:
 
@@ -135,19 +150,19 @@ The table of different Chipster versions and corresponding Ubuntu and K3s versio
 | v4.14.0 - v4.14.2 | 20.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.26.4     |
 | >= v4.15.0        | 24.04              | 24.04                                       | 16.04, 20.04 or 24.04     | v1.32.4     |
 
-Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.15.0. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see previous chapter) and Ubuntu on the K3s host. The next two sections show you two options for doing it.
+Until Chipster version v4.13.15, the Chipster containers (except comp) were running Ubuntu 20.04. If you installed any version between v4.14.0 and v4.14.2, those containers were running Ubuntu 24.04, but the K3s host was still running older Ubuntu 20.04. We have now updated the [Chipster installation instructions](README.md) in Chipster version v4.15.0. Those now start also from Ubuntu 24.04 on the K3s host. If you are running a Chipster version v4.14.2 or older, you should update K3s (see the previous section) and Ubuntu on the K3s host. The next two sections show you two options for doing it.
 
 Analysis tools in `comp` containers run in Ubuntu 16.04, Ubuntu 20.04 or Ubuntu 24.04. That shouldn’t pose significant security risks, because comp is well protected behind other Chipster services.
 
 When a job is started, the comp gets an access token only for the session where it's run. The most important attack vectors for the comp are the input files and parameters, but the user who can change the parameters and input files, can already access all the data in the session anyway.
 
-### Option 1: Install New Server (recommended)
+#### Option 1: Install New Server (recommended)
 
 Our recommended option is to install a new server and make sure that all necessary data is moved before removing the old server. The tools-bin package wasn’t updated at this point, so you can reuse your possible local copies of the latest tools-bin package (tools-bin version chipster-4.9.0).
 
 The sessions from the old server can be moved either by following the [backup instructions](backup.md) or users can do it themselves by downloading the sessions to zip files from the old server and upload those to the new server.
 
-### Option 2: Update Existing Server
+#### Option 2: Update Existing Server
 
 We were able to update an old Chipster server, but this process is more risky for the data stored in Chipster. If the update fails for any reason, it may be difficult to copy the data from the broken server. This is also slower than the installation of new Chipster, at least excluding the download of the tools-bin package.
 
@@ -168,9 +183,7 @@ sudo do-release-upgrade
 
 And then continue with the [Chipster update instructions](README.md#Updates), if you didn't do that already.
 
-## Replace Bitnami image
-
-### Update to v4.18.0
+## Update to v4.18.0 (replace Bitnami image)
 
 Chipster has used Bitnami image to run its PostgreSQL databases until version v4.17.5. Unfortunately Bitnami has decided to stop providing this image after September 29th: https://hub.docker.com/r/bitnami/postgresql .
 
@@ -243,6 +256,12 @@ Until now Chipster used Bitnami Helm chart and container image to deploy the dat
 - The Bitnami image is replaced with the "Docker Official Image" PostgreSQL: https://hub.docker.com/_/postgres . This upstream image is copied to Chipster image repository and tagged like all other Chipster images. This ensures that the image stays available, even if the upstream renames it.
 - The Bitnami image always generated configuration files `postgresql.conf` and `pg_hba.conf`. The new image assumes that these files are found from the database volume. The StatefulSet above creates an `initContainer`, which creates these files if necessary.
 
+## Update to v4.20.1 (PostgreSQL 17)
+
+The Chipster versions up to v4.19.5 used PostgreSQL 14, and PostgreSQL 17 is used since v4.20.1.
+To update to v4.20.1, follow the [PostgreSQL migration instructions](update-postgres.md) instead of
+the usual update instructions.
+
 ## Update to v4.21.0
 
 The `bash-job-scheduler` ServiceAccount was bound to the built-in `edit` ClusterRole, which granted far more than the scheduler needs (read access to all Secrets, `pods/exec` into any pod, etc.). Since v4.21.0 it is bound to a minimal namespaced `Role` (`scheduler-role.yaml`) instead (GHSA-3j6x-m3jw-r5mg).
@@ -271,3 +290,139 @@ This is a one-time step; fresh installs are unaffected.
 Comp jobs process untrusted input files and parameters, so a NetworkPolicy now limits their connections to DNS, the Chipster services they need and the internet. Private networks and the cloud metadata service are blocked.
 
 If your jobs use an http proxy in a private network, allow it as shown in [Chipster behind proxy](behind-proxy.md). Otherwise the jobs can't access the internet after the update. Other hosts in private networks can be allowed in the same way, see `compJobNetworkPolicy` in [values.yaml](helm/chipster/values.yaml).
+
+## Update to v4.22.0
+
+### Database texts from large objects to text columns
+
+Until now the long texts in the databases (job screen outputs, session and dataset notes etc.) were
+stored as PostgreSQL large objects. Since v4.22.0 they are stored in ordinary text columns, which
+makes session-db much faster, especially when listing the jobs of a session. The services convert
+the data automatically when the new version starts for the first time:
+
+- session-db: the notes of sessions and datasets, and the screen output, source code, state
+  details and tool description of jobs
+- job-history: the screen output of jobs
+- auth: the codes of OIDC logins
+
+On most servers this takes only a moment and you can update as usual. Check the free disk space
+first. If the conversion takes too long or fails, see
+[Troubleshooting the conversion](#troubleshooting-the-conversion).
+
+If you have a large installation, consider practising the update on a copy of the databases
+first, to see how long the conversion takes, and read the troubleshooting chapter beforehand.
+
+Things to know before you start:
+- The services are not available until the conversion has finished. If it fails or is
+  interrupted, the database is left as it was and the conversion starts again when the service
+  restarts.
+- **You can't go back to an older Chipster version afterwards** without restoring the databases
+  from a backup taken before the update. Take [backups](backup.md) first.
+- The commands below are run on the K3s host in the `k3s` directory. Single quotes (`'`) are
+  important, so that your shell doesn't expand the variables, which are only defined in the
+  database container.
+
+#### 1. Check the free disk space
+
+The conversion writes the texts again, so make sure that the disk of each database has free space
+of at least the size of the database plus 1 GB for the transaction log.
+
+#### 2. Update
+
+Follow the usual [update instructions](README.md#updates). Then check that `session-db`,
+`job-history` and `auth` start:
+
+```bash
+kubectl get pod
+```
+
+If one of them keeps restarting, see
+[Troubleshooting the conversion](#troubleshooting-the-conversion).
+
+#### 3. Release the disk space
+
+The conversion leaves the old large objects on the disk. Remove them and give the space back to
+the operating system. Chipster can be used meanwhile.
+
+```bash
+for db in auth session-db job-history; do
+  kubectl exec statefulset/chipster-$db-postgresql -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD vacuumlo -U postgres -l 1000 $POSTGRES_DB'
+  kubectl exec statefulset/chipster-$db-postgresql -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres $POSTGRES_DB -c "VACUUM FULL pg_largeobject"'
+done
+```
+
+If you use Chipster's [built-in backup](backup-to-s3.md), it runs `vacuumlo` before each backup,
+so the first backup after the update takes longer, unless you have done this step already.
+
+#### Troubleshooting the conversion
+
+##### A service keeps restarting
+
+If `session-db`, `job-history` or `auth` keeps restarting (its `RESTARTS` count grows) and its
+log ends with a Flyway message about migrating to `Convert oid columns to text`, the conversion
+takes longer than the liveness probe allows. The services start to answer the probe only after
+the conversion, and Kubernetes restarts a service that doesn't answer for about a minute. Nothing
+is lost, because each interrupted conversion is rolled back, but it never finishes. If the log
+shows an error instead, see [The conversion fails](#the-conversion-fails). See the log of the
+previous restart for example with:
+
+```bash
+kubectl logs deployment/session-db --previous | grep -E 'Migrating|ERROR:'
+```
+
+In that case, restart the database pod of that service, because the database may still be
+running the interrupted conversion, and deploy again with a longer probe period (in seconds):
+
+```bash
+kubectl delete pod chipster-session-db-postgresql-0
+bash deploy.bash -f ~/values.yaml --set deploymentDefault.livenessProbe.periodSeconds=3600
+kubectl logs deployment/session-db -f
+```
+
+When the conversion has finished and the services are running, deploy again without the `--set`
+argument, to set the probe back to normal:
+
+```bash
+bash deploy.bash -f ~/values.yaml
+```
+
+##### The conversion fails
+
+The conversion stops, and the service doesn't start, if a text contains a NUL character or
+isn't valid UTF-8. Normally this doesn't happen. If it does, the log of the service shows
+an error like `invalid byte sequence for encoding "UTF8"`, and the database is left as it was.
+This lists the texts that can't be converted. It reads all the old texts, so on a large database
+it takes a while:
+
+```bash
+cat > lo-bad.sql <<'EOF'
+create function pg_temp.lo_bad(o oid) returns boolean language plpgsql as $$
+begin
+  if o is null or not exists (select 1 from pg_largeobject_metadata where oid = o) then
+    return false;
+  end if;
+  perform convert_from(lo_get(o), 'UTF8');
+  return false;
+exception when character_not_in_repertoire or untranslatable_character then
+  return true;
+end
+$$;
+EOF
+
+check() {
+  kubectl exec -i statefulset/chipster-$1-postgresql -- bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U postgres -v ON_ERROR_STOP=1 $POSTGRES_DB'
+}
+
+(cat lo-bad.sql; echo "
+select 'session' as type, sessionid as id from session where pg_temp.lo_bad(notes)
+union all select 'dataset', datasetid from dataset where pg_temp.lo_bad(notes)
+union all select 'job', jobid from job where pg_temp.lo_bad(screenoutput) or pg_temp.lo_bad(sourcecode)
+  or pg_temp.lo_bad(statedetail) or pg_temp.lo_bad(tooldescription);") | check session-db
+
+(cat lo-bad.sql; echo "select jobid from jobhistory where pg_temp.lo_bad(screenoutput);") | check job-history
+
+(cat lo-bad.sql; echo "select count(*) from oidcloginsession where pg_temp.lo_bad(code);") | check auth
+```
+
+Please let us know about the problem on the chipster-tech list. Until it has been solved, you can
+go back to the previous Chipster version, because the database wasn't changed.

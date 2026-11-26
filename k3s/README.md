@@ -169,15 +169,7 @@ TODO How to follow vulnerabilities in Ubuntu, Helm and K3s?
 
 #### Select Chipster version
 
-> 2024-10-08 Note! The Chipster versions up to v4.11.1 used PostgreSQL version 11 and PostgreSQL 14 is used since Chipster version v4.12.0. Please [update the PostgreSQL and migrate the data](https://github.com/chipster/chipster-openshift/blob/v4.19.5/k3s/update-postgres.md) before updating from v4.11.1 (or older) to v4.12.0.
-
-> 2025-05-12 Note! The Chipster versions up to `v4.14.2` used K3s version `v1.26.4` and Ubuntu `20.04`. Since Chipster version `v4.15.0`, K3s `v1.32.4` and Ubuntu `24.04` are used. Please follow [K3s instructions](migration.md#update-to-k3s-v1324) **before** updating to v4.15.0. You can update [Ubuntu](migration.md#update-to-ubuntu-2404) before or after updating Chipster.
-
-> 2025-09-18 Note! The Chipster versions up to `v4.17.5` used Bitnami container image for the databases. This was changed in `v4.18.0`. Please follow the few [extra update steps](migration.md#replace-bitnami-image).
-
-> TODO 2025-08-26 Note! The Chipster versions up to `v4.19.5` used PostgreSQL version 14 and PostgreSQL 17 is used since Chipster version `v4.20.1`. To update to `v4.20.1`, follow the [PostgreSQL migration instructions](update-postgres.md) instead.
-
-> 2026-09-25 Note! Earlier versions bound the `bash-job-scheduler` ServiceAccount to the cluster `edit` role. Since Chipster version `v4.21.0` it uses a minimal namespaced Role instead (GHSA-3j6x-m3jw-r5mg). `deploy.bash` migrates existing installations automatically. If you run `helm upgrade` by hand, follow the [scheduler RBAC step](migration.md#update-to-v4210) first, otherwise the upgrade fails on the immutable `roleRef`.
+> Note! Some Chipster versions need extra steps when you update an existing server. Before updating, read the [migration instructions](migration.md) of all versions that are newer than your current version, up to the version you are updating to.
 
 In the initial configuration Chipster did pull the latest container images, but setting a specific image version makes sure the deployment scripts and all your images are compatible with each other.
 
